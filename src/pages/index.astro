@@ -1,10 +1,18 @@
 ---
 import Layout from '../layouts/Layout.astro'
+import TopTitle from '../components/page/TopTitle.astro'
+import About from '../components/page/About.astro'
+import ImageCol from '../components/page/ImageCol.astro'
+import Contact from '../components/page/Contact.astro'
 ---
 
 <Layout>
   <div class="container">
     <main>
+      <TopTitle />
+      <About />
+      <ImageCol />
+      <Contact />
       <h2>Welcome!</h2>
       <p>Your astro-notion-blog deployed successfully!</p>
       <p>Have fun!</p>
@@ -14,13 +22,12 @@ import Layout from '../layouts/Layout.astro'
 
 <style>
   .container {
-    width: 640px;
     max-width: 100%;
     margin: 0 auto;
   }
 
   .container > main {
-    margin-bottom: 40px;
+    width: 100%;
   }
   .container div:last-child {
     margin-bottom: 0;
