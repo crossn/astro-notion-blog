@@ -20,6 +20,7 @@
     "@astrojs/react": "^2.1.0",
     "@astrojs/rss": "^2.0.0",
     "@notionhq/client": "^2.2.3",
+    "@react-spring/parallax": "^9.7.1",
     "@react-spring/web": "^9.7.1",
     "@supercharge/promise-pool": "^2.3.2",
     "@types/react": "^18.0.21",
