@@ -17,10 +17,12 @@
     "_fetch-notion-blocks": "node scripts/retrieve-block-children.cjs"
   },
   "dependencies": {
-    "@astrojs/react": "^1.2.2",
+    "@astrojs/react": "^2.1.0",
     "@astrojs/rss": "^2.0.0",
     "@notionhq/client": "^2.2.3",
     "@supercharge/promise-pool": "^2.3.2",
+    "@types/react": "^18.0.21",
+    "@types/react-dom": "^18.0.6",
     "astro": "^2.0.10",
     "katex": "^0.16.4",
     "mermaid": "^9.3.0",
@@ -30,8 +32,8 @@
     "metascraper-title": "^5.33.4",
     "node-fetch": "^3.3.0",
     "prismjs": "^1.29.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
   },
   "devDependencies": {
     "@nrwl/nx-cloud": "^15.0.2",
