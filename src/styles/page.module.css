@@ -52,7 +52,12 @@
   height: 300px;
   background-color: #dfdddd;
   width: 40%;
+  padding: 0;
 }
+.sectionContainer > .image > img {
+  max-width: 100%;
+}
+
 .sectionContainer > .text {
   width: 60%;
   text-align: left;
