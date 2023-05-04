@@ -1,6 +1,7 @@
 ---
 import { PUBLIC_SITE_TITLE } from '../../server-constants.ts'
 import backimage from '/page/tsukurun-zukei.svg'
+
 import styles from '../../styles/page.module.css'
 ---
 
@@ -15,20 +16,8 @@ import styles from '../../styles/page.module.css'
     </h2>
     <p>Aesthetic Cocumentarian</p>
   </div>
-  <div className={styles.buttonSection}>
-    <div className={styles.buttonFlex}>
-      <div>
-        <span>Work</span>
-      </div>
-    </div>
-  </div>
-
-  <div className={styles.hr}></div>
-  <div class="dotLine">
-    <span> &nbsp;</span>
-    <span>#work</span>
-    <span> &nbsp;</span>
-  </div>
+  
+  
 </div>
 
 <style>
@@ -46,25 +35,5 @@ import styles from '../../styles/page.module.css'
     font-weight: 400;
   }
 
-  .dotLine {
-    background-color: rgba(31, 33, 49, 0.3);
-    font-size: 0.75rem;
-    height: 1.375rem;
-    line-height: 1.375rem;
-    width: 100%;
-    position: relative;
-    display: flex;
-    padding: 0 0.6rem;
-    color: #e6eb2f;
-  }
-  .dotLine span:nth-child(odd) {
-    border-top: dashed 2px;
-    height: inherit;
-    flex-grow: 1;
-    position: relative;
-    top: calc(50% - 1px);
-  }
-  .dotLine span:nth-child(2) {
-    padding: 0 0.6rem;
-  }
+  
 </style>
