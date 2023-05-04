@@ -45,12 +45,12 @@
   justify-content: center;
 }
 .sectionContainer > div {
-  padding: 4rem 4rem;
+  padding: 4rem 4rem 0;
   border-radius: calc(0.5rem - 1px);
 }
 .sectionContainer > .image {
-  height: 300px;
-  background-color: #dfdddd;
+  /* height: 300px; */
+  /* background-color: #dfdddd; */
   width: 40%;
   padding: 0;
 }
