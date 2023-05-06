@@ -20,6 +20,7 @@
     "@astrojs/react": "^2.1.0",
     "@astrojs/rss": "^2.0.0",
     "@notionhq/client": "^2.2.3",
+    "@react-spring/parallax": "^9.7.2",
     "@supercharge/promise-pool": "^2.3.2",
     "@types/react": "^18.0.21",
     "@types/react-dom": "^18.0.6",
@@ -34,7 +35,7 @@
     "prismjs": "^1.29.0",
     "react": "^18.0.0",
     "react-dom": "^18.2.0",
-    "react-spring": "8.0.27"
+    "react-spring": "^9.7.1"
   },
   "devDependencies": {
     "@nrwl/nx-cloud": "^15.0.2",
