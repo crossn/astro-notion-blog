@@ -1,0 +1,53 @@
+.animation,
+.animation_layer {
+  height: 1000px;
+}
+
+.animation {
+  display: block;
+  position: relative;
+  z-index: 10;
+}
+
+.animation_layer {
+  background-position: bottom center;
+  /* background-size: auto 1038px; */
+  background-repeat: no-repeat;
+  width: 100%;
+  position: absolute;
+}
+.animation_layer.parallax {
+  position: fixed;
+  background-repeat: repeat-x;
+  background-position: center center;
+}
+
+#artback {
+  background-image: url(../../home/backdesk02.png);
+  background-size: contain;
+}
+
+#jungle1 {
+  background-image: url(../../home/block01.png);
+  background-size: contain;
+}
+
+#jungle2 {
+  background-image: url(../../home/block02.png);
+  background-size: contain;
+}
+
+#jungle3 {
+  background-image: url(../../home/block03.png);
+  background-size: contain;
+}
+
+#jungle4 {
+  background-image: url(../../home/block04.png);
+  background-size: contain;
+}
+
+#jungle5 {
+  background-image: url(../../home/block05.png);
+  background-size: contain;
+}
