@@ -1,3 +1,8 @@
+import Tmg from '/home/tmg-fb.png';
+import Palette from '/home/palette.png';
+import Saiban from '/home/saiban02.png';
+import Dammy from '/home/tegaki-note02.jpg';
+
 import styles from '../../styles/page.module.css';
 
 function ContentBlock03() {
@@ -53,42 +58,41 @@ function ContentBlock03() {
           &nbsp;
         </span>
       </div>
+
       <div className={styles.sectionContainer}>
         <div className={styles.sectionContainer}>
-          <div
+          <img
+            src={Tmg}
             style={{
-              height: '300px',
-              backgroundColor: '#dfdddd',
-              width: '40%',
-            }}
-          ></div>
-          <div
-            style={{
-              height: '300px',
-              backgroundColor: '#dfdddd',
               width: '40%',
               marginLeft: '20px',
             }}
-          ></div>
+          ></img>
+          <img
+            src={Palette}
+            style={{
+              width: '40%',
+              marginLeft: '20px',
+            }}
+          ></img>
         </div>
       </div>
       <div className={styles.sectionContainer}>
         <div className={styles.sectionContainer}>
-          <div
+          <img
+            src={Saiban}
             style={{
-              height: '300px',
-              backgroundColor: '#dfdddd',
-              width: '40%',
-            }}
-          ></div>
-          <div
-            style={{
-              height: '300px',
-              backgroundColor: '#dfdddd',
               width: '40%',
               marginLeft: '20px',
             }}
-          ></div>
+          ></img>
+          <img
+            src={Dammy}
+            style={{
+              width: '40%',
+              marginLeft: '20px',
+            }}
+          ></img>
         </div>
       </div>
     </div>
