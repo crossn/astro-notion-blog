@@ -20,7 +20,7 @@ function ContentBlock() {
             fontWeight: 'bold',
           }}
         >
-          PUBLIC_SITE_TITLE
+          tsukurun
         </h2>
         <p
           style={{
@@ -29,7 +29,7 @@ function ContentBlock() {
             fontWeight: '400',
           }}
         >
-          Aesthetic Cocumentarian
+          Notion template
         </p>
       </div>
     </div>
