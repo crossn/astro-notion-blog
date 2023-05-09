@@ -38,12 +38,6 @@ function MyCompoPalla() {
             }}
           ></img>
         </ParallaxLayer>
-
-        <ParallaxLayer
-          offset={2.0}
-          speed={1}
-          style={{ backgroundColor: '#87BCDE', opacity: '0.1' }}
-        />
         <ParallaxLayer
           offset={3.0}
           speed={1}
@@ -54,7 +48,11 @@ function MyCompoPalla() {
           speed={1}
           style={{ backgroundColor: '#87BCDE', opacity: '0.1' }}
         />
-
+        <ParallaxLayer
+          offset={5.5}
+          speed={1}
+          style={{ backgroundColor: '#cf72ab', opacity: '0.1' }}
+        />
         <ParallaxLayer offset={0} speed={0.1} style={{ display: 'flex' }}>
           <img
             src={Jungle01}
@@ -111,7 +109,7 @@ function MyCompoPalla() {
           ></img>
         </ParallaxLayer>
 
-        <ParallaxLayer offset={1.5} speed={0.5} id="textblock">
+        <ParallaxLayer offset={0.6} speed={0.1} id="textblock">
           <ContentBlock />
         </ParallaxLayer>
 
@@ -179,7 +177,7 @@ function MyCompoPalla() {
           <ContentBlock03 />
         </ParallaxLayer>
 
-        <ParallaxLayer offset={4} speed={0.5} id="textblock">
+        <ParallaxLayer offset={4.5} speed={0.5} id="textblock">
           <ContentBlock04 />
         </ParallaxLayer>
 
@@ -205,7 +203,7 @@ function MyCompoPalla() {
             }}
           ></img>
         </ParallaxLayer>
-        <ParallaxLayer offset={4} speed={0.2} style={{ display: 'flex' }}>
+        <ParallaxLayer offset={4} speed={0.3} style={{ display: 'flex' }}>
           <img
             src={Jungle03}
             className="animation_layer parallax"
@@ -216,7 +214,7 @@ function MyCompoPalla() {
             }}
           ></img>
         </ParallaxLayer>
-        <ParallaxLayer offset={4} speed={-0.4} style={{ display: 'flex' }}>
+        <ParallaxLayer offset={4} speed={-0.2} style={{ display: 'flex' }}>
           <img
             src={Jungle04}
             className="animation_layer parallax"
@@ -227,7 +225,7 @@ function MyCompoPalla() {
             }}
           ></img>
         </ParallaxLayer>
-        <ParallaxLayer offset={4} speed={0.5} style={{ display: 'flex' }}>
+        <ParallaxLayer offset={4} speed={0.1} style={{ display: 'flex' }}>
           <img
             src={Jungle05}
             className="animation_layer parallax"

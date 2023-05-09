@@ -7,7 +7,10 @@ function ContentBlock02() {
     <div style={{ textAlign: 'center' }}>
       <div className={styles.sectionContainer}>
         <div className={styles.sectionContainer}>
-          <div className={styles.text}>
+          <div
+            className={styles.text}
+            style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}
+          >
             <h3>挫折を経験したからこそ</h3>
             <p>
               Notionは学習コストが高く、何でもできるが故に何から始めればいいのかが分からず、一度挫折を経験しています。
@@ -35,10 +38,15 @@ function ContentBlock02() {
       </div>
       <div className={styles.sectionContainer}>
         <div className={styles.sectionContainer}>
-          <div className={styles.image}>
+          <div className={styles.image} style={{ marginRight: '20px' }}>
             <img src={Mainichi} />
           </div>
-          <div className={styles.text}>
+          <div
+            className={styles.text}
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.5)',
+            }}
+          >
             <p>
               <h3>今はできなくても...</h3>
               <br />
