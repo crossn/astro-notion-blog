@@ -236,6 +236,19 @@ function MyCompoPalla() {
             }}
           ></img>
         </ParallaxLayer>
+        <ParallaxLayer
+          offset={5.3}
+          speed={0.1}
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            fontSize: '2em',
+            color: '#666',
+          }}
+        >
+          <span>astro-notion-blog</span>
+        </ParallaxLayer>
       </Parallax>
     </div>
   );
