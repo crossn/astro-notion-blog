@@ -173,14 +173,6 @@ function MyCompoPalla() {
           <ContentBlock02 />
         </ParallaxLayer>
 
-        <ParallaxLayer offset={3} speed={0.5} id="textblock">
-          <ContentBlock03 />
-        </ParallaxLayer>
-
-        <ParallaxLayer offset={4.5} speed={0.5} id="textblock">
-          <ContentBlock04 />
-        </ParallaxLayer>
-
         <ParallaxLayer offset={4} speed={0.1} style={{ display: 'flex' }}>
           <img
             src={Jungle01}
@@ -248,6 +240,15 @@ function MyCompoPalla() {
           }}
         >
           <span>astro-notion-blog</span>
+        </ParallaxLayer>
+
+        {/* 最上部にレイヤー置く */}
+        <ParallaxLayer offset={3} speed={0.5} id="textblock">
+          <ContentBlock03 />
+        </ParallaxLayer>
+
+        <ParallaxLayer offset={4.5} speed={0.5} id="textblock">
+          <ContentBlock04 />
         </ParallaxLayer>
       </Parallax>
     </div>
