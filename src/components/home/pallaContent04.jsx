@@ -11,7 +11,15 @@ function ContentBlock04() {
               maxWidth: '100%',
             }}
           >
-            <span>Contact</span>
+            <span>
+              <a
+                href="https://twitter.com/crossma64"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Contact
+              </a>
+            </span>
           </div>
         </div>
       </div>
