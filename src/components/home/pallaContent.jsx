@@ -20,7 +20,7 @@ function ContentBlock() {
             fontWeight: 'bold',
           }}
         >
-          tsukurun
+          Notion Template
         </h2>
         <p
           style={{

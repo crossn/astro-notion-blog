@@ -61,38 +61,51 @@ function ContentBlock03() {
 
       <div className={styles.sectionContainer}>
         <div className={styles.sectionContainer}>
-          <img
-            src={Tmg}
-            style={{
-              width: '40%',
-              marginLeft: '20px',
-            }}
-          ></img>
-          <img
-            src={Palette}
-            style={{
-              width: '40%',
-              marginLeft: '20px',
-            }}
-          ></img>
+          <a
+            href="https://suzuri.jp/crossn/digital_products/4871"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ flexBasis: '40%', padding: '1%' }}
+          >
+            <img src={Tmg} style={{ width: '100%', objectFit: 'cover' }}></img>
+          </a>
+          <a
+            href="https://suzuri.jp/crossn/digital_products/7685"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ flexBasis: '40%', padding: '1%' }}
+          >
+            <img
+              src={Palette}
+              style={{ width: '100%', objectFit: 'cover' }}
+            ></img>
+          </a>
         </div>
       </div>
       <div className={styles.sectionContainer}>
         <div className={styles.sectionContainer}>
-          <img
-            src={Saiban}
-            style={{
-              width: '40%',
-              marginLeft: '20px',
-            }}
-          ></img>
-          <img
-            src={Dammy}
-            style={{
-              width: '40%',
-              marginLeft: '20px',
-            }}
-          ></img>
+          <a
+            href="https://suzuri.jp/crossn/digital_products/7686"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ flexBasis: '40%', padding: '1%' }}
+          >
+            <img
+              src={Saiban}
+              style={{ width: '100%', objectFit: 'cover' }}
+            ></img>
+          </a>
+          <a
+            href=""
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ flexBasis: '40%', padding: '1%' }}
+          >
+            <img
+              src={Dammy}
+              style={{ width: '100%', objectFit: 'cover' }}
+            ></img>
+          </a>
         </div>
       </div>
     </div>
