@@ -8,14 +8,15 @@ import MyCompoPalla from '../components/home/MyCompoPalla'
 ---
 
 <Layout>
-  <div class="container">
+  <div class="container" style={{ position: 'relative', zIndex: 2 }}>
     <main>
-      <MyCompoPalla client:only />
       <h2>Welcome!</h2>
       <p>Your astro-notion-blog deployed successfully!</p>
       <p>Have fun!</p>
     </main>
   </div>
+
+  <MyCompoPalla style={{ position: 'relative', zIndex: 1 }} client:only />
 </Layout>
 
 <style>
