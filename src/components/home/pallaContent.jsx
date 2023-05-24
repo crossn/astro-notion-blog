@@ -1,4 +1,3 @@
-import styles from '../../styles/page.module.css';
 // import { PUBLIC_SITE_TITLE } from '../../server-constants';
 
 function ContentBlock() {
