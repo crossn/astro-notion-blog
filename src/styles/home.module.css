@@ -64,6 +64,18 @@
   text-align: left;
 }
 
+@media (max-width: 600px) {
+  .sectionContainer {
+    display: block;
+    width: 100%;
+  }
+  .sectionContainer > .image,
+  .sectionContainer > .text,
+  .sectionContainer > a {
+    width: 100%;
+  }
+}
+
 /* 以下親para */
 .animation,
 .animation_layer {
