@@ -1,6 +1,6 @@
 import Cross from '/home/cross.png';
 import Mainichi from '/home/mainichi.png';
-import styles from '../../styles/page.module.css';
+import styles from '../../styles/home.module.css';
 
 function ContentBlock02() {
   return (

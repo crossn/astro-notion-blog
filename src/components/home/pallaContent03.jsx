@@ -3,7 +3,7 @@ import Palette from '/home/palette.png';
 import Saiban from '/home/saiban02.png';
 import Dammy from '/home/tegaki-note02.jpg';
 
-import styles from '../../styles/page.module.css';
+import styles from '../../styles/home.module.css';
 
 function ContentBlock03() {
   return (
