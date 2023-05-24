@@ -1,3 +1,70 @@
+.buttonSection {
+  position: relative;
+  width: auto;
+  max-width: 100%;
+}
+.buttonFlex {
+  gap: 0;
+  flex-flow: row wrap;
+}
+.buttonFlex > div {
+  max-width: 100%;
+}
+.buttonFlex span {
+  border-radius: 0.5rem;
+  border: 1px solid rgba(61, 61, 61, 0.21);
+  display: inline-block;
+  width: 10rem;
+  height: 3.5rem;
+  font-size: 1em;
+  font-weight: 400;
+  line-height: calc(3.5rem - 2px);
+  padding: 0px 0.5rem;
+  vertical-align: middle;
+}
+.hr {
+  border: 0px;
+  padding: 0px;
+  position: relative;
+  width: 100%;
+}
+.hr::before {
+  height: 8rem;
+  border-left: 1px solid rgba(61, 61, 61, 0.12);
+  width: 1px;
+  content: '';
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+.sectionContainer {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+.sectionContainer > div {
+  padding: 4rem 4rem 0;
+  border-radius: calc(0.5rem - 1px);
+}
+.sectionContainer > .image {
+  /* height: 300px; */
+  /* background-color: #dfdddd; */
+  width: 40%;
+  padding: 0;
+}
+
+.sectionContainer > .image > img {
+  max-width: 100%;
+}
+
+.sectionContainer > .text {
+  width: 60%;
+  text-align: left;
+}
+
+/* 以下親para */
 .animation,
 .animation_layer {
   height: 1000px;
@@ -20,4 +87,34 @@
   position: fixed;
   background-repeat: repeat-x;
   background-position: center center;
+}
+
+#artback {
+  background-image: url(../images/page/backdesk02.png);
+  background-size: contain;
+}
+
+#jungle1 {
+  background-image: url(../images/page/block01.png);
+  background-size: contain;
+}
+
+#jungle2 {
+  background-image: url(../images/page/block02.png);
+  background-size: contain;
+}
+
+#jungle3 {
+  background-image: url(../images/page/block03.png);
+  background-size: contain;
+}
+
+#jungle4 {
+  background-image: url(../images/page/block04.png);
+  background-size: contain;
+}
+
+#jungle5 {
+  background-image: url(../images/page/block05.png);
+  background-size: contain;
 }
