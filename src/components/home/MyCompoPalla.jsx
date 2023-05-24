@@ -34,7 +34,8 @@ function MyCompoPalla() {
             className="animation_layer parallax"
             style={{
               width: '100%',
-              height: 'auto',
+              height: '100%',
+              objectFit: 'contain',
             }}
           ></img>
         </ParallaxLayer>
