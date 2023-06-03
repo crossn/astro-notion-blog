@@ -48,7 +48,7 @@
   padding: 4rem 4rem 0;
   border-radius: calc(0.5rem - 1px);
 }
-.sectionContainer > .image,
+.image,
 .icon {
   /* height: 300px; */
   /* background-color: #dfdddd; */
@@ -59,7 +59,7 @@
 .iconResponsive {
   display: none;
 }
-.sectionContainer > .image > img {
+.image > img {
   max-width: 100%;
 }
 .icon > img {
@@ -67,7 +67,7 @@
   height: auto;
 }
 
-.sectionContainer > .text {
+.text {
   width: 60%;
   text-align: left;
 }
@@ -79,13 +79,13 @@
   .sectionContainer > div {
     padding: 0 4rem 0;
   }
-  .sectionContainer > .image,
-  .sectionContainer > .text {
+  .image,
+  .text {
     margin: 4rem 0;
     padding: 0;
   }
-  .sectionContainer > .image,
-  .sectionContainer > .text,
+  .image,
+  .text,
   .sectionContainer > a {
     width: 100%;
   }
