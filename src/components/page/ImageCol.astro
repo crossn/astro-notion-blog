@@ -5,22 +5,66 @@ import styles from '../../styles/page.module.css'
 <div style="text-align: center; margin:100px 0">
   <div className={styles.sectionContainer}>
     <div className={styles.sectionContainer}>
-      <div className={styles.image}>
-        <img src="../../page/tmg-fb.png" />
+      <div class="image">
+        <a
+          href="https://suzuri.jp/crossn/digital_products/4871"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <img src="../../page/tmg-fb.png" />
+        </a>
       </div>
-      <div className={styles.image} style="margin-left:20px;">
-        <img src="../../page/palette.png" />
+      <div class="image">
+        <a
+          href="https://suzuri.jp/crossn/digital_products/7685"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <img src="../../page/palette.png" />
+        </a>
       </div>
     </div>
   </div>
   <div className={styles.sectionContainer}>
     <div className={styles.sectionContainer}>
-      <div className={styles.image}>
-        <img src="../../page/saiban02.png" />
+      <div class="image">
+        <a
+          href="https://suzuri.jp/crossn/digital_products/7686"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <img src="../../page/saiban02.png" />
+        </a>
       </div>
-      <div className={styles.image} style="margin-left:20px;">
+      <div class="image">
         <img src="../../page/tegaki-note02.jpg" />
       </div>
     </div>
   </div>
 </div>
+
+<style>
+  a {
+    flex-basis: 40%;
+    padding: 1%;
+  }
+  img {
+    width: 100%;
+    object-fit: cover;
+  }
+  .image {
+    width: 40%;
+    padding: 0 !important;
+    margin-left: 20px;
+  }
+  .image > img {
+    max-width: 100%;
+  }
+  @media (max-width: 800px) {
+    .image {
+      margin: 0 0 4rem;
+
+      width: 100%;
+    }
+  }
+</style>
