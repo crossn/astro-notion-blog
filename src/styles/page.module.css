@@ -72,18 +72,30 @@
   text-align: left;
   background-color: rgba(255, 255, 255, 0.5);
 }
+@media (max-width: 600px) {
+  .iconResponsive {
+    max-width: 100%;
+  }
+}
+
 @media (max-width: 800px) {
   .sectionContainer {
     display: block;
     width: 100%;
   }
   .sectionContainer > div {
-    padding: 0 4rem 0;
+    padding: 0 2rem 0;
   }
-  .image,
-  .text {
-    margin: 4rem 0;
+
+  .image {
+    margin: 0 !important;
     padding: 0;
+  }
+
+  .text {
+    margin: 0 0 4rem;
+    padding: 4rem 2rem !important;
+    position: relative;
   }
   .image,
   .text,
@@ -92,10 +104,16 @@
   }
   .iconResponsive {
     display: block;
-    margin: 0;
+    margin: 0 0 0 auto;
+    width: 50%;
+    position: relative;
+    top: 4rem;
+    right: -3rem;
+    z-index: 1;
+    padding: 0 !important;
   }
   .iconResponsive > img {
-    max-width: 100%;
+    max-width: 65%;
     height: auto;
   }
   .icon {
