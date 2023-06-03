@@ -1,8 +1,87 @@
 ---
 import Layout from '../layouts/Layout.astro'
 import MyCompoPalla from '../components/home/MyCompoPalla'
+import TopTitle from '../components/page/TopTitle.astro'
+import About from '../components/page/About.astro'
+import ImageCol from '../components/page/ImageCol.astro'
+import Contact from '../components/page/Contact.astro'
+import styles from '../styles/page.module.css'
 ---
 
-<Layout>
+<!-- <Layout>
   <MyCompoPalla style={{ position: 'relative', zIndex: 1 }} client:only />
+</Layout> -->
+<Layout>
+  <div class="container">
+    <main>
+      <TopTitle />
+      <About />
+      <div style="text-align: center; margin:100px 0 0">
+        <div className={styles.buttonSection}>
+          <div className={styles.buttonFlex}>
+            <div>
+              <span>Work</span>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.hr}></div>
+      </div>
+
+      <div class="dotLine">
+        <span> &nbsp;</span>
+        <span>#work</span>
+        <span> &nbsp;</span>
+      </div>
+
+      <ImageCol />
+      <Contact />
+    </main>
+  </div>
 </Layout>
+
+<style>
+  .container {
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .container > main {
+    width: 100%;
+  }
+  .container div:last-child {
+    margin-bottom: 0;
+  }
+
+  .container h2 {
+    margin: 0 0 14px;
+    font-size: 1.4rem;
+    font-weight: 400;
+  }
+
+  .container p {
+    margin: 0.3rem auto;
+    line-height: 2rem;
+  }
+  .dotLine {
+    background-color: rgba(31, 33, 49, 0.3);
+    font-size: 0.75rem;
+    height: 1.375rem;
+    line-height: 1.375rem;
+    width: 100%;
+    position: relative;
+    display: flex;
+    padding: 0 0.6rem;
+    color: #e6eb2f;
+  }
+  .dotLine span:nth-child(odd) {
+    border-top: dashed 2px;
+    height: inherit;
+    flex-grow: 1;
+    position: relative;
+    top: calc(50% - 1px);
+  }
+  .dotLine span:nth-child(2) {
+    padding: 0 0.6rem;
+  }
+</style>

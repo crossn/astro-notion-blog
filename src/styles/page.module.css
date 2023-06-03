@@ -48,19 +48,58 @@
   padding: 4rem 4rem 0;
   border-radius: calc(0.5rem - 1px);
 }
-.sectionContainer > .image {
+.sectionContainer > .image,
+.icon {
   /* height: 300px; */
   /* background-color: #dfdddd; */
   width: 40%;
-  padding: 0;
+  padding: 0 !important;
+  margin-left: 20px;
+}
+.iconResponsive {
+  display: none;
 }
 .sectionContainer > .image > img {
   max-width: 100%;
+}
+.icon > img {
+  max-width: 100%;
+  height: auto;
 }
 
 .sectionContainer > .text {
   width: 60%;
   text-align: left;
+}
+@media (max-width: 800px) {
+  .sectionContainer {
+    display: block;
+    width: 100%;
+  }
+  .sectionContainer > div {
+    padding: 0 4rem 0;
+  }
+  .sectionContainer > .image,
+  .sectionContainer > .text {
+    margin: 4rem 0;
+    padding: 0;
+  }
+  .sectionContainer > .image,
+  .sectionContainer > .text,
+  .sectionContainer > a {
+    width: 100%;
+  }
+  .iconResponsive {
+    display: block;
+    margin: 0;
+  }
+  .iconResponsive > img {
+    max-width: 100%;
+    height: auto;
+  }
+  .icon {
+    display: none;
+  }
 }
 
 /* 以下親para */
