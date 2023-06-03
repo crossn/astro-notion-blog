@@ -1,7 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro'
 import MyCompoPalla from '../components/home/MyCompoPalla'
-import TopTitle from '../components/page/TopTitle.astro'
+// import TopTitle from '../components/page/TopTitle.astro'
 import About from '../components/page/About.astro'
 import ImageCol from '../components/page/ImageCol.astro'
 import Contact from '../components/page/Contact.astro'
@@ -12,9 +12,10 @@ import styles from '../styles/page.module.css'
   <MyCompoPalla style={{ position: 'relative', zIndex: 1 }} client:only />
 </Layout> -->
 <Layout>
-  <div class="container">
+  <MyCompoPalla style={{ position: 'relative', zIndex: 1 }} client:only />
+  <div class="container" style={{ position: 'relative', zIndex: 1 }}>
     <main>
-      <TopTitle />
+      <!-- <TopTitle /> -->
       <About />
       <div style="text-align: center; margin:100px 0 0">
         <div className={styles.buttonSection}>
