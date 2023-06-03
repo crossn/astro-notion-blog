@@ -240,7 +240,7 @@ function MyCompoPalla() {
             color: '#666',
           }}
         >
-          <span>astro-notion-blog</span>
+          {/* <span>astro-notion-blog</span> */}
         </ParallaxLayer>
 
         {/* 最上部にレイヤー置く */}
