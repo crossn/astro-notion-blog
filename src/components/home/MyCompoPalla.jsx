@@ -54,7 +54,7 @@ function MyCompoPalla() {
           speed={1}
           style={{ backgroundColor: '#cf72ab', opacity: '0.1' }}
         />
-        <ParallaxLayer offset={0} speed={0.1} style={{ display: 'flex' }}>
+        <ParallaxLayer offset={0.5} speed={0.1} style={{ display: 'flex' }}>
           <img
             src={Jungle01}
             className="animation_layer parallax"
@@ -65,7 +65,7 @@ function MyCompoPalla() {
             }}
           ></img>
         </ParallaxLayer>
-        <ParallaxLayer offset={0} speed={-0.2} style={{ display: 'flex' }}>
+        <ParallaxLayer offset={0.5} speed={-0.2} style={{ display: 'flex' }}>
           <img
             src={Jungle02}
             className="animation_layer parallax"
@@ -76,7 +76,7 @@ function MyCompoPalla() {
             }}
           ></img>
         </ParallaxLayer>
-        <ParallaxLayer offset={0} speed={0.1} style={{ display: 'flex' }}>
+        <ParallaxLayer offset={0.5} speed={0.1} style={{ display: 'flex' }}>
           <img
             src={Jungle03}
             className="animation_layer parallax"
@@ -87,7 +87,7 @@ function MyCompoPalla() {
             }}
           ></img>
         </ParallaxLayer>
-        <ParallaxLayer offset={0} speed={-0.2} style={{ display: 'flex' }}>
+        <ParallaxLayer offset={0.5} speed={-0.2} style={{ display: 'flex' }}>
           <img
             src={Jungle04}
             className="animation_layer parallax"
@@ -98,7 +98,7 @@ function MyCompoPalla() {
             }}
           ></img>
         </ParallaxLayer>
-        <ParallaxLayer offset={0} speed={0.3} style={{ display: 'flex' }}>
+        <ParallaxLayer offset={0.5} speed={0.3} style={{ display: 'flex' }}>
           <img
             src={Jungle05}
             className="animation_layer parallax"
