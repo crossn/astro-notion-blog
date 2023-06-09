@@ -28,6 +28,11 @@ function MyCompoPalla() {
         style={{ top: '0', left: '0', background: '#f2edde' }}
         className="animation"
       >
+        <ParallaxLayer
+          offset={0.8}
+          speed={1}
+          style={{ backgroundColor: '#87BCDE', opacity: '0.1' }}
+        />
         <ParallaxLayer offset={1} speed={1} style={{ display: 'flex' }}>
           <img
             src={Artback}
@@ -54,7 +59,7 @@ function MyCompoPalla() {
           speed={1}
           style={{ backgroundColor: '#cf72ab', opacity: '0.1' }}
         />
-        <ParallaxLayer offset={0.5} speed={0.1} style={{ display: 'flex' }}>
+        {/* <ParallaxLayer offset={0.5} speed={0.1} style={{ display: 'flex' }}>
           <img
             src={Jungle01}
             className="animation_layer parallax"
@@ -108,7 +113,7 @@ function MyCompoPalla() {
               objectFit: 'contain',
             }}
           ></img>
-        </ParallaxLayer>
+        </ParallaxLayer> */}
 
         <ParallaxLayer offset={0.6} speed={0.1} id="textblock">
           {/* <ContentBlock /> */}
