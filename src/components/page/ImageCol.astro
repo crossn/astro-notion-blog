@@ -51,11 +51,20 @@ import styles from '../../styles/page.module.css'
   img {
     width: 100%;
     object-fit: cover;
+    border-radius: 10px;
+    display: block;
+    transition: transform 0.3s ease-out;
+    transform: translateZ(0);
   }
   .image {
     width: 40%;
     padding: 0 !important;
     margin-left: 20px;
+    overflow: hidden;
+    border-radius: 12px;
+  }
+  .image:hover img {
+    transform: scale(1.2);
   }
   .image > img {
     max-width: 100%;
