@@ -3,6 +3,11 @@
   "type": "module",
   "version": "0.3.0",
   "private": true,
+  "packageManager": "npm@10.8.2",
+  "engines": {
+    "node": "22.16.0",
+    "npm": ">=10 <11"
+  },
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
@@ -17,14 +22,14 @@
     "_fetch-notion-blocks": "node scripts/retrieve-block-children.cjs"
   },
   "dependencies": {
-    "@astrojs/react": "^2.1.0",
-    "@astrojs/rss": "^2.0.0",
+    "@astrojs/react": "^3.2.0",
+    "@astrojs/rss": "^3.0.0",
     "@notionhq/client": "^2.2.3",
     "@react-spring/parallax": "^9.7.2",
     "@supercharge/promise-pool": "^2.3.2",
     "@types/react": "^18.0.21",
     "@types/react-dom": "^18.0.6",
-    "astro": "^2.0.10",
+    "astro": "^3.6.5",
     "katex": "^0.16.4",
     "mermaid": "^9.3.0",
     "metascraper": "^5.33.4",

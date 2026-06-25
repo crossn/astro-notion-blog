@@ -1,88 +1,435 @@
 ---
 import Layout from '../layouts/Layout.astro'
-import MyCompoPalla from '../components/home/MyCompoPalla'
-import TopTitle from '../components/page/TopTitle.astro'
-import About from '../components/page/About.astro'
-import ImageCol from '../components/page/ImageCol.astro'
-import Contact from '../components/page/Contact.astro'
-import styles from '../styles/page.module.css'
+
+const shopUrl = 'https://suzuri.jp/crossn/digital_products'
+
+const products = [
+  {
+    title: 'Themes / Goal Management',
+    eyebrow: '目標管理',
+    description:
+      'やりたいことを、日々の行動へほどいていくNotionテンプレート。迷子になりがちな目標を、見返せる形に整えます。',
+    image: '/page/tmg-fb.png',
+    href: 'https://suzuri.jp/crossn/digital_products/4871',
+  },
+  {
+    title: 'Themes / Goal Management Lite',
+    eyebrow: '目標管理 Lite',
+    description:
+      'Goal Managementの考え方を、より軽く始められる形にしたLite版。まず小さく整えたい人向けです。',
+    image: '/templates/themes-goal-management-lite.png',
+    href: shopUrl,
+  },
+  {
+    title: 'Spark Brain OS Pro',
+    eyebrow: 'Brain OS',
+    description:
+      'アイデア、メモ、タスク、振り返りをひとつの流れで扱うためのNotion OS。深く使い込みたい人向けです。',
+    image: '/templates/spark-brain-os-pro.png',
+    href: shopUrl,
+  },
+  {
+    title: 'Spark Brain OS Lite',
+    eyebrow: 'Brain OS Lite',
+    description:
+      'Spark Brain OSの入口として、思考やメモを散らかしすぎず集めていくための軽量版です。',
+    image: '/templates/spark-brain-os-lite.png',
+    href: shopUrl,
+  },
+  {
+    title: 'Font Chooser',
+    eyebrow: 'Notion Tools',
+    description:
+      'Notionページの雰囲気づくりに使えるフォント選びの補助ツール。見た目を整える小さな相棒です。',
+    image: '/templates/font-chooser.png',
+    href: shopUrl,
+  },
+  {
+    title: 'Color Palette',
+    eyebrow: 'Notion Tools',
+    description:
+      'Notionページづくりの色選びを助けるパレット。整える時間そのものが少し楽しくなる道具です。',
+    image: '/page/palette.png',
+    href: 'https://suzuri.jp/crossn/digital_products/7685',
+  },
+]
 ---
 
-<!-- <Layout>
-  <MyCompoPalla style={{ position: 'relative', zIndex: 1 }} client:only />
-</Layout> -->
-<Layout>
-  <MyCompoPalla style={{ position: 'relative', zIndex: 1 }} client:only />
-  <div class="container" style={{ position: 'relative', zIndex: 1 }}>
-    <main>
-      <TopTitle />
-      <About />
-      <div style="text-align: center; margin:100px 0 0">
-        <div className={styles.buttonSection}>
-          <div className={styles.buttonFlex}>
-            <div>
-              <span>Work</span>
-            </div>
-          </div>
+<Layout
+  title="Notion templates for making things your own"
+  description="tukurun-Labは、Notionテンプレートと小さな仕組みづくりを通して、自分らしく楽しめる毎日を少しずつつくる場所です。"
+  path="/"
+>
+  <main class="home">
+    <section class="hero">
+      <div class="heroCopy">
+        <p class="label">tukurun-Lab / Notion templates</p>
+        <h1>毎日に、<br class="mobileBreak" />自分らしさを少しずつ。</h1>
+        <p class="lead">
+          Notionを完璧に使いこなすことより、毎日ちょっとでも自分らしく、楽しくいられる形を見つけたい。
+          tukurun-Labは、そんな小さな試行錯誤から生まれたテンプレートと道具を置いていく場所です。
+        </p>
+        <div class="actions">
+          <a class="primaryAction" href="#templates">テンプレートを見る</a>
+          <a class="secondaryAction" href="/blog">Blogを読む</a>
         </div>
-
-        <div className={styles.hr}></div>
       </div>
 
-      <div class="dotLine">
-        <span> &nbsp;</span>
-        <span>#work</span>
-        <span> &nbsp;</span>
+      <div class="heroVisual" aria-label="tukurun-Lab visual mood">
+        <img src="/home/banner.png" alt="tukurun-Lab banner" />
+      </div>
+    </section>
+
+    <section class="intro" aria-labelledby="intro-title">
+      <p class="sectionLabel">About</p>
+      <h2 id="intro-title">少しずつ触れて、<br class="mobileBreak" />自分に合う形を見つけていく。</h2>
+      <div class="introGrid">
+        <p>
+          Notionは自由度が高いぶん、最初はどこから触ればいいのか迷いやすいツールです。
+          私自身も、わからないことを調べたり、試したり、しばらく離れたりしながら、
+          メモやToDoのような身近なところから少しずつ触れ直してきました。
+        </p>
+        <p>
+          ここで大切にしたいのは、決まった正解を押しつけることではなく、自分に合うやり方を見つけること。
+          やりたいこと、できること、調べながら試したことを形にして、
+          「自分でもつくれそう」と思える入口を少しずつ増やしていきます。
+        </p>
+      </div>
+    </section>
+
+    <section class="products" id="templates" aria-labelledby="templates-title">
+      <div class="sectionHeading">
+        <p class="sectionLabel">Templates</p>
+        <h2 id="templates-title">いま公開しているテンプレート。</h2>
+        <p>
+          目標管理、思考整理、ページづくりの見た目を整えるためのNotionテンプレートと小さなツールです。
+          詳細や購入はSUZURIの販売ページで確認できます。
+        </p>
       </div>
 
-      <ImageCol />
-      <Contact />
-    </main>
-  </div>
+      <div class="productGrid">
+        {
+          products.map((product) => (
+            <article class="productCard">
+              <a href={product.href} target="_blank" rel="noopener noreferrer">
+                <div class="productImage">
+                  <img src={product.image} alt="" loading="lazy" />
+                </div>
+                <div>
+                  <p>{product.eyebrow}</p>
+                  <h3>{product.title}</h3>
+                  <span>{product.description}</span>
+                </div>
+              </a>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="contact" aria-label="links">
+      <p>制作メモや使い方は、Blogにも少しずつ残していきます。</p>
+      <div>
+        <a href="/blog">Blog</a>
+        <a href="https://suzuri.jp/crossn" target="_blank" rel="noopener noreferrer">
+          SUZURI
+        </a>
+        <a
+          href="https://www.linkedin.com/in/cross-tsukurun-lab/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          LinkedIn
+        </a>
+        <a href="https://twitter.com/crossma64" target="_blank" rel="noopener noreferrer">
+          X
+        </a>
+      </div>
+    </section>
+  </main>
 </Layout>
 
 <style>
-  .container {
-    max-width: 100%;
+  .home {
+    color: #232323;
+  }
+
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(320px, 1.05fr);
+    gap: clamp(2rem, 6vw, 5rem);
+    align-items: center;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: clamp(3rem, 8vw, 7rem) 0 clamp(4rem, 8vw, 7rem);
+  }
+
+  .heroCopy {
+    position: relative;
+    z-index: 1;
+  }
+
+  .label,
+  .sectionLabel {
+    margin: 0 0 1rem;
+    color: #7c6cf2;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .hero h1 {
+    max-width: 13.5em;
+    margin: 0;
+    font-size: clamp(2.2rem, 4.8vw, 4.6rem);
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+  }
+
+  .mobileBreak {
+    display: none;
+  }
+
+  .lead {
+    max-width: 36rem;
+    margin: 1.6rem 0 0;
+    color: #4d4a57;
+    font-size: clamp(1rem, 2vw, 1.15rem);
+    line-height: 2;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-top: 2rem;
+  }
+
+  .primaryAction,
+  .secondaryAction,
+  .contact a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+    border-radius: 999px;
+    padding: 0.75rem 1.25rem;
+    font-weight: 700;
+  }
+
+  .primaryAction {
+    background: #232323;
+    color: #fff;
+    box-shadow: 0 16px 40px rgba(35, 35, 35, 0.18);
+  }
+
+  .primaryAction:hover {
+    color: #fff;
+    transform: translateY(-1px);
+  }
+
+  .secondaryAction,
+  .contact a {
+    border: 1px solid rgba(35, 35, 35, 0.12);
+    background: rgba(255, 255, 255, 0.72);
+    color: #232323;
+  }
+
+  .heroVisual {
+    position: relative;
+  }
+
+  .heroVisual::before {
+    position: absolute;
+    inset: -8%;
+    z-index: -1;
+    border-radius: 40% 60% 52% 48%;
+    background:
+      radial-gradient(circle at 22% 28%, rgba(248, 221, 94, 0.65), transparent 34%),
+      radial-gradient(circle at 75% 25%, rgba(124, 108, 242, 0.32), transparent 32%),
+      radial-gradient(circle at 58% 80%, rgba(133, 221, 176, 0.42), transparent 36%);
+    content: '';
+    filter: blur(4px);
+  }
+
+  .heroVisual img {
+    display: block;
+    width: 100%;
+    border: 1px solid rgba(35, 35, 35, 0.08);
+    border-radius: 2rem;
+    box-shadow: 0 30px 80px rgba(64, 53, 112, 0.2);
+  }
+
+  .intro,
+  .products,
+  .contact {
+    max-width: 1180px;
     margin: 0 auto;
   }
 
-  .container > main {
-    width: 100%;
-  }
-  .container div:last-child {
-    margin-bottom: 0;
-  }
-
-  .container h2 {
-    margin: 0 0 14px;
-    font-size: 1.4rem;
-    font-weight: 400;
+  .intro {
+    border-radius: 2rem;
+    padding: clamp(2rem, 5vw, 4rem);
+    background: #f7f3ea;
   }
 
-  .container p {
-    margin: 0.3rem auto;
-    line-height: 2rem;
+  .intro h2,
+  .sectionHeading h2 {
+    max-width: 48rem;
+    margin: 0;
+    font-size: clamp(1.55rem, 3vw, 2.7rem);
+    line-height: 1.28;
+    letter-spacing: -0.04em;
   }
-  .dotLine {
-    background-color: rgba(31, 33, 49, 0.3);
-    font-size: 0.75rem;
-    height: 1.375rem;
-    line-height: 1.375rem;
-    width: 100%;
-    position: relative;
+
+  .introGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(1.5rem, 4vw, 3rem);
+    margin-top: 2rem;
+  }
+
+  .introGrid p,
+  .sectionHeading p,
+  .contact p {
+    color: #55505c;
+    line-height: 2;
+  }
+
+  .products {
+    padding: clamp(4rem, 9vw, 7rem) 0;
+  }
+
+  .sectionHeading {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(280px, 0.7fr);
+    gap: clamp(1.5rem, 5vw, 4rem);
+    align-items: end;
+    margin-bottom: 2rem;
+  }
+
+  .sectionHeading p:last-child {
+    margin: 0;
+  }
+
+  .productGrid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .productCard a {
     display: flex;
-    padding: 0 0.6rem;
-    color: #e6eb2f;
+    min-height: 100%;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid rgba(35, 35, 35, 0.08);
+    border-radius: 1.5rem;
+    background: #fff;
+    color: inherit;
+    box-shadow: 0 20px 60px rgba(64, 53, 112, 0.08);
+    transition:
+      box-shadow 0.25s ease,
+      transform 0.25s ease;
   }
-  .dotLine span:nth-child(odd) {
-    border-top: dashed 2px;
-    height: inherit;
-    flex-grow: 1;
-    position: relative;
-    top: calc(50% - 1px);
+
+  .productCard a:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 26px 70px rgba(64, 53, 112, 0.14);
   }
-  .dotLine span:nth-child(2) {
-    padding: 0 0.6rem;
+
+  .productImage {
+    display: grid;
+    aspect-ratio: 16 / 11;
+    place-items: center;
+    padding: clamp(0.9rem, 3vw, 1.4rem);
+    background:
+      radial-gradient(circle at 20% 20%, rgba(248, 221, 94, 0.38), transparent 34%),
+      radial-gradient(circle at 80% 12%, rgba(124, 108, 242, 0.18), transparent 32%),
+      linear-gradient(135deg, #fbfaf7, #f1f5ff);
+  }
+
+  .productImage img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 14px 24px rgba(64, 53, 112, 0.12));
+  }
+
+  .productCard div:not(.productImage) {
+    padding: 1.25rem;
+  }
+
+  .productCard p {
+    margin: 0 0 0.5rem;
+    color: #7c6cf2;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .productCard h3 {
+    margin: 0 0 0.75rem;
+    font-size: 1.15rem;
+    line-height: 1.35;
+  }
+
+  .productCard span {
+    color: #5d5864;
+    line-height: 1.8;
+  }
+
+  .contact {
+    border-radius: 2rem;
+    margin-bottom: 4rem;
+    padding: clamp(2rem, 5vw, 3rem);
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.42)),
+      #eaf7ef;
+    text-align: center;
+  }
+
+  .contact p {
+    margin: 0 auto 1.4rem;
+  }
+
+  .contact div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    justify-content: center;
+  }
+
+  @media (max-width: 900px) {
+    .hero,
+    .sectionHeading {
+      grid-template-columns: 1fr;
+    }
+
+    .productGrid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 720px) {
+    .mobileBreak {
+      display: initial;
+    }
+
+    .hero {
+      padding-top: 2.4rem;
+    }
+
+    .introGrid,
+    .productGrid {
+      grid-template-columns: 1fr;
+    }
+
+    .heroVisual img,
+    .intro,
+    .contact {
+      border-radius: 1.4rem;
+    }
   }
 </style>

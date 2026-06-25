@@ -56,7 +56,15 @@ const client = new Client({
 
 let cache: Post[] | null = null
 
+const isNotionConfigured = (): boolean =>
+  NOTION_API_SECRET.trim().length > 0 && DATABASE_ID.trim().length > 0
+
 export async function getAllPosts(): Promise<Post[]> {
+  if (!isNotionConfigured()) {
+    cache = []
+    return cache
+  }
+
   if (cache !== null) {
     return Promise.resolve(cache)
   }

@@ -2,10 +2,11 @@ import { defineConfig } from 'astro/config';
 import { CUSTOM_DOMAIN, BASE_PATH } from './src/server-constants';
 import FeaturedImageDownloader from './src/integrations/featured-image-downloader';
 import PublicNotionCopier from './src/integrations/public-notion-copier';
-import react from "@astrojs/react";
+import react from '@astrojs/react';
+
 const getSite = function () {
   if (!process.env.CF_PAGES) {
-    return new URL(BASE_PATH, 'http://localhost:3000').toString();
+    return new URL(BASE_PATH, 'http://localhost:4321').toString();
   }
   if (process.env.CF_PAGES_BRANCH !== 'main') {
     return new URL(BASE_PATH, process.env.CF_PAGES_URL).toString();
@@ -17,10 +18,12 @@ const getSite = function () {
 };
 
 // https://astro.build/config
-
-// https://astro.build/config
 export default defineConfig({
   site: getSite(),
   base: BASE_PATH,
-  integrations: [FeaturedImageDownloader(), PublicNotionCopier(), react()]
+  scopedStyleStrategy: 'where',
+  build: {
+    inlineStylesheets: 'never',
+  },
+  integrations: [FeaturedImageDownloader(), PublicNotionCopier(), react()],
 });

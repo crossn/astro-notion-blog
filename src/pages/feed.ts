@@ -3,7 +3,7 @@ import { PUBLIC_SITE_TITLE, PUBLIC_SITE_DESCRIPTION } from '../server-constants'
 import { getAllPosts } from '../lib/notion/client'
 import { getPostLink } from '../lib/blog-helpers'
 
-export async function get() {
+export async function GET() {
   const posts = await getAllPosts()
 
   return rss({
