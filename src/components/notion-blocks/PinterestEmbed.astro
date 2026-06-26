@@ -1,0 +1,22 @@
+---
+export interface Props {
+  url: URL
+}
+
+const { url } = Astro.props
+---
+
+<div class="pinterest-wrapper">
+  <a href={url.toString()} data-pin-do="embedPin"></a>
+</div>
+
+<script is:inline async defer src="https://assets.pinterest.com/js/pinit.js"></script>
+
+<style>
+  .pinterest-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin: 1.5rem 0;
+  }
+</style>

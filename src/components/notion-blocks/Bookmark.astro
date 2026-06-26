@@ -1,5 +1,7 @@
 ---
 import * as interfaces from '../../lib/interfaces.ts'
+import { isGitHubURL } from '../../lib/blog-helpers.ts'
+import GitHubLinkPreview from './GitHubLinkPreview.astro'
 
 export interface Props {
   block: interfaces.Block
@@ -19,27 +21,30 @@ try {
 ---
 
 {
-  url && (
-    <div class="bookmark">
-      <a href={url.toString()} target="_blank" rel="noopener noreferrer">
-        <div>
-          <div>{url.hostname}</div>
-          <div>{url.toString()}</div>
+  url &&
+    (block.LinkPreview && isGitHubURL(url) ? (
+      <GitHubLinkPreview url={url} />
+    ) : (
+      <div class="bookmark">
+        <a href={url.toString()} target="_blank" rel="noopener noreferrer">
           <div>
+            <div>{url.hostname}</div>
+            <div>{url.toString()}</div>
             <div>
-              <img
-                src={`https://www.google.com/s2/favicons?domain=${url.hostname}`}
-                alt=""
-                loading="lazy"
-                decoding="async"
-              />
+              <div>
+                <img
+                  src={'https://www.google.com/s2/favicons?domain=' + url.hostname}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <div>{url.origin}</div>
             </div>
-            <div>{url.origin}</div>
           </div>
-        </div>
-      </a>
-    </div>
-  )
+        </a>
+      </div>
+    ))
 }
 
 <style>

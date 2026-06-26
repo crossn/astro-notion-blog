@@ -1,6 +1,6 @@
 ---
 import * as interfaces from '../lib/interfaces.ts'
-import { isTweetURL, buildURLToHTMLMap } from '../lib/blog-helpers.ts'
+
 import Paragraph from './notion-blocks/Paragraph.astro'
 import Heading1 from './notion-blocks/Heading1.astro'
 import Heading2 from './notion-blocks/Heading2.astro'
@@ -90,24 +90,7 @@ if (isRoot) {
   )
 }
 
-const bookmarkURLs = blocks
-  .filter((b: interfaces.Block) =>
-    ['bookmark', 'link_preview', 'embed'].includes(b.Type)
-  )
-  .map((b: interfaces.Block) => {
-    const urlString = (b.Bookmark || b.LinkPreview || b.Embed).Url
-
-    let url: URL
-    try {
-      url = new URL(urlString)
-    } catch (err) {
-      console.log(err)
-    }
-    return url
-  })
-  .filter((url: URL) => url && !isTweetURL(url))
-
-const bookmarkURLMap = await buildURLToHTMLMap(bookmarkURLs)
+const bookmarkURLMap: { [key: string]: string } = {}
 ---
 
 {

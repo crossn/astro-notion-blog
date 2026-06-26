@@ -1,0 +1,23 @@
+---
+export interface Props {
+  url: URL
+}
+
+const { url } = Astro.props
+const embedScriptSrc =
+  'https://emgithub.com/embed-v2.js?target=' +
+  encodeURIComponent(url.toString()) +
+  '&style=github&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showFullPath=on&showCopy=on'
+---
+
+<div class="github-link-preview-wrapper">
+  <script is:inline src={embedScriptSrc}></script>
+</div>
+
+<style>
+  .github-link-preview-wrapper {
+    width: 100%;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+  }
+</style>

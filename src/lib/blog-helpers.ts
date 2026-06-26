@@ -12,7 +12,7 @@ import { pathJoin } from './utils'
 
 export const filePath = (url: URL): string => {
   const [dir, filename] = url.pathname.split('/').slice(-2)
-  return `/notion/${dir}/${filename}`
+  return pathJoin(BASE_PATH, `/notion/${dir}/${filename}`)
 }
 
 export const extractTargetBlocks = (
@@ -176,7 +176,65 @@ export const buildHeadingId = (heading: Heading1 | Heading2 | Heading3) => {
 }
 
 export const isTweetURL = (url: URL): boolean => {
-  return /https:\/\/twitter.com\/[^/]+\/status\/[\d]+/.test(url.toString())
+  if (
+    url.hostname !== 'twitter.com' &&
+    url.hostname !== 'www.twitter.com' &&
+    url.hostname !== 'x.com' &&
+    url.hostname !== 'www.x.com'
+  ) {
+    return false
+  }
+  return /\/[^/]+\/status\/[\d]+/.test(url.pathname)
+}
+
+export const isTikTokURL = (url: URL): boolean => {
+  if (url.hostname !== 'tiktok.com' && url.hostname !== 'www.tiktok.com') {
+    return false
+  }
+  return /\/[^/]+\/video\/[\d]+/.test(url.pathname)
+}
+
+export const isInstagramURL = (url: URL): boolean => {
+  if (
+    url.hostname !== 'instagram.com' &&
+    url.hostname !== 'www.instagram.com'
+  ) {
+    return false
+  }
+  return /\/(p|reel|tv)\/[^/]+/.test(url.pathname)
+}
+
+export const isPinterestURL = (url: URL): boolean => {
+  if (
+    url.hostname !== 'pinterest.com' &&
+    url.hostname !== 'www.pinterest.com' &&
+    url.hostname !== 'pinterest.jp' &&
+    url.hostname !== 'www.pinterest.jp'
+  ) {
+    return false
+  }
+  return /\/pin\/[\d]+/.test(url.pathname)
+}
+
+export const isCodePenURL = (url: URL): boolean => {
+  if (url.hostname !== 'codepen.io' && url.hostname !== 'www.codepen.io') {
+    return false
+  }
+  return /\/[^/]+\/pen\/[^/]+/.test(url.pathname)
+}
+
+export const isGitHubURL = (url: URL): boolean => {
+  if (url.hostname !== 'github.com' && url.hostname !== 'www.github.com') {
+    return false
+  }
+  return /\/[^/]+\/[^/]+\/blob\/[^/]+\/.+/.test(url.pathname)
+}
+
+export const isCircuitSimulatorAppletURL = (url: URL): boolean => {
+  if (url.hostname !== 'falstad.com' && url.hostname !== 'www.falstad.com') {
+    return false
+  }
+  return url.pathname === '/circuit/circuitjs.html'
 }
 
 export const isYouTubeURL = (url: URL): boolean => {

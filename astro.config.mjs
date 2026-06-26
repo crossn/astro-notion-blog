@@ -2,7 +2,6 @@ import { defineConfig } from 'astro/config';
 import { CUSTOM_DOMAIN, BASE_PATH } from './src/server-constants';
 import FeaturedImageDownloader from './src/integrations/featured-image-downloader';
 import PublicNotionCopier from './src/integrations/public-notion-copier';
-import react from '@astrojs/react';
 
 const getSite = function () {
   if (!process.env.CF_PAGES) {
@@ -25,5 +24,5 @@ export default defineConfig({
   build: {
     inlineStylesheets: 'never',
   },
-  integrations: [FeaturedImageDownloader(), PublicNotionCopier(), react()],
+  integrations: [FeaturedImageDownloader(), PublicNotionCopier()],
 });

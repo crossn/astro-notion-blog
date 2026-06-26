@@ -1,0 +1,37 @@
+---
+export interface Props {
+  url: URL
+}
+
+const { url } = Astro.props
+---
+
+<div class="instagram-wrapper">
+  <blockquote
+    class="instagram-media"
+    data-instgrm-captioned
+    data-instgrm-permalink={url.toString()}
+    data-instgrm-version="14"
+  >
+    <a href={url.toString()} target="_blank" rel="noopener noreferrer">
+      View this post on Instagram
+    </a>
+  </blockquote>
+</div>
+
+<script is:inline async src="https://www.instagram.com/embed.js"></script>
+
+<style>
+  .instagram-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin: 1.5rem 0;
+  }
+
+  .instagram-media {
+    min-width: 326px;
+    max-width: 540px;
+    width: 100%;
+  }
+</style>
