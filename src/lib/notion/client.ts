@@ -1,7 +1,7 @@
 import fs, { createWriteStream } from 'node:fs'
 import { pipeline } from 'node:stream'
 import { promisify } from 'node:util'
-import fetch, { Response, AbortError } from 'node-fetch'
+import fetch, { AbortError } from 'node-fetch'
 import {
   NOTION_API_SECRET,
   DATABASE_ID,

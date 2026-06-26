@@ -73,7 +73,7 @@ await Promise.all(
         let url!: URL
         try {
           url = new URL((block.Image || block.File).File.Url)
-        } catch (err) {
+        } catch {
           console.log('Invalid file URL')
           return Promise.reject()
         }
