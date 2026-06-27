@@ -1,0 +1,232 @@
+---
+export interface TableOfContentsItem {
+  id: string
+  text: string
+  level: 1 | 2 | 3
+}
+
+export interface Props {
+  items: TableOfContentsItem[]
+}
+
+const { items } = Astro.props
+---
+
+{
+  items.length > 0 && (
+    <nav class="blog-toc" aria-label="記事の目次">
+      <p class="blog-toc__title">目次</p>
+      <ol class="blog-toc__list">
+        {items.map((item) => (
+          <li class={`blog-toc__item blog-toc__item--level-${item.level}`}>
+            <a
+              class="blog-toc__link"
+              href={`#${item.id}`}
+              data-heading-id={item.id}
+            >
+              <span class="blog-toc__marker" aria-hidden="true" />
+              <span class="blog-toc__text">{item.text}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  )
+}
+
+<script is:inline data-astro-rerun>
+  (() => {
+    const links = Array.from(document.querySelectorAll('.blog-toc__link'))
+    if (!links.length) return
+
+    const sections = links
+      .map((link) => {
+        const id = link.getAttribute('data-heading-id')
+        if (!id) return null
+        const target = document.getElementById(id)
+        if (!target) return null
+        return { link, target }
+      })
+      .filter(Boolean)
+
+    if (!sections.length) return
+
+    const setActive = (activeLink) => {
+      links.forEach((link) => {
+        link.classList.toggle('is-active', link === activeLink)
+        if (link === activeLink) {
+          link.setAttribute('aria-current', 'location')
+        } else {
+          link.removeAttribute('aria-current')
+        }
+      })
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleEntries = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
+
+        if (!visibleEntries.length) return
+
+        const active = sections.find(
+          (section) => section.target === visibleEntries[0].target
+        )
+
+        if (active) setActive(active.link)
+      },
+      {
+        rootMargin: '-18% 0px -72% 0px',
+        threshold: [0, 1],
+      }
+    )
+
+    sections.forEach((section) => observer.observe(section.target))
+    setActive(sections[0].link)
+  })()
+</script>
+
+<style>
+  .blog-toc {
+    position: relative;
+    width: 100%;
+    color: #6b6478;
+  }
+
+  .blog-toc__title {
+    margin: 0 0 0.7rem;
+    color: #3f394d;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+  }
+
+  .blog-toc__list {
+    position: relative;
+    display: grid;
+    gap: 0.15rem;
+    margin: 0;
+    padding: 0.2rem 0 0.2rem 0.1rem;
+    list-style: none;
+  }
+
+  .blog-toc__list::before {
+    content: '';
+    position: absolute;
+    top: 0.35rem;
+    bottom: 0.35rem;
+    left: 0.42rem;
+    width: 1px;
+    border-radius: 999px;
+    background: rgba(124, 108, 242, 0.18);
+  }
+
+  .blog-toc__item {
+    min-width: 0;
+  }
+
+  .blog-toc__item--level-2 {
+    padding-left: 0.85rem;
+  }
+
+  .blog-toc__item--level-3 {
+    padding-left: 1.55rem;
+  }
+
+  .blog-toc__link {
+    position: relative;
+    display: grid;
+    grid-template-columns: 0.85rem minmax(0, 1fr);
+    gap: 0.45rem;
+    align-items: start;
+    min-height: 1.55rem;
+    border-radius: 999px;
+    color: inherit;
+    text-decoration: none;
+    transition:
+      color 160ms ease,
+      background-color 160ms ease;
+  }
+
+  .blog-toc__link:hover,
+  .blog-toc__link:focus-visible,
+  .blog-toc__link.is-active {
+    color: #4f43c7;
+  }
+
+  .blog-toc__marker {
+    position: relative;
+    z-index: 1;
+    width: 0.45rem;
+    height: 0.45rem;
+    margin: 0.48rem auto 0;
+    border: 1px solid rgba(124, 108, 242, 0.35);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.92);
+    transition:
+      border-color 160ms ease,
+      background-color 160ms ease,
+      transform 160ms ease;
+  }
+
+  .blog-toc__link:hover .blog-toc__marker,
+  .blog-toc__link:focus-visible .blog-toc__marker,
+  .blog-toc__link.is-active .blog-toc__marker {
+    border-color: rgba(124, 108, 242, 0.9);
+    background: #7c6cf2;
+    transform: scale(1.18);
+  }
+
+  .blog-toc__text {
+    overflow: hidden;
+    padding: 0.18rem 0.35rem 0.18rem 0;
+    font-size: 0.84rem;
+    line-height: 1.45;
+    text-overflow: ellipsis;
+  }
+
+  @media (max-width: 1180px) {
+    .blog-toc {
+      width: 2.8rem;
+      padding: 0.6rem 0;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: 0 16px 36px rgba(76, 60, 120, 0.08);
+      transition:
+        width 180ms ease,
+        padding 180ms ease,
+        border-radius 180ms ease;
+    }
+
+    .blog-toc:hover,
+    .blog-toc:focus-within {
+      width: min(17rem, calc(100vw - 2rem));
+      padding: 0.9rem 0.95rem;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.96);
+    }
+
+    .blog-toc__title,
+    .blog-toc__text {
+      opacity: 0;
+      transition: opacity 140ms ease;
+    }
+
+    .blog-toc:hover .blog-toc__title,
+    .blog-toc:focus-within .blog-toc__title,
+    .blog-toc:hover .blog-toc__text,
+    .blog-toc:focus-within .blog-toc__text {
+      opacity: 1;
+    }
+
+    .blog-toc__title {
+      width: max-content;
+      margin-left: 0.1rem;
+    }
+
+    .blog-toc__list {
+      padding-left: 0.15rem;
+    }
+  }
+</style>

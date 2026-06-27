@@ -15,6 +15,7 @@ import {
   getPostLink,
   filePath,
   extractTargetBlocks,
+  buildHeadingId,
 } from '../../lib/blog-helpers.ts'
 import Layout from '../../layouts/Layout.astro'
 import PostDate from '../../components/PostDate.astro'
@@ -24,6 +25,7 @@ import PostBody from '../../components/PostBody.astro'
 import PostRelativeLink from '../../components/PostRelativeLink.astro'
 import BlogPostsLink from '../../components/BlogPostsLink.astro'
 import BlogTagsLink from '../../components/BlogTagsLink.astro'
+import BlogTableOfContents from '../../components/BlogTableOfContents.astro'
 import styles from '../../styles/blog.module.css'
 
 export async function getStaticPaths() {
@@ -87,6 +89,58 @@ const currentPostIndex = allPosts.findIndex((post) => post.Slug === slug)
 const prevPost = allPosts[currentPostIndex + 1]
 const nextPost = allPosts[currentPostIndex - 1]
 
+type TableOfContentsItem = {
+  id: string
+  text: string
+  level: 1 | 2 | 3
+}
+
+const collectHeadingItems = (
+  targetBlocks: interfaces.Block[]
+): TableOfContentsItem[] => {
+  return targetBlocks.flatMap((block) => {
+    const heading = block.Heading1 || block.Heading2 || block.Heading3
+    const children =
+      block.Heading1?.Children ||
+      block.Heading2?.Children ||
+      block.Heading3?.Children ||
+      block.Paragraph?.Children ||
+      block.Quote?.Children ||
+      block.Callout?.Children ||
+      block.SyncedBlock?.Children ||
+      block.Toggle?.Children ||
+      []
+
+    const childItems = collectHeadingItems(children)
+
+    if (!heading) {
+      return childItems
+    }
+
+    const text = heading.RichTexts.map((richText) => richText.PlainText)
+      .join('')
+      .trim()
+
+    if (!text) {
+      return childItems
+    }
+
+    const level =
+      block.Type === 'heading_1' ? 1 : block.Type === 'heading_2' ? 2 : 3
+
+    return [
+      {
+        id: buildHeadingId(heading),
+        text,
+        level,
+      },
+      ...childItems,
+    ]
+  })
+}
+
+const tocItems = collectHeadingItems(blocks)
+
 let ogImage = ''
 if (post.FeaturedImage && post.FeaturedImage.Url) {
   ogImage = new URL(filePath(new URL(post.FeaturedImage.Url)), Astro.site)
@@ -99,8 +153,24 @@ if (post.FeaturedImage && post.FeaturedImage.Url) {
   path={getPostLink(post.Slug)}
   ogImage={ogImage}
 >
-  <div class={styles.container}>
-    <main>
+  <div
+    class={`${styles.container} ${
+      tocItems.length > 0 ? styles.withToc : styles.withoutToc
+    }`}
+  >
+    <aside class={styles.sidebar}>
+      <BlogPostsLink
+        heading="同じカテゴリの記事"
+        posts={postsHavingSameTag.filter(
+          (p: interfaces.Post) => p.Slug !== post.Slug
+        )}
+      />
+      <BlogPostsLink heading="おすすめ" posts={rankedPosts} />
+      <BlogPostsLink heading="新着記事" posts={recentPosts} />
+      <BlogTagsLink heading="カテゴリ" tags={tags} />
+    </aside>
+
+    <main class={styles.article}>
       <div class={styles.post}>
         <PostDate post={post} />
         <PostTags post={post} />
@@ -114,16 +184,12 @@ if (post.FeaturedImage && post.FeaturedImage.Url) {
       </div>
     </main>
 
-    <aside>
-      <BlogPostsLink
-        heading="同じカテゴリの記事"
-        posts={postsHavingSameTag.filter(
-          (p: interfaces.Post) => p.Slug !== post.Slug
-        )}
-      />
-      <BlogPostsLink heading="おすすめ" posts={rankedPosts} />
-      <BlogPostsLink heading="新着記事" posts={recentPosts} />
-      <BlogTagsLink heading="カテゴリ" tags={tags} />
-    </aside>
+    {
+      tocItems.length > 0 && (
+        <aside class={styles.tocSidebar}>
+          <BlogTableOfContents items={tocItems} />
+        </aside>
+      )
+    }
   </div>
 </Layout>
