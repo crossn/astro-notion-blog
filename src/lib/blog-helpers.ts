@@ -237,6 +237,23 @@ export const isCircuitSimulatorAppletURL = (url: URL): boolean => {
   return url.pathname === '/circuit/circuitjs.html'
 }
 
+export const isShortAmazonURL = (url: URL): boolean => {
+  return url.hostname === 'amzn.to' || url.hostname === 'www.amzn.to'
+}
+
+export const isFullAmazonURL = (url: URL): boolean => {
+  return [
+    'amazon.com',
+    'www.amazon.com',
+    'amazon.co.jp',
+    'www.amazon.co.jp',
+  ].includes(url.hostname)
+}
+
+export const isAmazonURL = (url: URL): boolean => {
+  return isShortAmazonURL(url) || isFullAmazonURL(url)
+}
+
 export const isYouTubeURL = (url: URL): boolean => {
   if (['www.youtube.com', 'youtube.com', 'youtu.be'].includes(url.hostname)) {
     return true

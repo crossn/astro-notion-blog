@@ -17,7 +17,23 @@ const userUrl = 'https://www.tiktok.com/' + user + '?refer=embed'
   </blockquote>
 </div>
 
-<script is:inline async src="https://www.tiktok.com/embed.js"></script>
+<script is:inline data-astro-rerun>
+  ;(() => {
+    const renderTikTokEmbeds = () => {
+      document.querySelectorAll('script[data-tiktok-embed]').forEach((script) => {
+        script.remove()
+      })
+
+      const script = document.createElement('script')
+      script.async = true
+      script.dataset.tiktokEmbed = 'true'
+      script.src = 'https://www.tiktok.com/embed.js'
+      document.body.appendChild(script)
+    }
+
+    renderTikTokEmbeds()
+  })()
+</script>
 
 <style>
   .tiktok-wrapper {

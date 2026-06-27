@@ -220,7 +220,9 @@ export interface Text {
 }
 
 export interface Emoji {
+  Type?: string
   Emoji: string
+  Url?: string
 }
 
 export interface Annotation {

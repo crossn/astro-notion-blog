@@ -99,9 +99,9 @@ if (post.FeaturedImage && post.FeaturedImage.Url) {
   path={getPostLink(post.Slug)}
   ogImage={ogImage}
 >
-  <div className={styles.container}>
+  <div class={styles.container}>
     <main>
-      <div className={styles.post}>
+      <div class={styles.post}>
         <PostDate post={post} />
         <PostTags post={post} />
         <PostTitle post={post} enableLink={false} />
@@ -116,14 +116,14 @@ if (post.FeaturedImage && post.FeaturedImage.Url) {
 
     <aside>
       <BlogPostsLink
-        heading="Posts in the same category"
+        heading="同じカテゴリの記事"
         posts={postsHavingSameTag.filter(
           (p: interfaces.Post) => p.Slug !== post.Slug
         )}
       />
-      <BlogPostsLink heading="Recommended" posts={rankedPosts} />
-      <BlogPostsLink heading="Latest posts" posts={recentPosts} />
-      <BlogTagsLink heading="Categories" tags={tags} />
+      <BlogPostsLink heading="おすすめ" posts={rankedPosts} />
+      <BlogPostsLink heading="新着記事" posts={recentPosts} />
+      <BlogTagsLink heading="カテゴリ" tags={tags} />
     </aside>
   </div>
 </Layout>

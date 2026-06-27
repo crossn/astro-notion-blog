@@ -14,7 +14,23 @@ const id = url.pathname.split('/')[3]
   </a>
 </p>
 
-<script is:inline async src="https://cpwebassets.codepen.io/assets/embed/ei.js"></script>
+<script is:inline data-astro-rerun>
+  ;(() => {
+    const renderCodePenEmbeds = () => {
+      document.querySelectorAll('script[data-codepen-embed]').forEach((script) => {
+        script.remove()
+      })
+
+      const script = document.createElement('script')
+      script.async = true
+      script.dataset.codepenEmbed = 'true'
+      script.src = 'https://cpwebassets.codepen.io/assets/embed/ei.js'
+      document.body.appendChild(script)
+    }
+
+    renderCodePenEmbeds()
+  })()
+</script>
 
 <style is:global>
   .cp_embed_wrapper {

@@ -13,7 +13,7 @@ import 'prismjs/components/prism-ruby'
 import 'prismjs/components/prism-sql'
 import 'prismjs/components/prism-typescript'
 import 'prismjs/components/prism-yaml'
-import * as interfaces from '../../lib/notion/interfaces'
+import * as interfaces from '../../lib/interfaces'
 import Caption from './Caption.astro'
 
 export interface Props {
@@ -53,7 +53,14 @@ const grammer =
 
 <script>
   import mermaid from 'mermaid'
-  mermaid.initialize({ startOnLoad: true, theme: 'neutral' })
+
+  const renderMermaid = async () => {
+    mermaid.initialize({ startOnLoad: false, theme: 'neutral' })
+    await mermaid.run({ querySelector: '.mermaid' })
+  }
+
+  document.addEventListener('astro:page-load', renderMermaid)
+  renderMermaid()
 </script>
 
 <script>
@@ -62,7 +69,13 @@ const grammer =
       navigator.clipboard
         .writeText(ev.target.getAttribute('data-code'))
         .then(() => {
+          const originalText = ev.target.innerText
+
           ev.target.innerText = ev.target.getAttribute('data-done-text')
+
+          setTimeout(() => {
+            ev.target.innerText = originalText
+          }, 3000)
         })
     })
   })
@@ -72,6 +85,7 @@ const grammer =
   .code {
     display: block;
     width: 100%;
+    margin-bottom: 0.6rem;
   }
   .code > div {
     background: rgb(247, 246, 243);
@@ -97,6 +111,10 @@ const grammer =
     padding: 0.8rem 2rem 2rem;
     font-size: 0.9rem;
     line-height: 1.2rem;
+    white-space: pre;
+    width: 100px;
+    min-width: 100%;
+    overflow-x: auto;
   }
   .code pre.mermaid {
     padding: 2rem;

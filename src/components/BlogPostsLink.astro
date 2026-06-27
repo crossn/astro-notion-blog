@@ -20,7 +20,18 @@ const { heading, posts } = Astro.props
       <ul>
         {posts.map((post: Post) => (
           <li>
-            <a href={getPostLink(post.Slug)}>{post.Title}</a>
+            <a href={getPostLink(post.Slug)}>
+              <span class="icon">
+                {post.Icon?.Emoji ? (
+                  post.Icon.Emoji
+                ) : post.Icon?.Url ? (
+                  <img src={post.Icon.Url} alt="" loading="lazy" />
+                ) : (
+                  '📄'
+                )}
+              </span>
+              <span>{post.Title}</span>
+            </a>
           </li>
         ))}
       </ul>
@@ -29,34 +40,55 @@ const { heading, posts } = Astro.props
 </div>
 
 <style>
-  .blog-posts-link {
-  }
   .blog-posts-link h3 {
     margin: 0;
-    font-size: 1.1rem;
+    color: #312b3d;
+    font-size: 1rem;
   }
+
   .blog-posts-link ul {
     list-style-type: none;
     padding: 0;
-    margin-top: 0.3rem;
-    margin-block-end: 1rem;
+    margin: 0.45rem 0 1.1rem;
   }
+
   .blog-posts-link ul li {
-    position: relative;
-    font-size: 0.95rem;
-    padding: 0.4rem 0;
-    padding-left: 0.7rem;
-    line-height: 1.2rem;
+    font-size: 0.92rem;
+    line-height: 1.35;
   }
-  .blog-posts-link ul li:before {
-    border-radius: 50%;
-    width: 5px;
-    height: 5px;
-    display: block;
-    position: absolute;
-    left: 0;
-    top: 0.9rem;
-    content: '';
-    background: #333;
+
+  .blog-posts-link ul li + li {
+    margin-top: 0.35rem;
+  }
+
+  .blog-posts-link a {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.45rem;
+    padding: 0.35rem 0.25rem;
+    border-radius: 6px;
+    color: #4a435a;
+    text-decoration: none;
+  }
+
+  .blog-posts-link a:hover {
+    background: rgba(124, 108, 242, 0.08);
+    color: #3f34b8;
+  }
+
+  .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    min-width: 1.25rem;
+    line-height: 1.25rem;
+  }
+
+  .icon img {
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 3px;
+    object-fit: cover;
   }
 </style>

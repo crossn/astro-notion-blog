@@ -19,7 +19,27 @@ const { url } = Astro.props
   </blockquote>
 </div>
 
-<script is:inline async src="https://www.instagram.com/embed.js"></script>
+<script is:inline data-astro-rerun>
+  ;(() => {
+    const renderInstagramEmbeds = () => {
+      if (window.instgrm?.Embeds) {
+        window.instgrm.Embeds.process()
+        return
+      }
+
+      if (document.querySelector('script[data-instagram-embed]')) return
+
+      const script = document.createElement('script')
+      script.async = true
+      script.dataset.instagramEmbed = 'true'
+      script.src = 'https://www.instagram.com/embed.js'
+      script.onload = () => window.instgrm?.Embeds?.process()
+      document.body.appendChild(script)
+    }
+
+    renderInstagramEmbeds()
+  })()
+</script>
 
 <style>
   .instagram-wrapper {
