@@ -1,31 +1,33 @@
 ---
 export interface Props {
-  url: string
+  url: URL
 }
 
 const { url } = Astro.props
 ---
 
 <blockquote class="twitter-tweet">
-  <a href={url}></a>
+  <a href={url.toString()}></a>
 </blockquote>
 
-<script is:inline>
-  window.twttr = (function (d, s, id) {
-    var js,
-      fjs = d.getElementsByTagName(s)[0],
-      t = window.twttr || {}
-    if (d.getElementById(id)) return t
-    js = d.createElement(s)
-    js.id = id
-    js.src = 'https://platform.twitter.com/widgets.js'
-    fjs.parentNode.insertBefore(js, fjs)
+<script is:inline data-astro-rerun>
+  ;(() => {
+    const renderTweetEmbeds = () => {
+      if (window.twttr?.widgets) {
+        window.twttr.widgets.load()
+        return
+      }
 
-    t._e = []
-    t.ready = function (f) {
-      t._e.push(f)
+      if (document.getElementById('twitter-wjs')) return
+
+      const script = document.createElement('script')
+      script.id = 'twitter-wjs'
+      script.async = true
+      script.src = 'https://platform.twitter.com/widgets.js'
+      script.onload = () => window.twttr?.widgets?.load()
+      document.body.appendChild(script)
     }
 
-    return t
-  })(document, 'script', 'twitter-wjs')
+    renderTweetEmbeds()
+  })()
 </script>

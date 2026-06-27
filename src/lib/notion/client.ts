@@ -1,7 +1,7 @@
 import fs, { createWriteStream } from 'node:fs'
 import { pipeline } from 'node:stream'
 import { promisify } from 'node:util'
-import fetch, { Response, AbortError } from 'node-fetch'
+import fetch, { AbortError } from 'node-fetch'
 import {
   NOTION_API_SECRET,
   DATABASE_ID,
@@ -524,10 +524,13 @@ function _buildBlock(blockObject: responses.BlockObject): Block {
       break
     case 'callout':
       if (blockObject.callout) {
+        const icon = blockObject.callout.icon
         const callout: Callout = {
           RichTexts: blockObject.callout.rich_text.map(_buildRichText),
           Icon: {
-            Emoji: blockObject.callout.icon.emoji,
+            Type: icon?.type || 'emoji',
+            Emoji: icon?.emoji || '',
+            Url: icon?.external?.url || icon?.file?.url || '',
           },
           Color: blockObject.callout.color,
         }
@@ -749,7 +752,7 @@ function _buildPost(pageObject: responses.PageObject): Post {
   const prop = pageObject.properties
 
   const icon = pageObject.icon as responses.Emoji
-  const emoji: Emoji = { Emoji: icon?.emoji || '' }
+  const emoji: Emoji = { Type: icon?.type || 'emoji', Emoji: icon?.emoji || '', Url: icon?.external?.url || '' }
 
   const cover: FileObject = { Url: pageObject.cover?.external?.url || '' }
 

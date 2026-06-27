@@ -47,7 +47,23 @@ const { block } = Astro.props
   .table {
     overflow-x: auto;
   }
+
+  .table table {
+    margin: 0.6rem 0;
+    border-collapse: collapse;
+  }
+
   .table th,
   .table td {
+    min-width: 120px;
+    border: 1px solid rgba(55, 53, 47, 0.16);
+    padding: 0.45rem 0.65rem;
+    font-weight: normal;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .table th {
+    background: rgba(247, 246, 243, 0.8);
   }
 </style>

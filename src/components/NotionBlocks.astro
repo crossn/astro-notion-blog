@@ -1,6 +1,16 @@
 ---
 import * as interfaces from '../lib/interfaces.ts'
-import { isTweetURL, buildURLToHTMLMap } from '../lib/blog-helpers.ts'
+import {
+  buildURLToHTMLMap,
+  isAmazonURL,
+  isTweetURL,
+  isTikTokURL,
+  isInstagramURL,
+  isPinterestURL,
+  isCodePenURL,
+  isCircuitSimulatorAppletURL,
+} from '../lib/blog-helpers.ts'
+
 import Paragraph from './notion-blocks/Paragraph.astro'
 import Heading1 from './notion-blocks/Heading1.astro'
 import Heading2 from './notion-blocks/Heading2.astro'
@@ -97,7 +107,7 @@ const bookmarkURLs = blocks
   .map((b: interfaces.Block) => {
     const urlString = (b.Bookmark || b.LinkPreview || b.Embed).Url
 
-    let url: URL
+    let url: URL | null = null
     try {
       url = new URL(urlString)
     } catch (err) {
@@ -105,7 +115,16 @@ const bookmarkURLs = blocks
     }
     return url
   })
-  .filter((url: URL) => url && !isTweetURL(url))
+  .filter((url: URL | null): url is URL =>
+    !!url &&
+    !isTweetURL(url) &&
+    !isTikTokURL(url) &&
+    !isInstagramURL(url) &&
+    !isPinterestURL(url) &&
+    !isCodePenURL(url) &&
+    !isCircuitSimulatorAppletURL(url) &&
+    !isAmazonURL(url)
+  )
 
 const bookmarkURLMap = await buildURLToHTMLMap(bookmarkURLs)
 ---

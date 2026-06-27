@@ -1,0 +1,46 @@
+---
+export interface Props {
+  url: URL
+}
+
+const { url } = Astro.props
+const user = url.pathname.split('/')[1]
+const id = url.pathname.split('/')[3]
+---
+
+<p class="codepen" data-slug-hash={id} data-user={user} data-default-tab="result">
+  <a href={url.toString()} target="_blank" rel="noopener noreferrer">
+    View this pen on CodePen
+  </a>
+</p>
+
+<script is:inline data-astro-rerun>
+  ;(() => {
+    const renderCodePenEmbeds = () => {
+      document.querySelectorAll('script[data-codepen-embed]').forEach((script) => {
+        script.remove()
+      })
+
+      const script = document.createElement('script')
+      script.async = true
+      script.dataset.codepenEmbed = 'true'
+      script.src = 'https://cpwebassets.codepen.io/assets/embed/ei.js'
+      document.body.appendChild(script)
+    }
+
+    renderCodePenEmbeds()
+  })()
+</script>
+
+<style is:global>
+  .cp_embed_wrapper {
+    width: 100%;
+    aspect-ratio: 1.6 / 1;
+    margin: 1.5rem 0;
+    background-color: #fff;
+  }
+
+  .cp_embed_wrapper iframe {
+    height: 100% !important;
+  }
+</style>

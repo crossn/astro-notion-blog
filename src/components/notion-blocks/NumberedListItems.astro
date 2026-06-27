@@ -14,9 +14,10 @@ export interface Props {
 const { block, level, headings } = Astro.props
 
 const listTypes = ['1', 'a', 'i']
+const listType = listTypes[(level - 1) % listTypes.length]
 ---
 
-<ol type={listTypes[level % 3]}>
+<ol type={listType}>
   {
     block.ListItems.filter(
       (b: interfaces.Block) => b.Type === 'numbered_list_item'

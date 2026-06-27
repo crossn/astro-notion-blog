@@ -39,7 +39,7 @@ const currentTag = posts[0].Tags.find((t) => t.name === tag)
 ---
 
 <Layout title={`Posts in ${tag}`} path={`/blog/tag/${tag}`}>
-  <div className={styles.container}>
+  <div class={styles.container}>
     <main>
       <header>
         <h2><span class={`tag ${currentTag.color}`}>{tag}</span></h2>
@@ -50,7 +50,7 @@ const currentTag = posts[0].Tags.find((t) => t.name === tag)
           <NoContents contents={posts} />
         ) : (
           posts.map((post) => (
-            <div className={styles.post} key={post.Slug}>
+            <div class={styles.post} key={post.Slug}>
               <PostDate post={post} />
               <PostTags post={post} />
               <PostTitle post={post} />
@@ -68,8 +68,8 @@ const currentTag = posts[0].Tags.find((t) => t.name === tag)
     </main>
 
     <aside>
-      <BlogPostsLink heading="Recommended" posts={rankedPosts} />
-      <BlogTagsLink heading="Categories" tags={tags} />
+      <BlogPostsLink heading="おすすめ" posts={rankedPosts} />
+      <BlogTagsLink heading="カテゴリ" tags={tags} />
     </aside>
   </div>
 </Layout>

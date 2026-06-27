@@ -1,0 +1,57 @@
+---
+export interface Props {
+  url: URL
+}
+
+const { url } = Astro.props
+---
+
+<div class="pinterest-wrapper">
+  <a class="pinterest-embed" href={url.toString()} data-pin-do="embedPin"></a>
+</div>
+
+<script is:inline data-astro-rerun>
+  ;(() => {
+    const renderPinterestEmbeds = () => {
+      if (window.PinUtils) {
+        window.PinUtils.build()
+        return
+      }
+
+      if (document.querySelector('script[data-pinterest-embed]')) return
+
+      const script = document.createElement('script')
+      script.async = true
+      script.defer = true
+      script.dataset.pinterestEmbed = 'true'
+      script.src = 'https://assets.pinterest.com/js/pinit.js'
+      script.onload = () => window.PinUtils?.build()
+      document.body.appendChild(script)
+    }
+
+    renderPinterestEmbeds()
+  })()
+</script>
+
+<style>
+  .pinterest-wrapper {
+    display: grid;
+    justify-items: center;
+    width: 100%;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+    text-align: center;
+  }
+
+  .pinterest-embed {
+    display: block;
+    width: fit-content;
+    max-width: 100%;
+    margin-inline: auto;
+  }
+
+  .pinterest-wrapper :global(span),
+  .pinterest-wrapper :global(iframe) {
+    margin-inline: auto !important;
+  }
+</style>
