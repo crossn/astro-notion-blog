@@ -7,33 +7,136 @@ export interface Props {
 }
 
 const { block } = Astro.props
+
+type RenderCell = {
+  cell: interfaces.TableCell
+  colIndex: number
+  rowIndex: number
+  colSpan: number
+  rowSpan: number
+  hidden: boolean
+}
+
+const isEmptyCell = (cell: interfaces.TableCell) =>
+  cell.RichTexts.every((richText) => !richText.PlainText.trim())
+
+const renderRows: RenderCell[][] = block.Table.Rows.map((row, rowIndex) =>
+  row.Cells.map((cell, colIndex) => ({
+    cell,
+    colIndex,
+    rowIndex,
+    colSpan: cell.ColSpan || 1,
+    rowSpan: cell.RowSpan || 1,
+    hidden: false,
+  }))
+)
+
+const hasExplicitSpans = renderRows.some((row) =>
+  row.some((cell) => cell.colSpan > 1 || cell.rowSpan > 1)
+)
+
+const visibleCellCovering = (row: RenderCell[], colIndex: number) =>
+  row.find(
+    (cell) =>
+      !cell.hidden &&
+      cell.colIndex <= colIndex &&
+      colIndex < cell.colIndex + cell.colSpan
+  )
+
+const visibleSourceReachingRow = (rowIndex: number, colIndex: number) => {
+  for (let i = rowIndex - 1; i >= 0; i--) {
+    const source = visibleCellCovering(renderRows[i], colIndex)
+    if (
+      source &&
+      !isEmptyCell(source.cell) &&
+      source.rowIndex + source.rowSpan === rowIndex
+    ) {
+      return source
+    }
+  }
+  return undefined
+}
+
+if (!hasExplicitSpans) {
+  renderRows.forEach((row) => {
+    row.forEach((renderCell, columnIndex) => {
+      if (renderCell.hidden || !isEmptyCell(renderCell.cell)) {
+        return
+      }
+
+      const prevCell = row[columnIndex - 1]
+      if (prevCell && !prevCell.hidden && !isEmptyCell(prevCell.cell)) {
+        prevCell.colSpan += 1
+        renderCell.hidden = true
+      }
+    })
+  })
+
+  renderRows.forEach((row, rowIndex) => {
+    if (rowIndex === 0) {
+      return
+    }
+
+    const extendedSources = new Set<RenderCell>()
+
+    row.forEach((renderCell) => {
+      if (renderCell.hidden || !isEmptyCell(renderCell.cell)) {
+        return
+      }
+
+      const source = visibleSourceReachingRow(rowIndex, renderCell.colIndex)
+      if (!source || extendedSources.has(source)) {
+        return
+      }
+      const cellsToHide: RenderCell[] = []
+      for (
+        let colIndex = source.colIndex;
+        colIndex < source.colIndex + source.colSpan;
+        colIndex++
+      ) {
+        const coveredCell = visibleCellCovering(row, colIndex)
+        if (!coveredCell || !isEmptyCell(coveredCell.cell)) {
+          return
+        }
+        if (!cellsToHide.includes(coveredCell)) {
+          cellsToHide.push(coveredCell)
+        }
+      }
+
+      source.rowSpan += 1
+      extendedSources.add(source)
+      cellsToHide.forEach((cell) => {
+        cell.hidden = true
+      })
+    })
+  })
+}
+
 ---
 
 <div class="table">
   <table>
     <tbody>
       {
-        block.Table.Rows.map((tableRow: interfaces.TableRow, j: number) => (
+        renderRows.map((tableRow: RenderCell[], j: number) => (
           <tr>
-            {tableRow.Cells.map((cell: interfaces.TableCell, i: number) => {
-              if (
+            {tableRow.map((renderCell: RenderCell, i: number) => {
+              if (renderCell.hidden) {
+                return null
+              }
+
+              const Tag =
                 (block.Table.HasRowHeader && i === 0) ||
                 (block.Table.HasColumnHeader && j === 0)
-              ) {
-                return (
-                  <th>
-                    {cell.RichTexts.map((richText: interfaces.RichText) => (
-                      <RichText richText={richText} />
-                    ))}
-                  </th>
-                )
-              }
+                  ? 'th'
+                  : 'td'
+
               return (
-                <td>
-                  {cell.RichTexts.map((richText: interfaces.RichText) => (
+                <Tag colspan={renderCell.colSpan} rowspan={renderCell.rowSpan}>
+                  {renderCell.cell.RichTexts.map((richText: interfaces.RichText) => (
                     <RichText richText={richText} />
                   ))}
-                </td>
+                </Tag>
               )
             })}
           </tr>
@@ -51,11 +154,15 @@ const { block } = Astro.props
   .table table {
     margin: 0.6rem 0;
     border-collapse: collapse;
+    width: max-content;
+    max-width: 100%;
+    table-layout: auto;
   }
 
   .table th,
   .table td {
-    min-width: 120px;
+    min-width: 0;
+    max-width: min(32rem, 72vw);
     border: 1px solid rgba(55, 53, 47, 0.16);
     padding: 0.45rem 0.65rem;
     font-weight: normal;

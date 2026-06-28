@@ -20,11 +20,13 @@ export interface Block {
   Heading1?: Heading1
   Heading2?: Heading2
   Heading3?: Heading3
+  Heading4?: Heading4
   BulletedListItem?: BulletedListItem
   NumberedListItem?: NumberedListItem
   ToDo?: ToDo
   Image?: Image
   File?: File
+  Pdf?: File
   Code?: Code
   Quote?: Quote
   Equation?: Equation
@@ -39,6 +41,8 @@ export interface Block {
   ColumnList?: ColumnList
   TableOfContents?: TableOfContents
   LinkToPage?: LinkToPage
+  Tab?: Tab
+  Unsupported?: Unsupported
 }
 
 export interface Paragraph {
@@ -62,6 +66,13 @@ export interface Heading2 {
 }
 
 export interface Heading3 {
+  RichTexts: RichText[]
+  Color: string
+  IsToggleable: boolean
+  Children?: Block[]
+}
+
+export interface Heading4 {
   RichTexts: RichText[]
   Color: string
   IsToggleable: boolean
@@ -184,6 +195,16 @@ export interface TableRow {
 
 export interface TableCell {
   RichTexts: RichText[]
+  ColSpan?: number
+  RowSpan?: number
+}
+
+export interface Tab {
+  Children: Block[]
+}
+
+export interface Unsupported {
+  BlockType: string
 }
 
 export interface ColumnList {
@@ -212,6 +233,7 @@ export interface RichText {
   PlainText: string
   Href?: string
   Equation?: Equation
+  Mention?: Mention
 }
 
 export interface Text {
@@ -247,4 +269,15 @@ export interface SelectProperty {
 export interface LinkToPage {
   Type: string
   PageId: string
+}
+
+export interface Mention {
+  Type: string
+  Page?: Reference
+  Database?: Reference
+  LinkPreview?: LinkPreview
+}
+
+export interface Reference {
+  Id: string
 }

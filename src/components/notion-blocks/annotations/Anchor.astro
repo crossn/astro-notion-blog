@@ -6,10 +6,11 @@ export interface Props {
 }
 
 const { richText } = Astro.props
+const shouldWrap = richText.Href && !richText.Mention?.Page
 ---
 
 {
-  richText.Href ? (
+  shouldWrap ? (
     <a href={richText.Href}>
       <slot />
     </a>

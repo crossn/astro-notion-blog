@@ -324,6 +324,7 @@ export interface BlockObject {
   heading_1?: Heading
   heading_2?: Heading
   heading_3?: Heading
+  heading_4?: Heading
   callout?: Callout
   quote?: Quote
   bulleted_list_item?: ListItem
@@ -351,6 +352,8 @@ export interface BlockObject {
   synced_block?: SyncedBlock
   table?: Table
   table_row?: TableRow
+  tab?: Record<string, never>
+  unsupported?: Unsupported
 }
 
 interface Paragraph {
@@ -457,5 +460,17 @@ interface Table {
 }
 
 interface TableRow {
-  cells: RichTextObject[][]
+  cells: TableCellObject[]
+}
+
+type TableCellObject = RichTextObject[] & {
+  col_span?: number
+  colspan?: number
+  column_span?: number
+  row_span?: number
+  rowspan?: number
+}
+
+interface Unsupported {
+  block_type: string
 }

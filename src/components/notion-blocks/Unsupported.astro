@@ -1,0 +1,37 @@
+---
+import * as interfaces from '../../lib/interfaces'
+
+export interface Props {
+  block: interfaces.Block
+}
+
+const { block } = Astro.props
+const blockType = block.Unsupported?.BlockType || block.Type || 'unknown'
+---
+
+<div class="unsupported" role="note">
+  <span>未対応ブロック</span>
+  <code>{blockType}</code>
+</div>
+
+<style>
+  .unsupported {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin: 0.75rem 0;
+    padding: 0.7rem 0.85rem;
+    border: 1px dashed rgba(124, 108, 242, 0.35);
+    border-radius: 12px;
+    color: #6b6478;
+    background: rgba(250, 247, 255, 0.72);
+    font-size: 0.9rem;
+  }
+
+  .unsupported code {
+    padding: 0.1rem 0.35rem;
+    border-radius: 6px;
+    color: #4f43c7;
+    background: rgba(124, 108, 242, 0.1);
+  }
+</style>

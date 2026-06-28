@@ -15,6 +15,7 @@ import Paragraph from './notion-blocks/Paragraph.astro'
 import Heading1 from './notion-blocks/Heading1.astro'
 import Heading2 from './notion-blocks/Heading2.astro'
 import Heading3 from './notion-blocks/Heading3.astro'
+import Heading4 from './notion-blocks/Heading4.astro'
 import TableOfContents from './notion-blocks/TableOfContents.astro'
 import Image from './notion-blocks/Image.astro'
 import Video from './notion-blocks/Video.astro'
@@ -33,6 +34,9 @@ import ToDo from './notion-blocks/ToDo.astro'
 import SyncedBlock from './notion-blocks/SyncedBlock.astro'
 import Toggle from './notion-blocks/Toggle.astro'
 import File from './notion-blocks/File.astro'
+import Pdf from './notion-blocks/Pdf.astro'
+import Tab from './notion-blocks/Tab.astro'
+import Unsupported from './notion-blocks/Unsupported.astro'
 import LinkToPage from './notion-blocks/LinkToPage.astro'
 
 export interface Props {
@@ -96,7 +100,7 @@ const blocks = rawBlocks.reduce((arr, block: interfaces.Block, i: number) => {
 let headings = rawHeadings
 if (isRoot) {
   headings = blocks.filter((b: interfaces.Block) =>
-    ['heading_1', 'heading_2', 'heading_3'].includes(b.Type)
+    ['heading_1', 'heading_2', 'heading_3', 'heading_4'].includes(b.Type)
   )
 }
 
@@ -140,6 +144,8 @@ const bookmarkURLMap = await buildURLToHTMLMap(bookmarkURLs)
         return <Heading2 block={block} headings={headings} />
       case 'heading_3':
         return <Heading3 block={block} headings={headings} />
+      case 'heading_4':
+        return <Heading4 block={block} headings={headings} />
       case 'table_of_contents':
         return <TableOfContents block={block} headings={headings} />
       case 'image':
@@ -179,9 +185,15 @@ const bookmarkURLMap = await buildURLToHTMLMap(bookmarkURLs)
         return <Toggle block={block} headings={headings} />
       case 'file':
         return <File block={block} />
+      case 'pdf':
+        return <Pdf block={block} />
+      case 'tab':
+        return <Tab block={block} headings={headings} />
+      case 'unsupported':
+        return <Unsupported block={block} />
       case 'link_to_page':
         return <LinkToPage block={block} />
     }
-    return null
+    return <Unsupported block={block} />
   })
 }

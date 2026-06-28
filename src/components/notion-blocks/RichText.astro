@@ -8,6 +8,7 @@ import Underline from './annotations/Underline.astro'
 import Color from './annotations/Color.astro'
 import Code from './annotations/Code.astro'
 import Anchor from './annotations/Anchor.astro'
+import Mention from './Mention.astro'
 
 export interface Props {
   richText: RichText
@@ -48,6 +49,18 @@ const { richText } = Astro.props
                     )}
                   />
                 )
+              }
+              {
+                richText.Mention?.Page && (
+                  <Mention
+                    pageId={richText.Mention.Page.Id}
+                    label={richText.PlainText}
+                    href={richText.Href}
+                  />
+                )
+              }
+              {
+                richText.Mention && !richText.Mention.Page && richText.PlainText
               }
             </Bold>
           </Italic>

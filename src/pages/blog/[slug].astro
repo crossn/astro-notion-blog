@@ -15,6 +15,7 @@ import {
   getPostLink,
   filePath,
   extractTargetBlocks,
+  buildHeadingId,
 } from '../../lib/blog-helpers.ts'
 import Layout from '../../layouts/Layout.astro'
 import PostDate from '../../components/PostDate.astro'
@@ -24,6 +25,7 @@ import PostBody from '../../components/PostBody.astro'
 import PostRelativeLink from '../../components/PostRelativeLink.astro'
 import BlogPostsLink from '../../components/BlogPostsLink.astro'
 import BlogTagsLink from '../../components/BlogTagsLink.astro'
+import BlogTableOfContents from '../../components/BlogTableOfContents.astro'
 import styles from '../../styles/blog.module.css'
 
 export async function getStaticPaths() {
@@ -50,11 +52,12 @@ const [blocks, allPosts, rankedPosts, recentPosts, tags, postsHavingSameTag] =
 
 const fileAtacchedBlocks = extractTargetBlocks('image', blocks)
   .concat(extractTargetBlocks('file', blocks))
+  .concat(extractTargetBlocks('pdf', blocks))
   .filter((block) => {
     if (!block) {
       return false
     }
-    const imageOrFile = block.Image || block.File
+    const imageOrFile = block.Image || block.File || block.Pdf
     return imageOrFile && imageOrFile.File && imageOrFile.File.Url
   })
 
@@ -62,7 +65,7 @@ const fileAtacchedBlocks = extractTargetBlocks('image', blocks)
 await Promise.all(
   fileAtacchedBlocks
     .map(async (block) => {
-      const expiryTime = (block.Image || block.File).File.ExpiryTime
+      const expiryTime = (block.Image || block.File || block.Pdf).File.ExpiryTime
       if (Date.parse(expiryTime) > Date.now()) {
         return Promise.resolve(block)
       }
@@ -72,7 +75,7 @@ await Promise.all(
       promise.then((block) => {
         let url!: URL
         try {
-          url = new URL((block.Image || block.File).File.Url)
+          url = new URL((block.Image || block.File || block.Pdf).File.Url)
         } catch {
           console.log('Invalid file URL')
           return Promise.reject()
@@ -87,6 +90,66 @@ const currentPostIndex = allPosts.findIndex((post) => post.Slug === slug)
 const prevPost = allPosts[currentPostIndex + 1]
 const nextPost = allPosts[currentPostIndex - 1]
 
+type TableOfContentsItem = {
+  id: string
+  text: string
+  level: 1 | 2 | 3 | 4
+}
+
+const collectHeadingItems = (
+  targetBlocks: interfaces.Block[]
+): TableOfContentsItem[] => {
+  return targetBlocks.flatMap((block) => {
+    const heading =
+      block.Heading1 || block.Heading2 || block.Heading3 || block.Heading4
+    const children =
+      block.Heading1?.Children ||
+      block.Heading2?.Children ||
+      block.Heading3?.Children ||
+      block.Heading4?.Children ||
+      block.Paragraph?.Children ||
+      block.Quote?.Children ||
+      block.Callout?.Children ||
+      block.SyncedBlock?.Children ||
+      block.Toggle?.Children ||
+      []
+
+    const childItems = collectHeadingItems(children)
+
+    if (!heading) {
+      return childItems
+    }
+
+    const text = heading.RichTexts.map((richText) => richText.PlainText)
+      .join('')
+      .trim()
+
+    if (!text) {
+      return childItems
+    }
+
+    const level =
+      block.Type === 'heading_1'
+        ? 1
+        : block.Type === 'heading_2'
+          ? 2
+          : block.Type === 'heading_3'
+            ? 3
+            : 4
+
+    return [
+      {
+        id: buildHeadingId(heading),
+        text,
+        level,
+      },
+      ...childItems,
+    ]
+  })
+}
+
+const tocItems = collectHeadingItems(blocks)
+
 let ogImage = ''
 if (post.FeaturedImage && post.FeaturedImage.Url) {
   ogImage = new URL(filePath(new URL(post.FeaturedImage.Url)), Astro.site)
@@ -99,8 +162,24 @@ if (post.FeaturedImage && post.FeaturedImage.Url) {
   path={getPostLink(post.Slug)}
   ogImage={ogImage}
 >
-  <div class={styles.container}>
-    <main>
+  <div
+    class={`${styles.container} ${
+      tocItems.length > 0 ? styles.withToc : styles.withoutToc
+    }`}
+  >
+    <aside class={styles.sidebar}>
+      <BlogPostsLink
+        heading="同じカテゴリの記事"
+        posts={postsHavingSameTag.filter(
+          (p: interfaces.Post) => p.Slug !== post.Slug
+        )}
+      />
+      <BlogPostsLink heading="おすすめ" posts={rankedPosts} />
+      <BlogPostsLink heading="新着記事" posts={recentPosts} />
+      <BlogTagsLink heading="カテゴリ" tags={tags} />
+    </aside>
+
+    <main class={styles.article}>
       <div class={styles.post}>
         <PostDate post={post} />
         <PostTags post={post} />
@@ -114,16 +193,12 @@ if (post.FeaturedImage && post.FeaturedImage.Url) {
       </div>
     </main>
 
-    <aside>
-      <BlogPostsLink
-        heading="同じカテゴリの記事"
-        posts={postsHavingSameTag.filter(
-          (p: interfaces.Post) => p.Slug !== post.Slug
-        )}
-      />
-      <BlogPostsLink heading="おすすめ" posts={rankedPosts} />
-      <BlogPostsLink heading="新着記事" posts={recentPosts} />
-      <BlogTagsLink heading="カテゴリ" tags={tags} />
-    </aside>
+    {
+      tocItems.length > 0 && (
+        <aside class={styles.tocSidebar}>
+          <BlogTableOfContents items={tocItems} />
+        </aside>
+      )
+    }
   </div>
 </Layout>

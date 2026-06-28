@@ -1,0 +1,110 @@
+---
+import * as interfaces from '../../lib/interfaces.ts'
+import NotionBlocks from '../NotionBlocks.astro'
+import RichText from './RichText.astro'
+
+export interface Props {
+  block: interfaces.Block
+  headings: interfaces.Block[]
+}
+
+const { block, headings } = Astro.props
+const tabs = (block.Tab?.Children || []).filter(
+  (child: interfaces.Block) => child.Type === 'paragraph' && child.Paragraph
+)
+const groupName = `tab-${block.Id}`
+---
+
+{
+  tabs.length > 0 && (
+    <div class="tabs">
+      <div class="tabLabels" role="tablist">
+        {tabs.map((tab: interfaces.Block, index: number) => {
+          const id = `${groupName}-${index}`
+          return (
+            <label class="tabLabel" for={id} role="tab">
+              <input id={id} type="radio" name={groupName} checked={index === 0} />
+              <span>
+                {tab.Paragraph.RichTexts.map((richText: interfaces.RichText) => (
+                  <RichText richText={richText} />
+                ))}
+              </span>
+            </label>
+          )
+        })}
+      </div>
+      <div class="tabPanels">
+        {tabs.map((tab: interfaces.Block, index: number) => (
+          <section class="tabPanel" data-tab-panel={index}>
+            {tab.Paragraph.Children && (
+              <NotionBlocks blocks={tab.Paragraph.Children} headings={headings} />
+            )}
+          </section>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+<style>
+  .tabs {
+    margin: 1rem 0;
+    border: 1px solid rgba(55, 53, 47, 0.12);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.72);
+    overflow: hidden;
+  }
+
+  .tabLabels {
+    display: flex;
+    gap: 0.35rem;
+    overflow-x: auto;
+    padding: 0.55rem 0.6rem 0;
+    border-bottom: 1px solid rgba(55, 53, 47, 0.1);
+  }
+
+  .tabLabel {
+    flex: 0 0 auto;
+  }
+
+  .tabLabel input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .tabLabel span {
+    display: block;
+    padding: 0.45rem 0.75rem;
+    border-radius: 10px 10px 0 0;
+    color: #6b6478;
+    cursor: pointer;
+    font-size: 0.92rem;
+    line-height: 1.35;
+  }
+
+  .tabLabel input:checked + span {
+    color: #373241;
+    background: rgba(250, 247, 255, 0.95);
+    box-shadow: inset 0 -2px 0 rgba(124, 108, 242, 0.65);
+  }
+
+  .tabPanels {
+    padding: 0.8rem 1rem 1rem;
+  }
+
+  .tabPanel {
+    display: none;
+  }
+
+  .tabs:has(.tabLabel:nth-child(1) input:checked) .tabPanel:nth-child(1),
+  .tabs:has(.tabLabel:nth-child(2) input:checked) .tabPanel:nth-child(2),
+  .tabs:has(.tabLabel:nth-child(3) input:checked) .tabPanel:nth-child(3),
+  .tabs:has(.tabLabel:nth-child(4) input:checked) .tabPanel:nth-child(4),
+  .tabs:has(.tabLabel:nth-child(5) input:checked) .tabPanel:nth-child(5),
+  .tabs:has(.tabLabel:nth-child(6) input:checked) .tabPanel:nth-child(6),
+  .tabs:has(.tabLabel:nth-child(7) input:checked) .tabPanel:nth-child(7),
+  .tabs:has(.tabLabel:nth-child(8) input:checked) .tabPanel:nth-child(8) {
+    display: block;
+  }
+</style>
