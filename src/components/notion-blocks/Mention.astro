@@ -1,0 +1,92 @@
+---
+import type { Post } from '../../lib/interfaces.ts'
+import { getPostByPageId } from '../../lib/notion/client'
+import { getPostLink } from '../../lib/blog-helpers.ts'
+import arrow from '../../images/icon-arrow-link.svg'
+
+export interface Props {
+  pageId: string
+  label?: string
+  href?: string
+}
+
+const { pageId, label = 'Linked page', href } = Astro.props
+
+let post: Post | null = null
+if (pageId) {
+  post = await getPostByPageId(pageId)
+}
+
+const icon = post?.Icon
+const emojiIcon = icon && 'Emoji' in icon ? icon.Emoji : null
+const imageIcon = icon && 'Url' in icon ? icon.Url : null
+const linkHref = post ? getPostLink(post.Slug) : href
+const title = post?.Title || label
+---
+
+<a
+  href={linkHref}
+  class:list={["mention-link", !linkHref && "mention-link--not-found"]}
+  target={!post && href ? '_blank' : undefined}
+  rel={!post && href ? 'noopener noreferrer' : undefined}
+>
+  <span class="mention-link__icon">
+    {
+      imageIcon ? (
+        <img src={imageIcon} class="mention-link__notion-icon" alt="" />
+      ) : (
+        emojiIcon || '📄'
+      )
+    }
+    <img src={arrow.src} class="mention-link__arrow" alt="" />
+  </span>
+  <span class="mention-link__text">{title}</span>
+</a>
+
+<style>
+  .mention-link {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 0.35rem;
+    color: var(--fg);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .mention-link--not-found {
+    opacity: 0.65;
+    pointer-events: none;
+  }
+
+  .mention-link__icon {
+    position: relative;
+    flex-shrink: 0;
+    height: fit-content;
+    line-height: 1.35;
+  }
+
+  .mention-link__notion-icon {
+    width: 1.3em;
+    height: 1.3em;
+    object-fit: cover;
+    border-radius: 0.25rem;
+    vertical-align: -0.2em;
+  }
+
+  .mention-link__arrow {
+    position: absolute;
+    right: -0.2em;
+    bottom: -0.05em;
+    display: block;
+    width: 8px;
+    height: 8px;
+  }
+
+  .mention-link__text {
+    color: var(--fg);
+    font-weight: 500;
+    text-decoration: underline;
+    text-decoration-thickness: 0.06em;
+    text-underline-offset: 0.16em;
+  }
+</style>

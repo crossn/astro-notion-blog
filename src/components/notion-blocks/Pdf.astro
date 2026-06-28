@@ -1,0 +1,86 @@
+---
+import * as interfaces from '../../lib/interfaces'
+import { filePath } from '../../lib/blog-helpers'
+import Caption from './Caption.astro'
+
+export interface Props {
+  block: interfaces.Block
+}
+
+const { block } = Astro.props
+
+let url: URL | null = null
+try {
+  url = new URL(block.Pdf?.External?.Url || block.Pdf?.File?.Url)
+} catch (err) {
+  console.error(`Invalid PDF URL. error: ${err}`)
+}
+
+const filename = url ? decodeURIComponent(url.pathname.split('/').slice(-1)[0]) : ''
+const href = url ? (block.Pdf.External ? url.toString() : filePath(url)) : ''
+---
+
+<div class="pdf">
+  {
+    url && (
+      <>
+        <a class="pdfLink" href={href} target="_blank" rel="noopener noreferrer">
+          <img src="https://www.notion.so/icons/pdf_gray.svg" alt="" loading="lazy" />
+          <span>{filename || 'PDF'}</span>
+        </a>
+        <iframe src={href} title={filename || 'PDF preview'} loading="lazy" />
+      </>
+    )
+  }
+  <Caption richTexts={block.Pdf.Caption} />
+</div>
+
+<style>
+  .pdf {
+    margin: 0.9rem 0;
+  }
+
+  .pdfLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    max-width: 100%;
+    margin-bottom: 0.55rem;
+    padding: 0.45rem 0.55rem;
+    border-radius: var(--radius);
+    color: var(--fg);
+    font-weight: 500;
+    line-height: 1.4rem;
+    text-decoration: none;
+  }
+
+  .pdfLink:hover {
+    background-color: rgba(235, 236, 237, 0.7);
+  }
+
+  .pdfLink img {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex: 0 0 auto;
+  }
+
+  .pdfLink span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .pdf iframe {
+    width: 100%;
+    min-height: min(70vh, 720px);
+    border: 1px solid rgba(55, 53, 47, 0.16);
+    border-radius: 12px;
+    background: rgba(247, 246, 243, 0.6);
+  }
+
+  @media (max-width: 640px) {
+    .pdf iframe {
+      min-height: 420px;
+    }
+  }
+</style>

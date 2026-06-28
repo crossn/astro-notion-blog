@@ -5,6 +5,7 @@ import type {
   Heading1,
   Heading2,
   Heading3,
+  Heading4,
   RichText,
   Column,
 } from './interfaces'
@@ -60,6 +61,10 @@ export const extractTargetBlocks = (
       } else if (block.Heading3 && block.Heading3.Children) {
         acc = acc.concat(
           extractTargetBlocks(blockType, block.Heading3.Children)
+        )
+      } else if (block.Heading4 && block.Heading4.Children) {
+        acc = acc.concat(
+          extractTargetBlocks(blockType, block.Heading4.Children)
         )
       } else if (block.Quote && block.Quote.Children) {
         acc = acc.concat(extractTargetBlocks(blockType, block.Quote.Children))
@@ -164,7 +169,9 @@ export const getDateStr = (date: string) => {
   return y + '-' + m + '-' + d
 }
 
-export const buildHeadingId = (heading: Heading1 | Heading2 | Heading3) => {
+export const buildHeadingId = (
+  heading: Heading1 | Heading2 | Heading3 | Heading4
+) => {
   return heading.RichTexts.map((richText: RichText) => {
     if (!richText.Text) {
       return ''

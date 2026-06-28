@@ -17,6 +17,7 @@ import type {
   Heading1,
   Heading2,
   Heading3,
+  Heading4,
   BulletedListItem,
   NumberedListItem,
   ToDo,
@@ -46,6 +47,10 @@ import type {
   Emoji,
   FileObject,
   LinkToPage,
+  Mention,
+  Reference,
+  Tab,
+  Unsupported,
 } from '../interfaces'
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 import { Client } from '@notionhq/client'
@@ -288,10 +293,18 @@ export async function getAllBlocksByBlockId(blockId: string): Promise<Block[]> {
       block.HasChildren
     ) {
       block.Heading3.Children = await getAllBlocksByBlockId(block.Id)
+    } else if (
+      block.Type === 'heading_4' &&
+      block.Heading4 &&
+      block.HasChildren
+    ) {
+      block.Heading4.Children = await getAllBlocksByBlockId(block.Id)
     } else if (block.Type === 'quote' && block.Quote && block.HasChildren) {
       block.Quote.Children = await getAllBlocksByBlockId(block.Id)
     } else if (block.Type === 'callout' && block.Callout && block.HasChildren) {
       block.Callout.Children = await getAllBlocksByBlockId(block.Id)
+    } else if (block.Type === 'tab' && block.Tab && block.HasChildren) {
+      block.Tab.Children = await getAllBlocksByBlockId(block.Id)
     }
   }
 
@@ -410,6 +423,16 @@ function _buildBlock(blockObject: responses.BlockObject): Block {
         block.Heading3 = heading3
       }
       break
+    case 'heading_4':
+      if (blockObject.heading_4) {
+        const heading4: Heading4 = {
+          RichTexts: blockObject.heading_4.rich_text.map(_buildRichText),
+          Color: blockObject.heading_4.color,
+          IsToggleable: blockObject.heading_4.is_toggleable,
+        }
+        block.Heading4 = heading4
+      }
+      break
     case 'bulleted_list_item':
       if (blockObject.bulleted_list_item) {
         const bulletedListItem: BulletedListItem = {
@@ -493,6 +516,23 @@ function _buildBlock(blockObject: responses.BlockObject): Block {
           }
         }
         block.File = file
+      }
+      break
+    case 'pdf':
+      if (blockObject.pdf) {
+        const pdf: File = {
+          Caption: blockObject.pdf.caption?.map(_buildRichText) || [],
+          Type: blockObject.pdf.type,
+        }
+        if (blockObject.pdf.type === 'external' && blockObject.pdf.external) {
+          pdf.External = { Url: blockObject.pdf.external.url }
+        } else if (blockObject.pdf.type === 'file' && blockObject.pdf.file) {
+          pdf.File = {
+            Url: blockObject.pdf.file.url,
+            ExpiryTime: blockObject.pdf.file.expiry_time,
+          }
+        }
+        block.Pdf = pdf
       }
       break
     case 'code':
@@ -623,6 +663,20 @@ function _buildBlock(blockObject: responses.BlockObject): Block {
         block.LinkToPage = linkToPage
       }
       break
+    case 'tab': {
+      const tab: Tab = {
+        Children: [],
+      }
+      block.Tab = tab
+      break
+    }
+    case 'unsupported': {
+      const unsupported: Unsupported = {
+        BlockType: blockObject.unsupported?.block_type || 'unknown',
+      }
+      block.Unsupported = unsupported
+      break
+    }
   }
 
   return block
@@ -665,6 +719,9 @@ async function _getTableRows(blockId: string): Promise<TableRow[]> {
       const cells: TableCell[] = blockObject.table_row.cells.map((cell) => {
         const tableCell: TableCell = {
           RichTexts: cell.map(_buildRichText),
+          ColSpan:
+            cell.col_span || cell.colspan || cell.column_span || undefined,
+          RowSpan: cell.row_span || cell.rowspan || undefined,
         }
 
         return tableCell
@@ -820,6 +877,34 @@ function _buildRichText(richTextObject: responses.RichTextObject): RichText {
       Expression: richTextObject.equation.expression,
     }
     richText.Equation = equation
+  } else if (richTextObject.type === 'mention' && richTextObject.mention) {
+    const mention: Mention = {
+      Type: richTextObject.mention.type,
+    }
+
+    if (richTextObject.mention.type === 'page' && richTextObject.mention.page) {
+      const reference: Reference = {
+        Id: richTextObject.mention.page.id,
+      }
+      mention.Page = reference
+    } else if (
+      richTextObject.mention.type === 'database' &&
+      richTextObject.mention.database
+    ) {
+      const reference: Reference = {
+        Id: richTextObject.mention.database.id,
+      }
+      mention.Database = reference
+    } else if (
+      richTextObject.mention.type === 'link_preview' &&
+      richTextObject.mention.link_preview
+    ) {
+      mention.LinkPreview = {
+        Url: richTextObject.mention.link_preview.url,
+      }
+    }
+
+    richText.Mention = mention
   }
 
   return richText
