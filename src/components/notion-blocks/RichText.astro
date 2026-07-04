@@ -6,7 +6,6 @@ import Italic from './annotations/Italic.astro'
 import Strikethrough from './annotations/Strikethrough.astro'
 import Underline from './annotations/Underline.astro'
 import Color from './annotations/Color.astro'
-import Code from './annotations/Code.astro'
 import Anchor from './annotations/Anchor.astro'
 import Mention from './Mention.astro'
 
@@ -15,57 +14,90 @@ export interface Props {
 }
 
 const { richText } = Astro.props
+
+const textContent = richText.Text?.Content ?? ''
+const trailingCodeSpacesMatch = richText.Annotation.Code
+  ? textContent.match(/ +$/)
+  : null
+const trailingCodeSpaces =
+  trailingCodeSpacesMatch && trailingCodeSpacesMatch[0].length < textContent.length
+    ? trailingCodeSpacesMatch[0]
+    : ''
+const codeContent = trailingCodeSpaces
+  ? textContent.slice(0, -trailingCodeSpaces.length)
+  : textContent
+const escapeHtml = (value: string) =>
+  value.replace(/[&<>"']/g, (char) => {
+    switch (char) {
+      case '&':
+        return '&amp;'
+      case '<':
+        return '&lt;'
+      case '>':
+        return '&gt;'
+      case '"':
+        return '&quot;'
+      default:
+        return '&#39;'
+    }
+  })
+const codeHtml = escapeHtml(codeContent).replace(/\n/g, '<br />')
 ---
 
 <Anchor richText={richText}>
-  <Code richText={richText}>
-    <Color richText={richText}>
-      <Underline richText={richText}>
-        <Strikethrough richText={richText}>
-          <Italic richText={richText}>
-            <Bold richText={richText}>
-              {
-                richText.Text &&
-                  richText.Text.Content.split('\n').map(
-                    (content: string, i: number) => {
-                      if (i === 0) {
-                        return content
-                      }
-                      return (
-                        <>
-                          <br />
-                          {content}
-                        </>
-                      )
+  <Color richText={richText}>
+    <Underline richText={richText}>
+      <Strikethrough richText={richText}>
+        <Italic richText={richText}>
+          <Bold richText={richText}>
+            {
+              richText.Text && richText.Annotation.Code && (
+                <>
+                  <code set:html={codeHtml} />
+                  {trailingCodeSpaces}
+                </>
+              )
+            }
+            {
+              richText.Text &&
+                !richText.Annotation.Code &&
+                richText.Text.Content.split('\n').map(
+                  (content: string, i: number) => {
+                    if (i === 0) {
+                      return content
                     }
-                  )
-              }
-              {
-                richText.Equation && (
-                  <span
-                    set:html={katex.renderToString(
-                      richText.Equation.Expression,
-                      { throwOnError: false }
-                    )}
-                  />
+                    return (
+                      <>
+                        <br />
+                        {content}
+                      </>
+                    )
+                  }
                 )
-              }
-              {
-                richText.Mention?.Page && (
-                  <Mention
-                    pageId={richText.Mention.Page.Id}
-                    label={richText.PlainText}
-                    href={richText.Href}
-                  />
-                )
-              }
-              {
-                richText.Mention && !richText.Mention.Page && richText.PlainText
-              }
-            </Bold>
-          </Italic>
-        </Strikethrough>
-      </Underline>
-    </Color>
-  </Code>
+            }
+            {
+              richText.Equation && (
+                <span
+                  set:html={katex.renderToString(
+                    richText.Equation.Expression,
+                    { throwOnError: false }
+                  )}
+                />
+              )
+            }
+            {
+              richText.Mention?.Page && (
+                <Mention
+                  pageId={richText.Mention.Page.Id}
+                  label={richText.PlainText}
+                  href={richText.Href}
+                />
+              )
+            }
+            {richText.Mention && !richText.Mention.Page && richText.PlainText}
+          </Bold>
+        </Italic>
+      </Strikethrough>
+    </Underline>
+  </Color>
 </Anchor>

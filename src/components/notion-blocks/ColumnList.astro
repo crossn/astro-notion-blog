@@ -23,13 +23,18 @@ const { block, headings } = Astro.props
 <style>
   .column-list {
     display: flex;
+    box-sizing: border-box;
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
     margin: 1rem auto;
     gap: 0 1rem;
   }
   .column-list > div {
     flex: 1 1 180px;
     width: 180px;
+    min-width: 0;
+    max-width: 100%;
   }
   @media (max-width: 640px) {
     .column-list {
