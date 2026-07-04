@@ -16,20 +16,22 @@ const { items } = Astro.props
   items.length > 0 && (
     <nav class="blog-toc" aria-label="記事の目次">
       <p class="blog-toc__title">目次</p>
-      <ol class="blog-toc__list">
-        {items.map((item) => (
-          <li class={`blog-toc__item blog-toc__item--level-${item.level}`}>
-            <a
-              class="blog-toc__link"
-              href={`#${item.id}`}
-              data-heading-id={item.id}
-            >
-              <span class="blog-toc__marker" aria-hidden="true" />
-              <span class="blog-toc__text">{item.text}</span>
-            </a>
-          </li>
-        ))}
-      </ol>
+      <div class="blog-toc__scroll">
+        <ol class="blog-toc__list">
+          {items.map((item) => (
+            <li class={`blog-toc__item blog-toc__item--level-${item.level}`}>
+              <a
+                class="blog-toc__link"
+                href={`#${item.id}`}
+                data-heading-id={item.id}
+              >
+                <span class="blog-toc__marker" aria-hidden="true" />
+                <span class="blog-toc__text">{item.text}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </div>
     </nav>
   )
 }
@@ -38,6 +40,24 @@ const { items } = Astro.props
   (() => {
     const links = Array.from(document.querySelectorAll('.blog-toc__link'))
     if (!links.length) return
+
+    const toc = links[0].closest('.blog-toc')
+    const scrollContainer = toc?.querySelector('.blog-toc__scroll')
+    let currentActiveLink = null
+
+    const scrollActiveIntoToc = (activeLink) => {
+      if (!scrollContainer || !(activeLink instanceof HTMLElement)) return
+
+      const containerRect = scrollContainer.getBoundingClientRect()
+      const linkRect = activeLink.getBoundingClientRect()
+      const padding = 18
+
+      if (linkRect.top < containerRect.top + padding) {
+        scrollContainer.scrollTop -= containerRect.top + padding - linkRect.top
+      } else if (linkRect.bottom > containerRect.bottom - padding) {
+        scrollContainer.scrollTop += linkRect.bottom - (containerRect.bottom - padding)
+      }
+    }
 
     const sections = links
       .map((link) => {
@@ -52,6 +72,9 @@ const { items } = Astro.props
     if (!sections.length) return
 
     const setActive = (activeLink) => {
+      const activeChanged = currentActiveLink !== activeLink
+      currentActiveLink = activeLink
+
       links.forEach((link) => {
         link.classList.toggle('is-active', link === activeLink)
         if (link === activeLink) {
@@ -60,6 +83,10 @@ const { items } = Astro.props
           link.removeAttribute('aria-current')
         }
       })
+
+      if (activeChanged) {
+        window.requestAnimationFrame(() => scrollActiveIntoToc(activeLink))
+      }
     }
 
     let ticking = false
@@ -99,9 +126,13 @@ const { items } = Astro.props
 <style>
   .blog-toc {
     position: relative;
+    display: flex;
+    flex-direction: column;
     box-sizing: border-box;
     width: 100%;
+    max-height: min(720px, calc(100vh - 3rem));
     padding: 1.1rem;
+    overflow: hidden;
     border: 1px solid rgba(124, 108, 242, 0.14);
     border-radius: 18px;
     color: #6b6478;
@@ -115,6 +146,30 @@ const { items } = Astro.props
     font-size: 1rem;
     font-weight: 700;
     letter-spacing: 0.04em;
+  }
+
+  .blog-toc__scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    margin: 0 -0.45rem 0 0;
+    padding-right: 0.45rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-color: rgba(124, 108, 242, 0.35) transparent;
+    scrollbar-width: thin;
+  }
+
+  .blog-toc__scroll::-webkit-scrollbar {
+    width: 0.45rem;
+  }
+
+  .blog-toc__scroll::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: rgba(124, 108, 242, 0.28);
+  }
+
+  .blog-toc__scroll::-webkit-scrollbar-track {
+    background: transparent;
   }
 
   .blog-toc__list {
@@ -170,8 +225,8 @@ const { items } = Astro.props
   }
 
   .blog-toc__item--level-4 {
-    --toc-marker-color: rgba(124, 108, 242, 0.72);
-    --toc-marker-border: rgba(124, 108, 242, 0.45);
+    --toc-marker-color: rgba(242, 143, 124, 0.82);
+    --toc-marker-border: rgba(202, 96, 74, 0.5);
   }
 
   .blog-toc__link {
@@ -233,6 +288,7 @@ const { items } = Astro.props
       z-index: 5;
       flex: 0 0 auto;
       width: 3rem;
+      max-height: min(720px, calc(100vh - 3rem));
       margin-left: 0;
       padding: 0.6rem 0;
       border: 1px solid rgba(124, 108, 242, 0.14);
@@ -267,6 +323,12 @@ const { items } = Astro.props
       opacity: 1;
     }
 
+    .blog-toc__scroll {
+      margin-right: 0;
+      padding-right: 0;
+      overflow-x: hidden;
+    }
+
     .blog-toc__list {
       --toc-rail-x: 1.5rem;
       padding-left: 0;
@@ -292,6 +354,12 @@ const { items } = Astro.props
       width: 0;
       padding: 0;
       white-space: nowrap;
+    }
+
+    .blog-toc:hover .blog-toc__scroll,
+    .blog-toc:focus-within .blog-toc__scroll {
+      margin-right: -0.45rem;
+      padding-right: 0.45rem;
     }
 
     .blog-toc:hover .blog-toc__list,

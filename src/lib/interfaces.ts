@@ -41,6 +41,7 @@ export interface Block {
   ColumnList?: ColumnList
   TableOfContents?: TableOfContents
   LinkToPage?: LinkToPage
+  ChildDatabase?: ChildDatabase
   Tab?: Tab
   Unsupported?: Unsupported
 }
@@ -201,6 +202,55 @@ export interface TableCell {
 
 export interface Tab {
   Children: Block[]
+}
+
+export type DatabaseChartType =
+  | 'vertical_bar'
+  | 'horizontal_bar'
+  | 'line'
+  | 'donut'
+  | 'number'
+
+export interface ChildDatabase {
+  Title: string
+  Chart?: DatabaseChart
+}
+
+export interface DatabaseChart {
+  Title: string
+  Type: DatabaseChartType
+  LabelProperty: string
+  ValueProperty: string
+  Data: DatabaseChartItem[]
+  Total: number
+  ColorTheme?: string
+  ShowDataLabels?: boolean
+  ColorByValue?: boolean
+  SmoothLine?: boolean
+  Caption?: string
+  ShowCaption?: boolean
+  NumberColor?: string
+  DonutDataLabels?: string
+  Height?: string
+  GridLines?: string
+  AxisLabels?: string
+  LegendPosition?: string
+  ShowLegend?: boolean
+  Sort?: string
+  Aggregator?: string
+  ValueLabel?: string
+  ValueSuffix?: string
+  ShowValue?: boolean
+  ShowValueLabel?: boolean
+  HideLineFillArea?: boolean
+  HideTitle?: boolean
+  YAxisMin?: number
+  YAxisMax?: number
+}
+
+export interface DatabaseChartItem {
+  Label: string
+  Value: number
 }
 
 export interface Unsupported {

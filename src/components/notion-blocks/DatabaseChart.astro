@@ -1,0 +1,884 @@
+---
+import * as interfaces from '../../lib/interfaces.ts'
+
+export interface Props {
+  block: interfaces.Block
+}
+
+const { block } = Astro.props
+const chart = block.ChildDatabase?.Chart
+const title = block.ChildDatabase?.Title || 'Database chart'
+
+const sortData = (
+  items: interfaces.DatabaseChartItem[],
+  sort: string | undefined
+): interfaces.DatabaseChartItem[] => {
+  if (!sort || sort === 'manual') return items
+
+  const sorted = [...items]
+  switch (sort) {
+    case 'x_ascending':
+    case 'name_ascending':
+    case 'label_ascending':
+      return sorted.sort((a, b) => a.Label.localeCompare(b.Label, 'ja'))
+    case 'x_descending':
+    case 'name_descending':
+    case 'label_descending':
+      return sorted.sort((a, b) => b.Label.localeCompare(a.Label, 'ja'))
+    case 'y_ascending':
+    case 'value_ascending':
+      return sorted.sort((a, b) => a.Value - b.Value)
+    case 'y_descending':
+    case 'value_descending':
+      return sorted.sort((a, b) => b.Value - a.Value)
+    default:
+      return items
+  }
+}
+
+const data = sortData(chart?.Data || [], chart?.Sort)
+const maxValue = Math.max(...data.map((item) => item.Value), 0)
+
+const chartWidth = 692
+const defaultChartHeight = 400
+const plotTop = 20
+const colorThemes: Record<string, string> = {
+  blue: '94, 159, 232',
+  green: '114, 188, 143',
+  orange: '222, 146, 85',
+  pink: '218, 116, 170',
+  purple: '191, 142, 218',
+  red: '212, 76, 71',
+  yellow: '234, 194, 107',
+  brown: '159, 107, 83',
+  gray: '125, 122, 117',
+  teal: '83, 174, 168',
+}
+const defaultColorByType: Record<string, string> = {
+  horizontal_bar: 'green',
+  vertical_bar: 'blue',
+  line: 'orange',
+  donut: 'teal',
+  number: 'red',
+}
+const colorTheme =
+  chart?.ColorTheme || defaultColorByType[chart?.Type || ''] || 'blue'
+const chartColor = colorThemes[colorTheme] || colorThemes.blue
+const numberColor =
+  colorThemes[chart?.NumberColor || ''] ||
+  colorThemes[chart?.ColorTheme || ''] ||
+  colorThemes.red
+const donutColorThemes: Record<string, string[]> = {
+  colorful: [
+    'rgba(94, 159, 232, 1)',
+    'rgba(234, 194, 107, 1)',
+    'rgba(114, 188, 143, 1)',
+    'rgba(191, 142, 218, 1)',
+    'rgba(218, 116, 170, 1)',
+  ],
+}
+const donutColors =
+  donutColorThemes[colorTheme] || [
+    `rgba(${chartColor}, 1)`,
+    `rgba(${chartColor}, 0.72)`,
+    `rgba(${chartColor}, 0.5)`,
+    `rgba(${chartColor}, 0.32)`,
+  ]
+const opacitySteps = [1, 0.7, 0.5, 0.3, 0.15, 0.1]
+const showDataLabels = chart?.ShowDataLabels !== false
+const useSmoothLine = chart?.SmoothLine !== false
+const showLineFillArea = chart?.HideLineFillArea !== true
+
+const normalizeSetting = (value: string | undefined, fallback: string) =>
+  (value || fallback).toLowerCase().replace(/[\s-]/g, '_')
+
+const normalizedGridLines = normalizeSetting(chart?.GridLines, 'horizontal')
+const showAnyGridLines = !['none', 'off', 'hidden', 'false'].includes(
+  normalizedGridLines
+)
+const showHorizontalGridLines =
+  showAnyGridLines && ['horizontal', 'both', 'y', 'y_axis'].includes(normalizedGridLines)
+const showVerticalGridLines =
+  showAnyGridLines && ['vertical', 'both', 'x', 'x_axis'].includes(normalizedGridLines)
+
+const normalizedAxisLabels = normalizeSetting(chart?.AxisLabels, 'none')
+const showConfigXAxisTitle = ['x', 'x_axis', 'both'].includes(normalizedAxisLabels)
+const showConfigYAxisTitle = ['y', 'y_axis', 'both'].includes(normalizedAxisLabels)
+const isHorizontalBar = chart?.Type === 'horizontal_bar'
+const showScreenBottomAxisTitle = isHorizontalBar
+  ? showConfigYAxisTitle
+  : showConfigXAxisTitle
+const showScreenLeftAxisTitle = isHorizontalBar
+  ? showConfigXAxisTitle
+  : showConfigYAxisTitle
+const screenBottomAxisTitle = isHorizontalBar
+  ? chart?.ValueProperty
+  : chart?.LabelProperty
+const screenLeftAxisTitle = isHorizontalBar
+  ? chart?.LabelProperty
+  : chart?.ValueProperty
+
+const defaultLegendPosition =
+  chart?.Type === 'donut' ? 'bottom' : chart?.Type === 'line' ? 'bottom' : 'none'
+const normalizedLegendPosition = normalizeSetting(
+  chart?.LegendPosition || (chart?.ShowLegend ? 'bottom' : undefined),
+  defaultLegendPosition
+)
+const legendPosition =
+  normalizedLegendPosition === 'side'
+    ? 'right'
+    : ['top', 'right', 'bottom', 'left'].includes(normalizedLegendPosition)
+      ? normalizedLegendPosition
+      : 'bottom'
+const showLegend =
+  chart?.ShowLegend ??
+  !['none', 'off', 'hidden', 'false'].includes(normalizedLegendPosition)
+const showSeriesLegend =
+  showLegend &&
+  !!chart &&
+  ['horizontal_bar', 'vertical_bar', 'line'].includes(chart.Type)
+const seriesLegendLabel = chart?.ValueProperty || chart?.Caption || title
+
+const chartHeightByOption: Record<string, number> = {
+  small: 240,
+  medium: 320,
+  large: 400,
+  xlarge: 520,
+}
+const renderedChartHeight = chart?.Height
+  ? chartHeightByOption[chart.Height] || defaultChartHeight
+  : defaultChartHeight
+const chartHeight = renderedChartHeight
+const bottomTickLabelSpace = 24
+const bottomAxisTitleSpace = showScreenBottomAxisTitle ? 31 : 0
+const leftAxisTitleSpace = showScreenLeftAxisTitle ? 58 : 0
+const plotBottom = chartHeight - bottomTickLabelSpace - bottomAxisTitleSpace
+const axisLabelY = plotBottom + 20
+const xAxisTitleY = plotBottom + 47
+const leftAxisTitleX = 16
+
+const formatNumber = (value: number) =>
+  new Intl.NumberFormat('ja-JP', { maximumFractionDigits: 1 }).format(value)
+const formatChartValue = (value: number, suffix = '') => `${formatNumber(value)}${suffix}`
+const chartCaptionLines = chart?.Caption?.split(/\r?\n/) || []
+const showChartCaption =
+  chart?.Type !== 'number' && chartCaptionLines.length > 0 && chart?.ShowCaption !== false
+
+const getNiceStep = (value: number) => {
+  if (value <= 0) return 1
+  const rawStep = value / 4
+  const power = Math.pow(10, Math.floor(Math.log10(rawStep)))
+  const normalized = rawStep / power
+  const nice =
+    normalized <= 1
+      ? 1
+      : normalized <= 2
+        ? 2
+        : normalized <= 3
+          ? 3
+          : normalized <= 5
+            ? 5
+            : 10
+  return nice * power
+}
+
+const axisMin = chart?.YAxisMin ?? 0
+const configuredAxisMax =
+  typeof chart?.YAxisMax === 'number' && chart.YAxisMax > axisMin
+    ? chart.YAxisMax
+    : undefined
+const tickStep = getNiceStep(Math.max((configuredAxisMax ?? maxValue) - axisMin, 0))
+const axisMax = configuredAxisMax ?? axisMin + tickStep * 4
+const ticks = configuredAxisMax
+  ? Array.from({ length: 5 }, (_, index) =>
+      axisMin + ((configuredAxisMax - axisMin) / 4) * index
+    )
+  : Array.from({ length: 5 }, (_, index) => axisMin + tickStep * index)
+const valueRatio = (value: number) => {
+  const ratio = (value - axisMin) / Math.max(axisMax - axisMin, 1)
+  return Math.max(0, Math.min(1, ratio))
+}
+const opacityForPoint = (value: number, index: number) => {
+  if (chart?.ColorByValue === false) return 1
+  if (chart?.ColorByValue === true) {
+    if (maxValue <= 0) return 1
+    return Math.max(0.3, Math.min(1, 0.3 + (value / maxValue) * 0.7))
+  }
+  return opacitySteps[index] || 0.15
+}
+
+const horizontalPlot = {
+  x: 26 + leftAxisTitleSpace,
+  y: plotTop,
+  width: 656 - leftAxisTitleSpace,
+  height: Math.max(110, plotBottom - plotTop),
+}
+const verticalPlot = {
+  x: 37 + leftAxisTitleSpace,
+  y: plotTop,
+  width: 645 - leftAxisTitleSpace,
+  height: Math.max(110, plotBottom - plotTop),
+}
+const linePlot = {
+  x: 37 + leftAxisTitleSpace,
+  y: plotTop,
+  width: 645 - leftAxisTitleSpace,
+  height: Math.max(100, plotBottom - plotTop),
+}
+const lineXAxisLabelY = axisLabelY
+const valueAxisTickLabelX = (plotX: number) => plotX - 8
+const horizontalCategoryLabelX = showScreenLeftAxisTitle
+  ? leftAxisTitleSpace + 8
+  : 10
+
+const horizontalSlotHeight = data.length ? horizontalPlot.height / data.length : 0
+const horizontalPoints = data.map((item, index) => {
+  const slotHeight = horizontalSlotHeight
+  const barHeight = 16
+  const y = horizontalPlot.y + slotHeight * index + slotHeight / 2 - barHeight / 2
+  const width = valueRatio(item.Value) * horizontalPlot.width
+  const labelX = Math.min(horizontalPlot.x + width + 8, chartWidth - 32)
+  return {
+    ...item,
+    x: horizontalPlot.x,
+    y,
+    width,
+    height: barHeight,
+    labelY: y + barHeight / 2 + 4,
+    labelX,
+    opacity: opacityForPoint(item.Value, index),
+  }
+})
+const horizontalCategoryBoundaryYs = Array.from(
+  { length: Math.max(data.length - 1, 0) },
+  (_, index) => horizontalPlot.y + horizontalSlotHeight * (index + 1)
+)
+
+const verticalPoints = data.map((item, index) => {
+  const slotWidth = verticalPlot.width / data.length
+  const barWidth = 16
+  const height = valueRatio(item.Value) * verticalPlot.height
+  const x = verticalPlot.x + slotWidth * index + slotWidth / 2 - barWidth / 2
+  const y = verticalPlot.y + verticalPlot.height - height
+  return {
+    ...item,
+    x,
+    y,
+    width: barWidth,
+    height,
+    labelX: x + barWidth / 2,
+    labelY: Math.max(verticalPlot.y + 12, y - 8),
+    axisX: verticalPlot.x + slotWidth * index + slotWidth / 2,
+    opacity: opacityForPoint(item.Value, index),
+  }
+})
+const verticalSlotWidth = data.length ? verticalPlot.width / data.length : 0
+const verticalCategoryBoundaryXs = Array.from(
+  { length: Math.max(data.length - 1, 0) },
+  (_, index) => verticalPlot.x + verticalSlotWidth * (index + 1)
+)
+
+const linePoints = data.map((item, index) => {
+  const x =
+    data.length <= 1
+      ? linePlot.x + linePlot.width / 2
+      : linePlot.x + (index / (data.length - 1)) * linePlot.width
+  const y = linePlot.y + linePlot.height - valueRatio(item.Value) * linePlot.height
+  return { ...item, x, y }
+})
+const lineCategoryGridXs = linePoints.map((point) => point.x)
+
+const buildSmoothPath = (
+  points: Array<{ x: number; y: number }>,
+  tension = 0.2
+) => {
+  if (!points.length) return ''
+  if (points.length === 1) return `M ${points[0].x} ${points[0].y}`
+
+  return points.reduce((path, point, index) => {
+    if (index === 0) return `M ${point.x} ${point.y}`
+
+    const previous = points[index - 1]
+    const beforePrevious = points[index - 2] || previous
+    const next = points[index + 1] || point
+    const control1X = previous.x + (point.x - beforePrevious.x) * tension
+    const control1Y = previous.y + (point.y - beforePrevious.y) * tension
+    const control2X = point.x - (next.x - previous.x) * tension
+    const control2Y = point.y - (next.y - previous.y) * tension
+
+    return `${path} C ${control1X} ${control1Y}, ${control2X} ${control2Y}, ${point.x} ${point.y}`
+  }, '')
+}
+
+const smoothLinePath = useSmoothLine
+  ? buildSmoothPath(linePoints)
+  : linePoints
+      .map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`)
+      .join(' ')
+const lineAreaPath = linePoints.length
+  ? `${smoothLinePath} L ${linePoints[linePoints.length - 1].x} ${
+      linePlot.y + linePlot.height
+    } L ${linePoints[0].x} ${linePlot.y + linePlot.height} Z`
+  : ''
+
+const total = chart?.Total || 0
+const donutStrokeWidth = Math.max(14, Math.min(26, chartHeight * 0.06))
+const donutTotalFontSize = Math.max(32, Math.min(58, chartHeight * 0.14))
+const donutCaptionFontSize = Math.max(11, Math.min(14, chartHeight * 0.036))
+const donutRadius = Math.max(72, Math.min(126, (chartHeight - 88) / 2))
+const donutCenterX = 336
+const donutCenterY = Math.max(
+  donutRadius + 28,
+  Math.min(
+    chartHeight - donutRadius - 28,
+    chartHeight / 2 - (showLegend && legendPosition === 'bottom' ? 24 : 0)
+  )
+)
+const donutCircumference = 2 * Math.PI * donutRadius
+let donutOffset = 0
+let donutAngleOffset = -90
+const donutSegments = data.map((item, index) => {
+  const ratio = total > 0 ? item.Value / total : 0
+  const dash = ratio * donutCircumference
+  const startAngle = donutAngleOffset
+  const endAngle = donutAngleOffset + ratio * 360
+  const midAngle = (startAngle + endAngle) / 2
+  const midAngleRad = (midAngle * Math.PI) / 180
+  const labelRadius = donutRadius + 42
+  const connectorStartRadius = donutRadius + donutStrokeWidth / 2 + 2
+  const connectorEndRadius = labelRadius - 10
+  const labelX = donutCenterX + Math.cos(midAngleRad) * labelRadius
+  const labelY = donutCenterY + Math.sin(midAngleRad) * labelRadius
+  const segment = {
+    ...item,
+    color: donutColors[index % donutColors.length],
+    dash,
+    offset: -donutOffset,
+    percentage: total > 0 ? Math.round(ratio * 100) : 0,
+    labelX,
+    labelY,
+    connectorStartX: donutCenterX + Math.cos(midAngleRad) * connectorStartRadius,
+    connectorStartY: donutCenterY + Math.sin(midAngleRad) * connectorStartRadius,
+    connectorEndX: donutCenterX + Math.cos(midAngleRad) * connectorEndRadius,
+    connectorEndY: donutCenterY + Math.sin(midAngleRad) * connectorEndRadius,
+    textAnchor:
+      labelX > donutCenterX + 8 ? 'start' : labelX < donutCenterX - 8 ? 'end' : 'middle',
+  }
+  donutOffset += dash
+  donutAngleOffset = endAngle
+  return segment
+})
+const normalizedDonutDataLabels = (chart?.DonutDataLabels || 'name_and_value')
+  .toLowerCase()
+  .replace(/-/g, '_')
+const showDonutDataLabels =
+  showDataLabels &&
+  !['none', 'off', 'hidden', 'false'].includes(normalizedDonutDataLabels)
+const donutValueCaption = chart?.ValueLabel
+const showDonutCenterValue = chart?.ShowValue !== false
+const showDonutCenterCaption =
+  showDonutCenterValue && chart?.ShowValueLabel === true && !!donutValueCaption
+const donutTotalY = showDonutCenterCaption ? donutCenterY - 3 : donutCenterY
+const donutCaptionY = donutCenterY + Math.max(24, donutTotalFontSize * 0.48)
+const getDonutSegmentLabel = (segment: (typeof donutSegments)[number]) => {
+  switch (normalizedDonutDataLabels) {
+    case 'value':
+    case 'percent':
+    case 'percentage':
+    case 'value_percent':
+    case 'value_percentage':
+    case 'value_and_percent':
+    case 'value_with_percent':
+    case 'value_with_percentage':
+      return `${formatNumber(segment.Value)}（${segment.percentage}%）`
+    case 'name':
+      return segment.Label
+    case 'name_and_value':
+    case 'value_and_name':
+    case 'name_and_value_percent':
+    case 'name_and_value_percentage':
+    case 'name_value_percent':
+    case 'value_percent_and_name':
+    default:
+      return `${segment.Label} ${formatNumber(segment.Value)}（${segment.percentage}%）`
+  }
+}
+---
+
+<div
+  class:list={[
+    'database-chart',
+    `database-chart--${chart?.Type || 'empty'}`,
+    showLegend && `database-chart--legend-${legendPosition}`,
+  ]}
+  style={`--database-chart-color: ${chartColor}; --database-chart-number-color: ${numberColor}; --database-chart-height: ${renderedChartHeight}px; --database-chart-donut-stroke: ${donutStrokeWidth}px; --database-chart-donut-total-font-size: ${donutTotalFontSize}px; --database-chart-donut-caption-font-size: ${donutCaptionFontSize}px;`}
+>
+  {!chart?.HideTitle && <div class="database-chart__title">{title}</div>}
+  {
+    !chart || !data.length ? (
+      <div class="database-chart__empty">
+        <span>表示できるグラフデータがありません</span>
+      </div>
+    ) : chart.Type === 'horizontal_bar' ? (
+      <svg class="database-chart__svg" viewBox={`0 0 ${chartWidth} ${chartHeight}`} role="img" aria-label={`${title} の横棒グラフ`}>
+        <rect class="database-chart__background" x="0" y="0" width={chartWidth} height={chartHeight} />
+        {showVerticalGridLines && horizontalCategoryBoundaryYs.map((y) => (
+          <line class="database-chart__grid" x1={horizontalPlot.x} y1={y} x2={horizontalPlot.x + horizontalPlot.width} y2={y} />
+        ))}
+        {ticks.map((tick) => {
+          const x = horizontalPlot.x + valueRatio(tick) * horizontalPlot.width
+          return (
+            <g>
+              {showHorizontalGridLines && <line class="database-chart__grid database-chart__grid--vertical" x1={x} y1={horizontalPlot.y} x2={x} y2={horizontalPlot.y + horizontalPlot.height} />}
+              <text class="database-chart__axis-label" x={x} y={axisLabelY} text-anchor="middle">{formatNumber(tick)}</text>
+            </g>
+          )
+        })}
+        <line class="database-chart__axis" x1={horizontalPlot.x} y1={horizontalPlot.y} x2={horizontalPlot.x} y2={horizontalPlot.y + horizontalPlot.height} />
+        {showScreenBottomAxisTitle && <text class="database-chart__axis-title" x={horizontalPlot.x + horizontalPlot.width / 2} y={xAxisTitleY} text-anchor="middle">{screenBottomAxisTitle}</text>}
+        {showScreenLeftAxisTitle && <text class="database-chart__axis-title" x={leftAxisTitleX} y={horizontalPlot.y + horizontalPlot.height / 2} text-anchor="middle" transform={`rotate(-90 ${leftAxisTitleX} ${horizontalPlot.y + horizontalPlot.height / 2})`}>{screenLeftAxisTitle}</text>}
+        {horizontalPoints.map((point) => (
+          <g>
+            <text class="database-chart__axis-label" x={horizontalCategoryLabelX} y={point.labelY} text-anchor="start">{point.Label}</text>
+            <rect
+              class="database-chart__bar"
+              x={point.x}
+              y={point.y}
+              width={point.width}
+              height={point.height}
+              rx="2"
+              ry="2"
+              fill={`rgba(${chartColor}, ${point.opacity})`}
+            />
+            {showDataLabels && <text class="database-chart__data-label" x={point.labelX} y={point.labelY} text-anchor={point.labelX > chartWidth - 40 ? 'end' : 'start'}>{formatNumber(point.Value)}</text>}
+          </g>
+        ))}
+      </svg>
+    ) : chart.Type === 'vertical_bar' ? (
+      <svg class="database-chart__svg" viewBox={`0 0 ${chartWidth} ${chartHeight}`} role="img" aria-label={`${title} の縦棒グラフ`}>
+        <rect class="database-chart__background" x="0" y="0" width={chartWidth} height={chartHeight} />
+        {showVerticalGridLines && verticalCategoryBoundaryXs.map((x) => (
+          <line class="database-chart__grid database-chart__grid--vertical" x1={x} y1={verticalPlot.y} x2={x} y2={verticalPlot.y + verticalPlot.height} />
+        ))}
+        {ticks.map((tick) => {
+          const y = verticalPlot.y + verticalPlot.height - valueRatio(tick) * verticalPlot.height
+          return (
+            <g>
+              {showHorizontalGridLines && <line class="database-chart__grid" x1={verticalPlot.x} y1={y} x2={verticalPlot.x + verticalPlot.width} y2={y} />}
+              <text class="database-chart__axis-label" x={valueAxisTickLabelX(verticalPlot.x)} y={y + 4} text-anchor="end">{formatNumber(tick)}</text>
+            </g>
+          )
+        })}
+        <line class="database-chart__axis" x1={verticalPlot.x} y1={verticalPlot.y + verticalPlot.height} x2={verticalPlot.x + verticalPlot.width} y2={verticalPlot.y + verticalPlot.height} />
+        {showScreenBottomAxisTitle && <text class="database-chart__axis-title" x={verticalPlot.x + verticalPlot.width / 2} y={xAxisTitleY} text-anchor="middle">{screenBottomAxisTitle}</text>}
+        {showScreenLeftAxisTitle && <text class="database-chart__axis-title" x={leftAxisTitleX} y={verticalPlot.y + verticalPlot.height / 2} text-anchor="middle" transform={`rotate(-90 ${leftAxisTitleX} ${verticalPlot.y + verticalPlot.height / 2})`}>{screenLeftAxisTitle}</text>}
+        {verticalPoints.map((point) => (
+          <g>
+            <rect
+              class="database-chart__bar"
+              x={point.x}
+              y={point.y}
+              width={point.width}
+              height={point.height}
+              rx="2"
+              ry="2"
+              fill={`rgba(${chartColor}, ${point.opacity})`}
+            />
+            {showDataLabels && <text class="database-chart__data-label" x={point.labelX} y={point.labelY} text-anchor="middle">{formatNumber(point.Value)}</text>}
+            <text class="database-chart__axis-label" x={point.axisX} y={axisLabelY} text-anchor="middle">{point.Label}</text>
+          </g>
+        ))}
+      </svg>
+    ) : chart.Type === 'line' ? (
+      <svg class="database-chart__svg" viewBox={`0 0 ${chartWidth} ${chartHeight}`} role="img" aria-label={`${title} の線グラフ`}>
+        <defs>
+          <linearGradient id={`chart-gradient-${block.Id}`} x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0" stop-color={`rgb(${chartColor})`} stop-opacity="0.1" />
+            <stop offset="1" stop-color={`rgb(${chartColor})`} stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <rect class="database-chart__background" x="0" y="0" width={chartWidth} height={chartHeight} />
+        {showVerticalGridLines && lineCategoryGridXs.map((x) => (
+          <line class="database-chart__grid database-chart__grid--vertical" x1={x} y1={linePlot.y} x2={x} y2={linePlot.y + linePlot.height} />
+        ))}
+        {ticks.map((tick) => {
+          const y = linePlot.y + linePlot.height - valueRatio(tick) * linePlot.height
+          return (
+            <g>
+              {showHorizontalGridLines && <line class="database-chart__grid" x1={linePlot.x} y1={y} x2={linePlot.x + linePlot.width} y2={y} />}
+              <text class="database-chart__axis-label" x={valueAxisTickLabelX(linePlot.x)} y={y + 4} text-anchor="end">{formatNumber(tick)}</text>
+            </g>
+          )
+        })}
+        {showScreenBottomAxisTitle && <text class="database-chart__axis-title" x={linePlot.x + linePlot.width / 2} y={xAxisTitleY} text-anchor="middle">{screenBottomAxisTitle}</text>}
+        {showScreenLeftAxisTitle && <text class="database-chart__axis-title" x={leftAxisTitleX} y={linePlot.y + linePlot.height / 2} text-anchor="middle" transform={`rotate(-90 ${leftAxisTitleX} ${linePlot.y + linePlot.height / 2})`}>{screenLeftAxisTitle}</text>}
+        {showLineFillArea && <path class="database-chart__area" d={lineAreaPath} fill={`url(#chart-gradient-${block.Id})`} />}
+        <path class="database-chart__line" d={smoothLinePath} />
+        {linePoints.map((point) => (
+          <g>
+            <circle class="database-chart__line-point" cx={point.x} cy={point.y} r="4" />
+            {showDataLabels && <text class="database-chart__data-label" x={point.x} y={Math.max(linePlot.y + 12, point.y - 10)} text-anchor="middle">{formatNumber(point.Value)}</text>}
+            <text class="database-chart__axis-label" x={point.x} y={lineXAxisLabelY} text-anchor="middle">{point.Label}</text>
+          </g>
+        ))}
+      </svg>
+    ) : chart.Type === 'donut' ? (
+      <div class:list={[
+        'database-chart__donut-wrap',
+        showLegend && `database-chart__donut-wrap--legend-${legendPosition}`,
+      ]} role="img" aria-label={`${title} のドーナツグラフ`}>
+        <svg class="database-chart__svg" viewBox={`0 0 ${chartWidth} ${chartHeight}`}>
+          <rect class="database-chart__background" x="0" y="0" width={chartWidth} height={chartHeight} />
+          <g transform={`translate(${donutCenterX} ${donutCenterY}) rotate(-90)`}>
+            <circle class="database-chart__donut-track" r={donutRadius} cx="0" cy="0" />
+            {donutSegments.map((segment) => (
+              <circle
+                class="database-chart__donut-segment"
+                r={donutRadius}
+                cx="0"
+                cy="0"
+                stroke={segment.color}
+                stroke-dasharray={`${segment.dash} ${donutCircumference}`}
+                stroke-dashoffset={segment.offset}
+              />
+            ))}
+          </g>
+          {showDonutDataLabels && donutSegments.map((segment) => (
+            <line
+              class="database-chart__donut-connector"
+              x1={segment.connectorStartX}
+              y1={segment.connectorStartY}
+              x2={segment.connectorEndX}
+              y2={segment.connectorEndY}
+            />
+          ))}
+          {showDonutDataLabels && donutSegments.map((segment) => (
+            <text
+              class="database-chart__donut-label"
+              x={segment.labelX}
+              y={segment.labelY}
+              text-anchor={segment.textAnchor}
+            >{getDonutSegmentLabel(segment)}</text>
+          ))}
+          {showDonutCenterValue && <text class="database-chart__donut-total" x={donutCenterX} y={donutTotalY} text-anchor="middle" dominant-baseline="central">{formatNumber(total)}</text>}
+          {showDonutCenterCaption && <text class="database-chart__donut-caption" x={donutCenterX} y={donutCaptionY} text-anchor="middle" dominant-baseline="central">{donutValueCaption}</text>}
+        </svg>
+        {showLegend && (
+          <div class:list={['database-chart__legend', `database-chart__legend--${legendPosition}`]}>
+            {donutSegments.map((segment) => (
+              <div class="database-chart__legend-item">
+                <span style={`--chart-color: ${segment.color};`} />
+                <strong>{segment.Label}</strong>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    ) : (
+      <div class="database-chart__number" role="img" aria-label={`${title} の数値グラフ`}>
+        <span>{chart.ValueLabel || data[0]?.Label || `合計/${chart.ValueProperty}`}</span>
+        <strong>{formatChartValue(data[0]?.Value || 0, chart.ValueSuffix)}</strong>
+      </div>
+    )
+  }
+  {showSeriesLegend && (
+    <div class:list={['database-chart__legend', 'database-chart__legend--series', `database-chart__legend--${legendPosition}`]}>
+      <div class="database-chart__legend-item">
+        <span style={`--chart-color: rgba(${chartColor}, 1);`} />
+        <strong>{seriesLegendLabel}</strong>
+      </div>
+    </div>
+  )}
+  {showChartCaption && (
+    <div class="database-chart__caption">
+      {chartCaptionLines.map((line) => <span>{line || ' '}</span>)}
+    </div>
+  )}
+</div>
+
+<style>
+  .database-chart {
+    width: 100%;
+    margin: 0.75rem 0 1.25rem;
+    color: #37352f;
+    font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI Variable Display', 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
+
+  .database-chart__title {
+    margin: 1rem 0 0.45rem;
+    color: #37352f;
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .database-chart__svg {
+    display: block;
+    width: 100%;
+    height: var(--database-chart-height, 400px);
+    overflow: visible;
+  }
+
+  .database-chart__background {
+    fill: transparent;
+  }
+
+  .database-chart__grid {
+    stroke: rgba(230, 229, 227, 1);
+    stroke-dasharray: 1 3;
+    stroke-width: 1;
+  }
+
+  .database-chart__grid--vertical {
+    stroke-dasharray: 1 3;
+  }
+
+  .database-chart__axis {
+    stroke: rgba(230, 229, 227, 1);
+    stroke-width: 1;
+  }
+
+  .database-chart__axis-label,
+  .database-chart__axis-title,
+  .database-chart__data-label {
+    fill: rgb(125, 122, 117);
+    font-size: 12px;
+    font-weight: 400;
+  }
+
+  .database-chart__axis-title {
+    fill: rgb(125, 122, 117);
+    font-weight: 600;
+  }
+
+  .database-chart__bar {
+    stroke: rgba(255, 255, 255, 1);
+    stroke-width: 0.5;
+  }
+
+  .database-chart__area {
+    pointer-events: none;
+  }
+
+  .database-chart__line {
+    fill: none;
+    stroke: rgb(var(--database-chart-color));
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 3;
+  }
+
+  .database-chart__line-point {
+    fill: rgb(var(--database-chart-color));
+    stroke: #fff;
+    stroke-width: 0;
+  }
+
+  .database-chart__donut-wrap {
+    position: relative;
+    min-height: var(--database-chart-height, 400px);
+  }
+
+  .database-chart__donut-wrap--legend-right,
+  .database-chart__donut-wrap--legend-left {
+    display: grid;
+    gap: 0.85rem;
+    align-items: center;
+  }
+
+  .database-chart__donut-wrap--legend-right {
+    grid-template-columns: minmax(0, 500px) max-content;
+    gap: 0;
+    justify-content: center;
+  }
+
+  .database-chart__donut-wrap--legend-right .database-chart__svg {
+    justify-self: center;
+  }
+
+  .database-chart__donut-wrap--legend-left {
+    grid-template-columns: max-content minmax(0, 1fr);
+  }
+
+  .database-chart__donut-wrap--legend-left .database-chart__legend {
+    order: -1;
+  }
+
+  .database-chart__donut-wrap--legend-right > .database-chart__legend {
+    margin-left: -0.5rem;
+  }
+
+  .database-chart__donut-track,
+  .database-chart__donut-segment {
+    fill: none;
+    stroke-width: var(--database-chart-donut-stroke, 19px);
+  }
+
+  .database-chart__donut-track {
+    stroke: rgba(230, 229, 227, 0.45);
+  }
+
+  .database-chart__donut-segment {
+    stroke-linecap: butt;
+  }
+
+  .database-chart__donut-total {
+    fill: #37352f;
+    font-size: var(--database-chart-donut-total-font-size, 30px);
+    font-weight: 600;
+  }
+
+  .database-chart__donut-caption {
+    fill: rgb(125, 122, 117);
+    font-size: var(--database-chart-donut-caption-font-size, 12px);
+    font-weight: 400;
+  }
+
+  .database-chart__donut-connector {
+    stroke: rgba(125, 122, 117, 0.55);
+    stroke-width: 1;
+  }
+
+  .database-chart__donut-label {
+    fill: rgb(125, 122, 117);
+    font-size: 12px;
+    font-weight: 400;
+  }
+
+  .database-chart__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem 1rem;
+    justify-content: center;
+    margin-top: 0.6rem;
+    color: rgb(125, 122, 117);
+    font-size: 12px;
+  }
+
+  .database-chart__donut-wrap > .database-chart__legend {
+    margin-top: 0.25rem;
+  }
+
+  .database-chart__donut-wrap--legend-right > .database-chart__legend,
+  .database-chart__donut-wrap--legend-left > .database-chart__legend {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    margin-top: 0;
+  }
+
+  .database-chart__legend--top {
+    margin-top: 0.25rem;
+  }
+
+  .database-chart__legend--series {
+    margin-top: 0.45rem;
+  }
+
+  .database-chart__legend-item {
+    display: inline-flex;
+    gap: 0.35rem;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .database-chart__legend-item > span {
+    width: 8px;
+    height: 8px;
+    border-radius: 1px;
+    background: var(--chart-color);
+  }
+
+  .database-chart__legend-item strong {
+    color: rgb(125, 122, 117);
+    font-weight: 400;
+  }
+
+  .database-chart__legend-item em {
+    color: rgb(125, 122, 117);
+    font-style: normal;
+  }
+
+  .database-chart__legend-item small {
+    color: rgb(125, 122, 117);
+  }
+
+  .database-chart__caption {
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
+    margin-top: 0.65rem;
+    color: rgb(125, 122, 117);
+    font-size: 12px;
+    line-height: 1.45;
+    text-align: center;
+    white-space: pre-wrap;
+  }
+
+  .database-chart__number {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: var(--database-chart-height, 400px);
+    text-align: center;
+  }
+
+  .database-chart__number span {
+    max-width: 100%;
+    margin-block-end: 4px;
+    padding-inline: 32px;
+    overflow: hidden;
+    color: #37352f;
+    font-size: 20px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .database-chart__number strong {
+    max-width: 100%;
+    padding-inline: 32px;
+    overflow: hidden;
+    color: rgb(var(--database-chart-number-color));
+    font-size: 64px;
+    font-weight: 600;
+    line-height: 1.1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .database-chart__empty {
+    display: grid;
+    min-height: 180px;
+    place-items: center;
+    color: rgb(125, 122, 117);
+    font-size: 12px;
+  }
+
+  @media (max-width: 700px) {
+    .database-chart__svg,
+    .database-chart__number,
+    .database-chart__donut-wrap {
+      height: 320px;
+      min-height: 320px;
+    }
+
+    .database-chart__donut-wrap--legend-right,
+    .database-chart__donut-wrap--legend-left {
+      display: block;
+    }
+
+    .database-chart__legend,
+    .database-chart__donut-wrap > .database-chart__legend {
+      margin-top: -1rem;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .database-chart__donut-label {
+      display: none;
+    }
+  }
+</style>
