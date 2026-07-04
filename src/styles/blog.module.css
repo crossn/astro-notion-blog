@@ -128,9 +128,30 @@
 }
 
 .post :global(.post-body) {
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
   padding: 1rem 0 0;
   color: #373241;
   line-height: 1.85;
+}
+
+.post :global(.post-body > *) {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.post :global(.post-body figure),
+.post :global(.post-body figure > div),
+.post :global(.post-body figure > div > div),
+.post :global(.post-body figure a) {
+  box-sizing: border-box;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.post :global(.post-body figure) {
+  overflow: hidden;
 }
 
 .post :global(.post-body p) {
@@ -148,8 +169,9 @@
 
 .post :global(.post-body img),
 .post :global(.post-body video) {
+  display: block;
   max-width: 100%;
-  display: inline-block;
+  height: auto;
   border-radius: 10px;
 }
 

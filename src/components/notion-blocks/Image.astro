@@ -39,15 +39,37 @@ if (block.Image.External) {
 
 <style>
   .image {
-    display: flex;
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
     margin: 0 auto;
+    overflow: hidden;
+    text-align: center;
   }
-  .image > div {
-    margin: 0 auto;
-  }
+
+  .image > div,
   .image > div > div {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0 auto;
   }
+
+  .image > div > div a {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+  }
+
   .image > div > div img {
     display: block;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
   }
 </style>

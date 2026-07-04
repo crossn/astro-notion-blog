@@ -21,6 +21,9 @@ pnpm-debug.log*
 # macOS-specific files
 .DS_Store
 
+# local screenshots
+.screenshot/
+
 .node-version
 
 tmp/
