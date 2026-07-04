@@ -27,6 +27,7 @@ import Embed from './notion-blocks/Embed.astro'
 import Bookmark from './notion-blocks/Bookmark.astro'
 import Divider from './notion-blocks/Divider.astro'
 import Table from './notion-blocks/Table.astro'
+import DatabaseChart from './notion-blocks/DatabaseChart.astro'
 import ColumnList from './notion-blocks/ColumnList.astro'
 import BulletedListItems from './notion-blocks/BulletedListItems.astro'
 import NumberedListItems from './notion-blocks/NumberedListItems.astro'
@@ -169,6 +170,8 @@ const bookmarkURLMap = await buildURLToHTMLMap(bookmarkURLs)
         return <Divider />
       case 'table':
         return <Table block={block} />
+      case 'child_database':
+        return <DatabaseChart block={block} />
       case 'column_list':
         return <ColumnList block={block} headings={headings} />
       case 'bulleted_list':

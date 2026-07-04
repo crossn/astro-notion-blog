@@ -1,6 +1,9 @@
 [English](README.md) | 日本語
 
-# astro-notion-blog
+# astro-notion-blog — tsukurun-Lab Edition
+
+tsukurun-Lab Edition は、[otoyo/astro-notion-blog](https://github.com/otoyo/astro-notion-blog) をフォークし、tsukurun-Lab のサイト向けに独自カスタマイズしている派生版です。
+元プロジェクトは MIT License で配布されており、このリポジトリでも元のライセンス表記を残しています。
 
 [![GitHub stars](https://img.shields.io/github/stars/otoyo/astro-notion-blog)](https://github.com/otoyo/astro-notion-blog/stargazers)
 [![GitHub license](https://img.shields.io/github/license/otoyo/astro-notion-blog)](https://github.com/otoyo/astro-notion-blog/blob/main/LICENSE)
