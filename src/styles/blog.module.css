@@ -160,6 +160,17 @@
   font-size: 1rem;
 }
 
+/* 通常の段落同士だけに、文章の区切りが伝わる余白を加える。 */
+.post :global(.post-body > p + p) {
+  margin-top: 0.7rem;
+}
+
+/* Notionの空Paragraphは、余白を追加せず空のまま扱う。 */
+.post :global(.post-body > p:empty) {
+  min-height: 0;
+  margin: 0;
+}
+
 .post :global(.post-body a:not([id])) {
   color: #7c6cf2;
   text-decoration: underline;
@@ -292,5 +303,9 @@
   .post {
     padding: 1.2rem;
     border-radius: 18px;
+  }
+
+  .post :global(.post-body > p + p) {
+    margin-top: 0.55rem;
   }
 }
