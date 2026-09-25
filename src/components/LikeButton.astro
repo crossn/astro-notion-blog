@@ -6,7 +6,7 @@ export interface Props {
 const { slug } = Astro.props
 ---
 
-<div class="like-area" data-like-root>
+<div class="like-area" data-like-root hidden>
   <button
     class="like-button"
     type="button"
@@ -17,7 +17,6 @@ const { slug } = Astro.props
     disabled
   >
     <span class="like-icon" data-like-icon aria-hidden="true">♡</span>
-    <span class="like-label">いいね</span>
     <span class="like-count" data-like-count aria-live="polite">–</span>
   </button>
   <span class="like-status" data-like-status role="status" aria-live="polite" hidden
@@ -26,6 +25,8 @@ const { slug } = Astro.props
 
 <script>
   const STORAGE_PREFIX = 'tsukurun-like-v1:'
+  // Pages Functions routes are based on the /functions file path, independent of Astro's BASE_PATH.
+  const API_PATH = '/api/likes'
 
   function readStoredVoterId(key) {
     try {
@@ -61,7 +62,7 @@ const { slug } = Astro.props
     ].join('-')
   }
 
-  function initLikeButton(root) {
+  function initLikeButton(root: HTMLElement) {
     const button = root.querySelector('[data-like-button]')
     const count = root.querySelector('[data-like-count]')
     const icon = root.querySelector('[data-like-icon]')
@@ -112,7 +113,7 @@ const { slug } = Astro.props
     }
 
     const readState = async () => {
-      const url = new URL('/api/likes', window.location.origin)
+      const url = new URL(API_PATH, window.location.origin)
       url.searchParams.set('slug', slug)
       if (voterId) {
         url.searchParams.set('voterId', voterId)
@@ -137,7 +138,7 @@ const { slug } = Astro.props
         writeStoredVoterId(storageKey, voterId)
       }
 
-      const response = await fetch('/api/likes', {
+      const response = await fetch(API_PATH, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -160,11 +161,11 @@ const { slug } = Astro.props
     readState()
       .then((state) => {
         render(Boolean(state.liked), Number(state.likes || 0))
+        root.hidden = false
         button.disabled = false
       })
       .catch(() => {
-        count.textContent = '–'
-        setStatus('いいねを読み込めませんでした')
+        root.hidden = true
       })
 
     button.addEventListener('click', async () => {
@@ -210,6 +211,10 @@ const { slug } = Astro.props
     align-items: center;
     gap: 0.75rem;
     margin: 2rem 0 1.35rem;
+  }
+
+  .like-area[hidden] {
+    display: none;
   }
 
   .like-button {
@@ -260,11 +265,6 @@ const { slug } = Astro.props
     font-size: 1.1rem;
     line-height: 1;
     text-align: center;
-  }
-
-  .like-label {
-    font-size: 0.92rem;
-    font-weight: 600;
   }
 
   .like-count {

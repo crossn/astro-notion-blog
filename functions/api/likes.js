@@ -33,25 +33,16 @@ function parseVoterId(value) {
 }
 
 async function getLikeState(db, slug, voterId) {
-  const countRow = await db
-    .prepare('SELECT COUNT(*) AS likes FROM article_likes WHERE slug = ?')
-    .bind(slug)
+  const row = await db
+    .prepare(
+      'SELECT COUNT(*) AS likes, COALESCE(MAX(CASE WHEN voter_id = ? THEN 1 ELSE 0 END), 0) AS liked FROM article_likes WHERE slug = ?'
+    )
+    .bind(voterId || '', slug)
     .first()
 
-  let liked = false
-  if (voterId) {
-    const row = await db
-      .prepare(
-        'SELECT 1 AS liked FROM article_likes WHERE slug = ? AND voter_id = ? LIMIT 1'
-      )
-      .bind(slug, voterId)
-      .first()
-    liked = Boolean(row?.liked)
-  }
-
   return {
-    likes: Number(countRow?.likes || 0),
-    liked,
+    likes: Number(row?.likes || 0),
+    liked: Boolean(row?.liked),
   }
 }
 
@@ -87,7 +78,8 @@ export async function onRequestGet({ request, env }) {
   }
 
   try {
-    return json(await getLikeState(db, slug, voterId))
+    const session = db.withSession('first-primary')
+    return json(await getLikeState(session, slug, voterId))
   } catch (error) {
     console.error('Failed to read likes', error)
     return json({ error: 'Failed to read likes.' }, 500)
@@ -120,21 +112,22 @@ export async function onRequestPost({ request, env }) {
   }
 
   try {
+    const session = db.withSession('first-primary')
     if (liked) {
-      await db
+      await session
         .prepare(
           'INSERT OR IGNORE INTO article_likes (slug, voter_id) VALUES (?, ?)'
         )
         .bind(slug, voterId)
         .run()
     } else {
-      await db
+      await session
         .prepare('DELETE FROM article_likes WHERE slug = ? AND voter_id = ?')
         .bind(slug, voterId)
         .run()
     }
 
-    return json(await getLikeState(db, slug, voterId))
+    return json(await getLikeState(session, slug, voterId))
   } catch (error) {
     console.error('Failed to update likes', error)
     return json({ error: 'Failed to update likes.' }, 500)
