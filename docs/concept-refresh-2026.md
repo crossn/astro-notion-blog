@@ -6,7 +6,7 @@ This branch is reserved for the tsukurun-Lab site concept refresh.
 
 The design concept and implementation phases are maintained in Notion:
 
-https://app.notion.com/p/3e0d5238b58c815abdc9d91c08c0ddf6
+https://app.notion.com/p/3e6d5238b58c81a49bdff2a5a8a2fdf4?pvs=204
 
 Section: `Concept Refresh 2026-09`
 
@@ -70,9 +70,11 @@ Do not skip the review gate between phases.
 - Keep unrelated refactors out
 - Preserve easy rollback by keeping changes scoped and reviewable
 
-## Phase 0 rule
+## Phase 0 status
 
-Phase 0 is audit-only.
+Phase 0 audit is complete. See `docs/concept-refresh-phase0-audit.md`.
+
+Phase 0 remains audit-only.
 
 Before implementing layout or styling changes, inspect the current code and report:
 - current brand tokens
