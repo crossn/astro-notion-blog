@@ -22,6 +22,7 @@ import PostDate from '../../components/PostDate.astro'
 import PostTags from '../../components/PostTags.astro'
 import PostTitle from '../../components/PostTitle.astro'
 import PostBody from '../../components/PostBody.astro'
+import LikeButton from '../../components/LikeButton.astro'
 import PostRelativeLink from '../../components/PostRelativeLink.astro'
 import BlogPostsLink from '../../components/BlogPostsLink.astro'
 import BlogTagsLink from '../../components/BlogTagsLink.astro'
@@ -186,6 +187,7 @@ if (post.FeaturedImage && post.FeaturedImage.Url) {
         <PostTitle post={post} enableLink={false} />
         <PostBody blocks={blocks} />
         <PostTags post={post} />
+        <LikeButton slug={post.Slug} />
 
         <footer>
           <PostRelativeLink prevPost={prevPost} nextPost={nextPost} />
