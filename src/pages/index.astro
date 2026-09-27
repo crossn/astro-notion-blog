@@ -190,7 +190,7 @@ const shelfWorks = [
         </header>
 
         <div class="postNotes">
-          <article class="leadPost">
+          <article class:list={['leadPost', { withoutImage: !featuredPostImage }]}>
             <a href={getPostLink(featuredPost.Slug)}>
               {featuredPostImage && (
                 <div class="postImage">
@@ -244,7 +244,7 @@ const shelfWorks = [
   .hero {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
-    padding: clamp(2.4rem, 5.5vw, 4.5rem) 0 0;
+    padding: clamp(2rem, 4.5vw, 3.5rem) 0 0;
   }
 
   .heroCopy {
@@ -313,9 +313,9 @@ const shelfWorks = [
   .heroArtwork {
     grid-column: 5 / -1;
     grid-row: 2;
-    width: min(100%, 780px);
+    width: min(100%, 720px);
     justify-self: end;
-    margin: 1.35rem 0 0;
+    margin: 0.95rem 0 0;
     padding: clamp(0.35rem, 1vw, 0.75rem);
     border: 1px solid var(--color-border-subtle);
     background: var(--color-paper);
@@ -333,7 +333,7 @@ const shelfWorks = [
 
   .heroNext {
     grid-column: 2 / -1;
-    margin: 0.8rem 0 0;
+    margin: 0.55rem 0 0;
     color: var(--color-ink-muted);
     font-size: 0.82rem;
     letter-spacing: 0.04em;
@@ -343,7 +343,7 @@ const shelfWorks = [
     display: grid;
     grid-template-columns: minmax(130px, 0.27fr) minmax(0, 1fr);
     gap: clamp(1rem, 4vw, 3rem);
-    margin: clamp(2rem, 5vw, 4rem) 8% 0;
+    margin: clamp(1.5rem, 3.5vw, 3rem) 8% 0;
     padding: 1.1rem 0 0;
     border-top: 1px solid var(--color-border-subtle);
   }
@@ -497,13 +497,8 @@ const shelfWorks = [
   .workShelf {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: clamp(1.25rem, 3vw, 2.5rem);
     margin-top: clamp(2.5rem, 5vw, 4rem);
-    border-top: 1px solid var(--color-border-subtle);
-    border-bottom: 1px solid var(--color-border-subtle);
-  }
-
-  .shelfWork + .shelfWork {
-    border-left: 1px solid var(--color-border-subtle);
   }
 
   .shelfWork a {
@@ -586,6 +581,10 @@ const shelfWorks = [
     align-items: start;
     color: inherit;
     text-decoration: none;
+  }
+
+  .leadPost.withoutImage > a {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .postImage {
@@ -838,6 +837,8 @@ const shelfWorks = [
     .workShelf {
       grid-template-columns: 1fr;
       margin-top: 1.8rem;
+      border-top: 1px solid var(--color-border-subtle);
+      border-bottom: 1px solid var(--color-border-subtle);
     }
 
     .shelfWork + .shelfWork {
