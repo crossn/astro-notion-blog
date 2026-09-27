@@ -13,8 +13,8 @@
 
   /* Small semantic scales, kept intentionally close to existing styles. */
   --radius-small: 4px;
-  --radius-object: 8px;
-  --radius-sheet: 12px;
+  --radius-object: 1.25rem;
+  --radius-sheet: 2rem;
   --radius-pill: 999px;
 
   --space-page-gutter: 5%;

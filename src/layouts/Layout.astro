@@ -67,27 +67,29 @@ const navItems = [
 
       <ul>
         {
-          navItems.map(({ label, path: p }) => (
-            <li key={label}>
-              <a
-                href={getNavLink(p)}
-                class={
-                  (p === '/' ? path === '/' : path === p || path.startsWith(`${p}/`))
-                    ? 'active'
-                    : null
-                }
-                aria-current={
-                  (p === '/' ? path === '/' : path === p || path.startsWith(`${p}/`))
-                    ? p === '/'
-                      ? 'page'
-                      : 'location'
-                    : undefined
-                }
-              >
-                {label}
-              </a>
-            </li>
-          ))
+          navItems.map(({ label, path: p }) => {
+            const isActive =
+              p === '/'
+                ? path === '/'
+                : path === p || path.startsWith(`${p}/`)
+            const ariaCurrent = isActive
+              ? path === p
+                ? 'page'
+                : 'location'
+              : undefined
+
+            return (
+              <li key={label}>
+                <a
+                  href={getNavLink(p)}
+                  class={isActive ? 'active' : null}
+                  aria-current={ariaCurrent}
+                >
+                  {label}
+                </a>
+              </li>
+            )
+          })
         }
       </ul>
     </header>
