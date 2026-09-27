@@ -69,7 +69,21 @@ const navItems = [
         {
           navItems.map(({ label, path: p }) => (
             <li key={label}>
-              <a href={getNavLink(p)} class={p === path ? 'active' : null}>
+              <a
+                href={getNavLink(p)}
+                class={
+                  (p === '/' ? path === '/' : path === p || path.startsWith(`${p}/`))
+                    ? 'active'
+                    : null
+                }
+                aria-current={
+                  (p === '/' ? path === '/' : path === p || path.startsWith(`${p}/`))
+                    ? p === '/'
+                      ? 'page'
+                      : 'location'
+                    : undefined
+                }
+              >
                 {label}
               </a>
             </li>
@@ -97,13 +111,13 @@ const navItems = [
 <style>
   .header {
     display: block;
-    padding: 15px 0;
+    padding: 1rem 0 0.5rem;
     text-align: center;
   }
   .header h1 {
-    padding: 0.5rem 0;
+    padding: 0.25rem 0;
     font-weight: 400;
-    color: #000;
+    color: var(--color-ink);
   }
   .header h1 a {
     color: inherit;
@@ -111,7 +125,7 @@ const navItems = [
   .header ul {
     list-style: none;
     margin: inherit;
-    padding: 0.5rem 0;
+    padding: 0.35rem 0 0.55rem;
     font-size: 1.1rem;
   }
   @media (max-width: 640px) {
@@ -121,30 +135,71 @@ const navItems = [
   }
   .header ul li {
     display: inline-block;
-    padding: 0 15px;
+    padding: 0 0.9rem;
   }
+  .header ul li :global(a) {
+    position: relative;
+    display: inline-block;
+    padding: 0.15rem 0.1rem 0.3rem;
+    color: var(--color-ink-muted);
+    transition: color var(--motion-fast) ease;
+  }
+  .header ul li :global(a::after) {
+    position: absolute;
+    right: 0.1rem;
+    bottom: 0;
+    left: 0.1rem;
+    height: 1px;
+    background: var(--color-interaction);
+    content: '';
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform var(--motion-soft) ease;
+  }
+  .header ul li :global(a:hover),
   .header ul li :global(a.active) {
-    color: var(--accents-3);
+    color: var(--color-interaction-hover);
+  }
+  .header ul li :global(a:hover::after),
+  .header ul li :global(a.active::after) {
+    transform: scaleX(1);
+  }
+  .header ul li :global(a:focus-visible) {
+    border-radius: var(--radius-small);
   }
 
   .container {
     width: 100%;
-    padding: 0 5%;
+    padding: 0 var(--space-page-gutter);
   }
 
   .footer {
-    margin: 40px 0 10px;
+    margin: var(--space-section) 0 0.5rem;
     text-align: center;
     font-size: 0.75rem;
-    background: #f7d4ea50;
-    /* opacity: 0.1; */
-    padding: 100px;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(247, 212, 234, 0.12) 100%
+    );
+    border-top: 1px solid var(--color-border-subtle);
+    padding: 2rem 1rem 1.5rem;
   }
   .footer span {
-    color: #777;
+    color: var(--color-ink-muted);
   }
-  .footer span a {
+  .footer a {
     color: inherit;
+  }
+  .footer a:hover {
+    color: var(--color-interaction-hover);
+  }
+
+  @media (max-width: 640px) {
+    .footer {
+      margin-top: 1.5rem;
+      padding: 1.5rem 1rem 1.25rem;
+    }
   }
 </style>
 
