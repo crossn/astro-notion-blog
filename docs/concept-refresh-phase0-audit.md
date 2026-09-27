@@ -1,10 +1,12 @@
 # Phase 0 Design Audit
 
-Status: **Human review gate**
+Status: **Complete / approved**
 
 Baseline:
 - Repository: `crossn/astro-notion-blog`
 - Base: `main@1039e1ef7f87e89156eed7607e3272a93149f78d`
+- Historical audit baseline: this Phase 0 review was conducted against `main@1039e1ef7f87e89156eed7607e3272a93149f78d`.
+- Current production baseline: `main@ab31f4983ece775188c792833a071494be20f141` (PR #16, Reversible Like, merged).
 - Working branch: `feat/concept-refresh-2026`
 - Mode: **Redesign - Preserve**
 - Target dials: **DESIGN_VARIANCE 6 / MOTION_INTENSITY 3 / VISUAL_DENSITY 4**
@@ -12,7 +14,7 @@ Baseline:
 Source of truth:
 https://app.notion.com/p/3e6d5238b58c81a49bdff2a5a8a2fdf4?pvs=204
 
-No production UI implementation is included in Phase 0.
+No production UI implementation was included in Phase 0.
 
 ## 1. Current design system
 
@@ -209,40 +211,43 @@ During Phase 4, review document outline semantics without changing the visual hi
 
 ## 7. Approved direction for the next phases
 
-### Phase 1 - shared foundation
+### Phase 1 - Shared Design Foundation
 Allowed:
 - consolidate color/spacing/radius/shadow tokens
 - unify interaction/focus language
 - reduced-motion baseline
 - refine header/footer
 - prepare reusable layout primitives
+- prepare shared reaction color, motion, and reduced-motion tokens if useful
 
 Not allowed yet:
 - major Home IA change
 - Blog listing redesign
 - article body redesign
-- Like implementation
+- Like backend or behavior reimplementation; preserve the production API, D1, token, state, accessibility, and failure-fallback behavior
 - new frontend framework
 
-### Phase 2 - Home
+### Phase 2 - TOP
 Target:
 **studio entrance -> short Lab note -> asymmetric Works shelf -> From the Lab -> quiet exits**
 
-### Phase 3 - Blog index
+### Phase 3 - Blog Index + Signals
 Target:
 **editorial contents page**, not repeated card feed.
 
-### Phase 4 - Article
+Signals: Latest uses existing post data; “よく読まれている” considers GA4 Data API first; “反応が多い” uses the existing D1 Like data as the source of truth. Add an aggregate read path only if the listing needs one. Keep static generation and let a Signals failure leave the normal article list available.
+
+### Phase 4 - Article + Reaction UI
 Target:
 **quiet reading surface with lighter editorial rails**.
+Refresh the existing Like presentation only (such as watercolor bloom, color, shadow, transition, and surrounding spacing). Preserve the current API contract, D1, anonymous token, Like / Unlike, state restore, `aria-pressed`, keyboard operation, and failure fallback.
 
-### Phase 5 - Reversible Like
-Target:
-small anonymous reaction with a subtle watercolor bloom, built only after article layout is settled.
+### Phase 5 - Pre-flight
+Verify brand fidelity, URLs/slugs, SEO, BASE_PATH, tags, pagination, RSS, mobile, keyboard, reduced motion, Like regression, Lighthouse, lint, build, and physical-device behavior.
 
 ## 8. Human review gate
 
-Before Phase 1 starts, confirm these five decisions:
+The five Phase 0 decisions below are **approved**:
 
 1. Keep target dials at **6 / 3 / 4**.
 2. Keep **orange as primary interaction** and purple/pastels as editorial/decorative accents.
@@ -250,4 +255,4 @@ Before Phase 1 starts, confirm these five decisions:
 4. Approve Blog direction: **editorial index**, not card feed.
 5. Keep article body typography and Notion renderer substantially unchanged.
 
-Until those are accepted, this branch should contain documentation only.
+The next gate is human review of the small Phase 1 Shared Design Foundation proposal. Implementation should wait for that review.

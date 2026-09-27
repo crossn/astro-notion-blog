@@ -25,13 +25,14 @@ Preserve:
 - Notion → Astro static blog workflow
 - existing article URLs, slugs, tags, pagination, RSS, SEO baseline
 - upstream credit to otoyo/astro-notion-blog
+- the production Reversible Like implementation and its API, D1, anonymous-token, accessibility, and failure-fallback behavior
 
 Improve:
 - TOP page composition
 - Blog index composition
 - Article detail framing around the content
 - shared visual language between TOP and Blog
-- reversible Like interaction in a later phase
+- visual refinement of the existing Like reaction in Phase 4, without rebuilding its behavior
 
 ## Taste Skill guardrails
 
@@ -49,15 +50,23 @@ Current target dials:
 - MOTION_INTENSITY: 3 / 10
 - VISUAL_DENSITY: 4 / 10
 
+## Production baseline
+
+PR #16, **Blogに取り消せるいいね機能を追加**, has been merged into `main`.
+The current production baseline is `main@ab31f4983ece775188c792833a071494be20f141`.
+
+The production Like feature uses Cloudflare Pages Functions + D1 (`LIKES_DB`) with an anonymous token scoped to each article slug. It supports Like / Unlike, restores the state after refresh, and displays `♡` / `♥` with the count. If the API or D1 is unavailable, only the Like UI is hidden; the static article remains available.
+
+Concept Refresh must not recreate or change the Like API contract, D1 storage, anonymous-token model, Like / Unlike behavior, `aria-pressed`, keyboard interaction, or failure fallback. Phase 4 may refresh only the visual presentation (for example watercolor bloom, color, shadow, transition, and surrounding spacing). Blog Signals should use the existing D1 data as the source of truth for “most reacted”; consider an aggregate read path in Phase 3 only if the listing needs it. Do not redesign reaction writes.
+
 ## Implementation phases
 
-0. Design audit only
-1. Shared design foundation
-2. TOP page
-3. Blog index
-4. Blog article
-5. Reversible Like
-6. Pre-flight / QA
+0. Design Audit — **Complete / approved**
+1. Shared Design Foundation
+2. TOP
+3. Blog Index + Signals
+4. Article + Reaction UI
+5. Pre-flight
 
 Do not skip the review gate between phases.
 
@@ -65,23 +74,13 @@ Do not skip the review gate between phases.
 
 - Base: `main`
 - Working branch: `feat/concept-refresh-2026`
-- Keep this work isolated from `feat/reversible-blog-likes` / PR #16
-- Do not merge PR #16 into this branch
 - Keep unrelated refactors out
 - Preserve easy rollback by keeping changes scoped and reviewable
 
 ## Phase 0 status
 
-Phase 0 audit is complete. See `docs/concept-refresh-phase0-audit.md`.
+Phase 0 audit is complete and approved. See `docs/concept-refresh-phase0-audit.md`.
 
-Phase 0 remains audit-only.
+The historical Phase 0 audit was performed against `main@1039e1ef7f87e89156eed7607e3272a93149f78d`. The current production baseline is `main@ab31f4983ece775188c792833a071494be20f141`, which includes merged PR #16.
 
-Before implementing layout or styling changes, inspect the current code and report:
-- current brand tokens
-- layout / typography / spacing / radius / shadow patterns
-- TOP / Blog index / article IA
-- preserve / retire candidates
-- PC / mobile issues
-- URLs / SEO / navigation that must not change
-
-Implementation begins only after human review of the audit.
+The next human review gate is the small design proposal for Phase 1 Shared Design Foundation. Do not begin implementation until that proposal is reviewed.
