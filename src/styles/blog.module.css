@@ -110,6 +110,10 @@
   margin: 0.3rem 0 0.9rem;
 }
 
+.post :global(.post-body + .post-tags) {
+  margin-top: 2rem;
+}
+
 .post :global(.post-title) {
   margin: 0.2rem 0 1rem;
   color: #282334;
@@ -307,5 +311,9 @@
 
   .post :global(.post-body > p + p) {
     margin-top: 0.55rem;
+  }
+
+  .post :global(.post-body + .post-tags) {
+    margin-top: 1.7rem;
   }
 }

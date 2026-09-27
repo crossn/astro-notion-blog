@@ -1,0 +1,296 @@
+---
+export interface Props {
+  slug: string
+}
+
+const { slug } = Astro.props
+---
+
+<div class="like-area" data-like-root hidden>
+  <button
+    class="like-button"
+    type="button"
+    data-like-button
+    data-slug={slug}
+    aria-pressed="false"
+    aria-label="この記事にいいねする"
+    disabled
+  >
+    <span class="like-icon" data-like-icon aria-hidden="true">♡</span>
+    <span class="like-count" data-like-count aria-live="polite">–</span>
+  </button>
+  <span class="like-status" data-like-status role="status" aria-live="polite" hidden
+  ></span>
+</div>
+
+<script>
+  const STORAGE_PREFIX = 'tsukurun-like-v1:'
+  // Pages Functions routes are based on the /functions file path, independent of Astro's BASE_PATH.
+  const API_PATH = '/api/likes'
+
+  function readStoredVoterId(key) {
+    try {
+      return window.localStorage.getItem(key) || ''
+    } catch {
+      return ''
+    }
+  }
+
+  function writeStoredVoterId(key, value) {
+    try {
+      window.localStorage.setItem(key, value)
+    } catch {
+      // The current page can still like/unlike even when localStorage is blocked.
+    }
+  }
+
+  function createVoterId() {
+    if (typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID()
+    }
+
+    const bytes = crypto.getRandomValues(new Uint8Array(16))
+    bytes[6] = (bytes[6] & 0x0f) | 0x40
+    bytes[8] = (bytes[8] & 0x3f) | 0x80
+    const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0'))
+    return [
+      hex.slice(0, 4).join(''),
+      hex.slice(4, 6).join(''),
+      hex.slice(6, 8).join(''),
+      hex.slice(8, 10).join(''),
+      hex.slice(10, 16).join(''),
+    ].join('-')
+  }
+
+  function initLikeButton(root: HTMLElement) {
+    const button = root.querySelector('[data-like-button]')
+    const count = root.querySelector('[data-like-count]')
+    const icon = root.querySelector('[data-like-icon]')
+    const status = root.querySelector('[data-like-status]')
+
+    if (
+      !(button instanceof HTMLButtonElement) ||
+      !(count instanceof HTMLElement) ||
+      !(icon instanceof HTMLElement) ||
+      !(status instanceof HTMLElement) ||
+      button.dataset.initialized === 'true'
+    ) {
+      return
+    }
+
+    button.dataset.initialized = 'true'
+
+    const slug = button.dataset.slug
+    if (!slug) {
+      return
+    }
+
+    const storageKey = STORAGE_PREFIX + slug
+    let voterId = readStoredVoterId(storageKey)
+    let liked = false
+
+    const setStatus = (message) => {
+      if (!message) {
+        status.textContent = ''
+        status.hidden = true
+        return
+      }
+
+      status.textContent = message
+      status.hidden = false
+    }
+
+    const render = (nextLiked, likes) => {
+      liked = nextLiked
+      button.classList.toggle('is-liked', liked)
+      button.setAttribute('aria-pressed', String(liked))
+      button.setAttribute(
+        'aria-label',
+        liked ? 'この記事へのいいねを取り消す' : 'この記事にいいねする'
+      )
+      icon.textContent = liked ? '♥' : '♡'
+      count.textContent = String(likes)
+    }
+
+    const readState = async () => {
+      const url = new URL(API_PATH, window.location.origin)
+      url.searchParams.set('slug', slug)
+      if (voterId) {
+        url.searchParams.set('voterId', voterId)
+      }
+
+      const response = await fetch(url, {
+        headers: {
+          Accept: 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to read likes')
+      }
+
+      return response.json()
+    }
+
+    const writeState = async (nextLiked) => {
+      if (!voterId) {
+        voterId = createVoterId()
+        writeStoredVoterId(storageKey, voterId)
+      }
+
+      const response = await fetch(API_PATH, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          slug,
+          voterId,
+          liked: nextLiked,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to update likes')
+      }
+
+      return response.json()
+    }
+
+    readState()
+      .then((state) => {
+        render(Boolean(state.liked), Number(state.likes || 0))
+        root.hidden = false
+        button.disabled = false
+      })
+      .catch(() => {
+        root.hidden = true
+      })
+
+    button.addEventListener('click', async () => {
+      if (button.disabled) {
+        return
+      }
+
+      const nextLiked = !liked
+      button.disabled = true
+      setStatus('')
+
+      try {
+        const state = await writeState(nextLiked)
+        render(Boolean(state.liked), Number(state.likes || 0))
+      } catch {
+        setStatus('更新できませんでした。少し時間をおいてもう一度お試しください')
+      } finally {
+        button.disabled = false
+      }
+    })
+  }
+
+  function initLikeButtons() {
+    document.querySelectorAll('[data-like-root]').forEach((root) => {
+      if (root instanceof HTMLElement) {
+        initLikeButton(root)
+      }
+    })
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initLikeButtons, { once: true })
+  } else {
+    initLikeButtons()
+  }
+
+  document.addEventListener('astro:page-load', initLikeButtons)
+</script>
+
+<style>
+  .like-area {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 2rem 0 1.35rem;
+  }
+
+  .like-area[hidden] {
+    display: none;
+  }
+
+  .like-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 2.5rem;
+    padding: 0.55rem 0.9rem;
+    border: 1px solid rgba(124, 108, 242, 0.2);
+    border-radius: 999px;
+    color: #4d4659;
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: 0 8px 24px rgba(76, 60, 120, 0.06);
+    font: inherit;
+    cursor: pointer;
+    transition:
+      transform 120ms ease,
+      border-color 120ms ease,
+      background 120ms ease,
+      box-shadow 120ms ease;
+  }
+
+  .like-button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    border-color: rgba(219, 139, 151, 0.42);
+    background: rgba(255, 249, 250, 0.96);
+    box-shadow: 0 10px 26px rgba(76, 60, 120, 0.09);
+  }
+
+  .like-button:focus-visible {
+    outline: 3px solid rgba(124, 108, 242, 0.22);
+    outline-offset: 3px;
+  }
+
+  .like-button.is-liked {
+    border-color: rgba(219, 139, 151, 0.42);
+    color: #9a5360;
+    background: rgba(255, 244, 246, 0.94);
+  }
+
+  .like-button:disabled {
+    cursor: default;
+    opacity: 0.58;
+  }
+
+  .like-icon {
+    min-width: 1.1em;
+    font-size: 1.1rem;
+    line-height: 1;
+    text-align: center;
+  }
+
+  .like-count {
+    min-width: 1.2ch;
+    color: #777184;
+    font-size: 0.88rem;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+  }
+
+  .is-liked .like-count {
+    color: inherit;
+  }
+
+  .like-status {
+    color: #777184;
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 640px) {
+    .like-area {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 0.45rem;
+      margin-top: 1.7rem;
+    }
+  }
+</style>
