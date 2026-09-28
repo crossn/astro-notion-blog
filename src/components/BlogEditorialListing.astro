@@ -1,0 +1,177 @@
+---
+import type { Post, SelectProperty } from '../lib/interfaces.ts'
+import { getDateStr, getPageLink, getPostLink } from '../lib/blog-helpers.ts'
+import BlogTagRail from './BlogTagRail.astro'
+import PostFeaturedImage from './PostFeaturedImage.astro'
+import PostTags from './PostTags.astro'
+import styles from '../styles/blog-listing.module.css'
+import '../styles/notion-color.css'
+
+export interface Props {
+  posts: Post[]
+  tags: SelectProperty[]
+  currentPage: number
+  numberOfPages: number
+  tag?: string
+}
+
+const {
+  posts,
+  tags,
+  currentPage,
+  numberOfPages,
+  tag = '',
+} = Astro.props
+
+const showLatest = currentPage === 1 && posts.length > 0
+const latestPost = showLatest ? posts[0] : undefined
+const recentPosts = showLatest ? posts.slice(1) : posts
+const activeTag = tag ? tags.find((item) => item.name === tag) : undefined
+const paginationStart = Math.max(1, currentPage - 2)
+const paginationEnd = Math.min(numberOfPages, currentPage + 2)
+const pageNumbers = Array.from(
+  { length: Math.max(0, paginationEnd - paginationStart + 1) },
+  (_, index) => paginationStart + index
+)
+
+const titleFor = (post: Post) =>
+  `${post.Icon?.Emoji ? `${post.Icon.Emoji} ` : ''}${post.Title}`
+---
+
+<main class={styles.listing}>
+  <header class={styles.intro}>
+    <p class={styles.eyebrow}>tsukurun-Lab / field notes</p>
+    <h1>Blog</h1>
+    <p class={styles.introCopy}>
+      試したことや、つまずいたこと。つくる途中の記録を少しずつ残しています。
+    </p>
+    {
+      (tag || currentPage > 1) && (
+        <p class={styles.context}>
+          {tag && (
+            <>
+              <span>タグ</span>
+              {activeTag ? (
+                <span class={`tag ${activeTag.color}`}>{tag}</span>
+              ) : (
+                <span>{tag}</span>
+              )}
+            </>
+          )}
+          {currentPage > 1 && (
+            <span class={styles.pageContext}>
+              {currentPage} / {numberOfPages}
+            </span>
+          )}
+        </p>
+      )
+    }
+  </header>
+
+  {
+    posts.length === 0 ? (
+      <p class={styles.emptyState}>まだ記事がありません。</p>
+    ) : (
+      <>
+        {latestPost && (
+          <section class={styles.latestSection} aria-labelledby="latest-heading">
+            <h2 id="latest-heading" class={styles.sectionHeading}>
+              <span>Latest</span>
+              <span class={styles.sectionRule} aria-hidden="true" />
+            </h2>
+            <article class={styles.latest}>
+              <PostFeaturedImage post={latestPost} alt={latestPost.Title} />
+              <div class={styles.latestCopy}>
+                {latestPost.Date && (
+                  <time class={styles.date} datetime={latestPost.Date}>
+                    {getDateStr(latestPost.Date)}
+                  </time>
+                )}
+                <h3>
+                  <a href={getPostLink(latestPost.Slug)}>
+                    {titleFor(latestPost)}
+                  </a>
+                </h3>
+                {latestPost.Excerpt && (
+                  <p class={styles.latestExcerpt}>{latestPost.Excerpt}</p>
+                )}
+                <PostTags post={latestPost} limit={2} />
+              </div>
+            </article>
+          </section>
+        )}
+
+        {recentPosts.length > 0 && (
+          <section class={styles.recentSection} aria-labelledby="recent-heading">
+            <h2 id="recent-heading" class={styles.sectionHeading}>
+              <span>Recent notes</span>
+              <span class={styles.sectionRule} aria-hidden="true" />
+            </h2>
+            <ol class={styles.notes}>
+              {recentPosts.map((post) => (
+                <li class={styles.note}>
+                  <div class={styles.noteMeta}>
+                    {post.Date && (
+                      <time datetime={post.Date} class={styles.date}>
+                        {getDateStr(post.Date)}
+                      </time>
+                    )}
+                    <PostTags post={post} limit={2} />
+                  </div>
+                  <div class={styles.noteCopy}>
+                    <h3>
+                      <a href={getPostLink(post.Slug)}>{titleFor(post)}</a>
+                    </h3>
+                    {post.Excerpt && <p>{post.Excerpt}</p>}
+                  </div>
+                  <PostFeaturedImage post={post} alt={post.Title} />
+                </li>
+              ))}
+            </ol>
+          </section>
+        )}
+      </>
+    )
+  }
+
+  <BlogTagRail tags={tags} activeTag={tag} />
+
+  {
+    numberOfPages > 1 && (
+      <nav class={styles.pagination} aria-label="ブログのページ">
+        {currentPage > 1 ? (
+          <a href={getPageLink(currentPage - 1, tag)} rel="prev">
+            前へ
+          </a>
+        ) : (
+          <span aria-disabled="true">前へ</span>
+        )}
+        <ol>
+          {pageNumbers.map((pageNumber) =>
+            pageNumber === currentPage ? (
+              <li>
+                <span aria-current="page">{pageNumber}</span>
+              </li>
+            ) : (
+              <li>
+                <a
+                  href={getPageLink(pageNumber, tag)}
+                  aria-label={`${pageNumber}ページへ`}
+                >
+                  {pageNumber}
+                </a>
+              </li>
+            )
+          )}
+        </ol>
+        {currentPage < numberOfPages ? (
+          <a href={getPageLink(currentPage + 1, tag)} rel="next">
+            次へ
+          </a>
+        ) : (
+          <span aria-disabled="true">次へ</span>
+        )}
+      </nav>
+    )
+  }
+</main>

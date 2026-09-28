@@ -5,9 +5,10 @@ import { filePath, getNotionFilePathParts } from '../lib/blog-helpers'
 
 export interface Props {
   post: Post
+  alt?: string
 }
 
-const { post } = Astro.props
+const { post, alt = 'post-featured-image' } = Astro.props
 
 let image = ''
 if (post.FeaturedImage && post.FeaturedImage.Url) {
@@ -30,7 +31,7 @@ if (post.FeaturedImage && post.FeaturedImage.Url) {
 {
   image && (
     <div class="post-featured-image">
-      <img src={image} alt="post-featured-image" />
+      <img src={image} alt={alt} />
     </div>
   )
 }

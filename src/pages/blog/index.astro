@@ -1,60 +1,25 @@
 ---
 import { NUMBER_OF_POSTS_PER_PAGE } from '../../server-constants.ts'
 import {
-  getPosts,
-  getRankedPosts,
   getAllTags,
+  getPosts,
   getNumberOfPages,
 } from '../../lib/notion/client.ts'
 import Layout from '../../layouts/Layout.astro'
-import NoContents from '../../components/NoContents.astro'
-import PostDate from '../../components/PostDate.astro'
-import PostTags from '../../components/PostTags.astro'
-import PostTitle from '../../components/PostTitle.astro'
-import PostFeaturedImage from '../../components/PostFeaturedImage.astro'
-import PostExcerpt from '../../components/PostExcerpt.astro'
-import ReadMoreLink from '../../components/ReadMoreLink.astro'
-import Pagination from '../../components/Pagination.astro'
-import BlogPostsLink from '../../components/BlogPostsLink.astro'
-import BlogTagsLink from '../../components/BlogTagsLink.astro'
-import styles from '../../styles/blog.module.css'
+import BlogEditorialListing from '../../components/BlogEditorialListing.astro'
 
-const [posts, rankedPosts, tags, numberOfPages] = await Promise.all([
+const [posts, tags, numberOfPages] = await Promise.all([
   getPosts(NUMBER_OF_POSTS_PER_PAGE),
-  getRankedPosts(),
   getAllTags(),
   getNumberOfPages(),
 ])
 ---
 
 <Layout title="Blog" path="/blog">
-  <div class={styles.container}>
-    <main>
-      {
-        posts.length === 0 ? (
-          <NoContents contents={posts} />
-        ) : (
-          posts.map((post) => (
-            <div class={styles.post} key={post.Slug}>
-              <PostDate post={post} />
-              <PostTags post={post} />
-              <PostTitle post={post} />
-              <PostFeaturedImage post={post} />
-              <PostExcerpt post={post} />
-              <ReadMoreLink post={post} />
-            </div>
-          ))
-        )
-      }
-
-      <footer>
-        <Pagination currentPage={1} numberOfPages={numberOfPages} />
-      </footer>
-    </main>
-
-    <aside>
-      <BlogPostsLink heading="おすすめ" posts={rankedPosts} />
-      <BlogTagsLink heading="カテゴリ" tags={tags} />
-    </aside>
-  </div>
+  <BlogEditorialListing
+    posts={posts}
+    tags={tags}
+    currentPage={1}
+    numberOfPages={numberOfPages}
+  />
 </Layout>
