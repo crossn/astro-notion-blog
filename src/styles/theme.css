@@ -1,7 +1,10 @@
 :root {
   /* tsukurun-Lab semantic color roles */
-  --color-canvas: #fff;
-  --color-paper: #fff;
+  --surface-canvas-warm: #fffefa;
+  --surface-reading: #fff;
+  --wash-pink: rgba(247, 212, 234, 0.12);
+  --color-canvas: var(--surface-canvas-warm);
+  --color-paper: var(--surface-reading);
   --color-ink: #333;
   --color-ink-muted: #777;
   --color-interaction: #ff7e33;
