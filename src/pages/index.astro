@@ -351,22 +351,23 @@ const shelfWorks = [
   }
 
   .labNote {
-    position: relative;
-    display: grid;
-    grid-template-columns: minmax(130px, 0.27fr) minmax(0, 1fr);
-    gap: clamp(1rem, 4vw, 3rem);
-    margin: clamp(1.5rem, 3.5vw, 3rem) 8% 0;
-    padding: 1.25rem clamp(1rem, 2.8vw, 2rem) 1.4rem;
-    border: 1px solid rgba(126, 111, 88, 0.14);
+    width: min(82%, 800px);
+    margin: clamp(1.5rem, 3.5vw, 3rem) 0 0 8%;
+    padding: 1rem 1.25rem 1.15rem;
+    border-bottom: 1px solid rgba(126, 111, 88, 0.1);
     background:
       radial-gradient(ellipse at 97% 5%, rgba(222, 215, 239, 0.14), transparent 34%),
       linear-gradient(108deg, rgba(255, 246, 222, 0.28), transparent 58%),
       var(--color-paper);
-    box-shadow: 0 8px 24px rgba(69, 58, 42, 0.045);
+    box-shadow: 0 8px 14px -18px rgba(69, 58, 42, 0.18);
   }
 
   .labNote .sectionLabel {
-    margin-top: 0.4rem;
+    margin: 0 0 0.45rem;
+  }
+
+  .labNote > div {
+    max-width: 690px;
   }
 
   .labNote h2,
@@ -792,10 +793,14 @@ const shelfWorks = [
     }
 
     .labNote {
-      grid-template-columns: 1fr;
-      gap: 0.2rem;
+      width: auto;
       margin: 2rem 0 0;
-      padding: 0.95rem 1rem 1.05rem;
+      padding: 0.55rem 0.15rem 0.7rem;
+      border-bottom-color: rgba(126, 111, 88, 0.08);
+      background:
+        radial-gradient(ellipse at 100% 0, rgba(222, 215, 239, 0.1), transparent 34%),
+        var(--color-paper);
+      box-shadow: none;
     }
 
     .labNote .sectionLabel {
