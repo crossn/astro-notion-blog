@@ -9,7 +9,7 @@
   max-width: 48rem;
   margin: 0 0 clamp(2.5rem, 5vw, 3.75rem);
   padding: 0 0 1.6rem;
-  border-bottom: 1px solid rgba(124, 108, 242, 0.16);
+  border-bottom: 1px solid rgba(126, 111, 88, 0.12);
 }
 
 .eyebrow {
@@ -60,6 +60,7 @@
   align-items: center;
   gap: 1rem;
   margin: 0 0 1.1rem;
+  isolation: isolate;
   color: var(--color-editorial, #7c6cf2);
   font-size: 0.78rem;
   font-weight: 650;
@@ -67,10 +68,32 @@
   line-height: 1.4;
 }
 
+.sectionHeading > span:first-child {
+  position: relative;
+}
+
+.sectionHeading > span:first-child::before {
+  position: absolute;
+  z-index: -1;
+  inset: -0.45rem -0.7rem;
+  background: radial-gradient(
+    ellipse,
+    rgba(222, 215, 239, 0.26),
+    transparent 72%
+  );
+  content: '';
+  pointer-events: none;
+}
+
 .sectionRule {
   height: 1px;
   flex: 1;
-  background: rgba(124, 108, 242, 0.16);
+  background: linear-gradient(
+    90deg,
+    rgba(126, 111, 88, 0.16),
+    rgba(126, 111, 88, 0.08) 72%,
+    transparent
+  );
 }
 
 .latest {
@@ -79,7 +102,7 @@
   gap: 1.5rem;
   align-items: center;
   padding: 0 0 clamp(2.3rem, 4vw, 3.2rem);
-  border-bottom: 1px solid rgba(124, 108, 242, 0.16);
+  border-bottom: 1px solid rgba(126, 111, 88, 0.13);
 }
 
 .latest:has(:global(.post-featured-image)) {
@@ -89,10 +112,14 @@
 
 .latest :global(.post-featured-image) {
   margin: 0;
-  padding: 0;
+  padding: 0.4rem;
   overflow: hidden;
-  border-radius: var(--radius-object, 1.25rem);
-  background: rgba(247, 212, 255, 0.16);
+  border: 1px solid rgba(126, 111, 88, 0.12);
+  border-radius: 1rem;
+  background:
+    radial-gradient(ellipse at 96% 3%, rgba(222, 215, 239, 0.18), transparent 42%),
+    rgba(250, 247, 239, 0.72);
+  box-shadow: 0 8px 18px -16px rgba(69, 58, 42, 0.28);
 }
 
 .latest :global(.post-featured-image img) {
@@ -192,12 +219,12 @@
   grid-template-columns: minmax(7rem, 0.23fr) minmax(0, 1fr);
   gap: 0.75rem clamp(1rem, 2.6vw, 2rem);
   align-items: center;
-  padding: 1.25rem 0;
-  border-top: 1px solid rgba(124, 108, 242, 0.14);
+  padding: 1.35rem 0;
+  border-top: 1px solid rgba(126, 111, 88, 0.12);
 }
 
 .note:has(:global(.post-featured-image)) {
-  grid-template-columns: minmax(7rem, 0.23fr) minmax(0, 1fr) 7rem;
+  grid-template-columns: minmax(7rem, 0.23fr) minmax(0, 1fr) 8.75rem;
 }
 
 .noteMeta {
@@ -225,12 +252,16 @@
 }
 
 .note :global(.post-featured-image) {
-  width: 7rem;
-  height: 4.5rem;
-  padding: 0;
+  width: 8.75rem;
+  aspect-ratio: 1200 / 630;
+  padding: 0.3rem;
   overflow: hidden;
-  border-radius: var(--radius-small, 4px);
-  background: rgba(247, 212, 255, 0.16);
+  border: 1px solid rgba(126, 111, 88, 0.12);
+  border-radius: 0.65rem;
+  background:
+    radial-gradient(ellipse at 96% 3%, rgba(222, 215, 239, 0.15), transparent 42%),
+    rgba(250, 247, 239, 0.68);
+  box-shadow: 0 5px 12px -12px rgba(69, 58, 42, 0.24);
 }
 
 .note :global(.post-featured-image img) {
@@ -242,8 +273,8 @@
 
 .tagRail {
   margin-top: clamp(2.5rem, 5vw, 3.8rem);
-  padding-top: 1.35rem;
-  border-top: 1px solid rgba(124, 108, 242, 0.16);
+  padding-top: 1.2rem;
+  border-top: 1px solid rgba(126, 111, 88, 0.12);
 }
 
 .tagRail h2 {
@@ -256,7 +287,7 @@
 .tagRail ul {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.45rem;
+  gap: 0.35rem 0.55rem;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -280,6 +311,14 @@
 .tagRail a[aria-current='page'] {
   box-shadow: inset 0 -1px var(--color-interaction, #ff7e33);
   color: var(--color-ink, #333);
+}
+
+.tagRail a:focus-visible,
+.latestCopy h3 a:focus-visible,
+.noteCopy h3 a:focus-visible,
+.pagination a:focus-visible {
+  outline: 2px solid var(--color-interaction, #ff7e33);
+  outline-offset: 3px;
 }
 
 .pagination {
@@ -409,7 +448,7 @@
   }
 
   .note:has(:global(.post-featured-image)) {
-    grid-template-columns: minmax(0, 1fr) 5.4rem;
+    grid-template-columns: minmax(0, 1fr) 6.25rem;
   }
 
   .noteMeta {
@@ -444,8 +483,7 @@
   .note > :global(.post-featured-image) {
     grid-column: 2;
     grid-row: 2;
-    width: 5.4rem;
-    height: 4rem;
+    width: 6.25rem;
   }
 
   .tagRail {
