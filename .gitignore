@@ -17,6 +17,12 @@ pnpm-debug.log*
 # environment variables
 .env
 .env.production
+.dev.vars
+.dev.vars.*
+
+# Local Worker configuration and state (production bindings are added in 3B-2b)
+workers/blog-signals-sync/wrangler.jsonc
+.wrangler/
 
 # macOS-specific files
 .DS_Store
