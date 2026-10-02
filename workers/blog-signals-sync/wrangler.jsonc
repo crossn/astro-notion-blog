@@ -1,0 +1,24 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "tsukurun-blog-signals-sync",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-02",
+  "workers_dev": false,
+  "vars": {
+    "GA_PROPERTY_ID": "353471002",
+    "SITE_HOSTNAME": "tsukurun-lab.com",
+    "SITE_BASE_PATH": "",
+    "GA_TIME_ZONE": "Asia/Tokyo"
+  },
+  "d1_databases": [
+    {
+      "binding": "BLOG_SIGNALS_DB",
+      "database_name": "tsukurun-blog-likes",
+      "database_id": "007ee48e-a54c-43a7-9ad7-2d75f675c091",
+      "migrations_dir": "../../migrations"
+    }
+  ],
+  "triggers": {
+    "crons": []
+  }
+}

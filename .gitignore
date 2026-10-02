@@ -20,8 +20,7 @@ pnpm-debug.log*
 .dev.vars
 .dev.vars.*
 
-# Local Worker configuration and state (production bindings are added in 3B-2b)
-workers/blog-signals-sync/wrangler.jsonc
+# Local Worker state
 .wrangler/
 
 # macOS-specific files
