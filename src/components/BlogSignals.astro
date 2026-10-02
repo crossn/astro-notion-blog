@@ -1,0 +1,181 @@
+---
+import styles from '../styles/blog-listing.module.css'
+
+export interface SignalPost {
+  slug: string
+  title: string
+  href: string
+}
+
+export interface Props {
+  posts: SignalPost[]
+  endpoint: string
+}
+
+const { posts, endpoint } = Astro.props
+---
+
+<section
+  class={styles.signals}
+  aria-labelledby="blog-signals-heading"
+  data-blog-signals
+  data-posts={JSON.stringify(posts)}
+  data-endpoint={endpoint}
+  hidden
+>
+  <h2 id="blog-signals-heading" class={styles.signalsHeading}>
+    <span>Signals</span>
+    <span class={styles.signalRule} aria-hidden="true"></span>
+  </h2>
+  <div class={styles.signalContent}>
+    <div class={styles.signalDescription}>
+      <h3>反応が多い</h3>
+      <p>♡が集まった記録</p>
+    </div>
+    <ul class={styles.signalList} data-signal-list></ul>
+  </div>
+</section>
+
+<script>
+  let cachedPayload = null
+  let cacheExpiresAt = 0
+  let pendingRequest = null
+
+  async function loadSignals(endpoint) {
+    if (cachedPayload && Date.now() < cacheExpiresAt) {
+      return cachedPayload
+    }
+
+    if (pendingRequest) {
+      return pendingRequest
+    }
+
+    pendingRequest = fetch(endpoint, {
+      headers: { Accept: 'application/json' },
+    })
+      .then((response) => {
+        if (!response.ok) return null
+        return response.json()
+      })
+      .then((payload) => {
+        if (
+          !payload ||
+          payload.version !== 1 ||
+          typeof payload.generatedAt !== 'string' ||
+          !Number.isFinite(Date.parse(payload.generatedAt)) ||
+          !Array.isArray(payload.signals)
+        ) {
+          return null
+        }
+
+        cachedPayload = payload
+        cacheExpiresAt = Date.now() + 60_000
+        return payload
+      })
+      .catch(() => null)
+      .finally(() => {
+        pendingRequest = null
+      })
+
+    return pendingRequest
+  }
+
+  function getPublishedSignals(payload, postBySlug) {
+    const mergedBySlug = new Map()
+
+    for (const signal of payload.signals) {
+      if (
+        !signal ||
+        !['reaction', 'read'].includes(signal.kind) ||
+        typeof signal.slug !== 'string'
+      ) {
+        continue
+      }
+
+      const post = postBySlug.get(signal.slug)
+      if (!post) continue
+
+      if (signal.kind === 'reaction') {
+        const value = Number(signal.value)
+        if (!Number.isSafeInteger(value) || value < 1) continue
+      }
+
+      let merged = mergedBySlug.get(signal.slug)
+      if (!merged) {
+        merged = { post, kinds: new Set(), values: new Map() }
+        mergedBySlug.set(signal.slug, merged)
+      }
+
+      merged.kinds.add(signal.kind)
+      if (signal.kind === 'reaction') {
+        const value = Number(signal.value)
+        merged.values.set(
+          signal.kind,
+          Math.max(merged.values.get(signal.kind) || 0, value)
+        )
+      }
+    }
+
+    return Array.from(mergedBySlug.values()).find((signal) =>
+      signal.kinds.has('reaction')
+    )
+  }
+
+  async function initializeBlogSignals() {
+    const container = document.querySelector('[data-blog-signals]')
+    if (!container || container.dataset.loaded === 'true') return
+
+    container.dataset.loaded = 'true'
+
+    try {
+      const posts = JSON.parse(container.dataset.posts || '[]')
+      const endpoint = container.dataset.endpoint
+      if (!Array.isArray(posts) || !endpoint) return
+
+      const postBySlug = new Map(
+        posts
+          .filter(
+            (post) =>
+              post &&
+              typeof post.slug === 'string' &&
+              typeof post.title === 'string' &&
+              typeof post.href === 'string' &&
+              post.href.startsWith('/') &&
+              !post.href.startsWith('//')
+          )
+          .map((post) => [post.slug, post])
+      )
+      const payload = await loadSignals(endpoint)
+      if (!payload || !container.isConnected) return
+
+      const signal = getPublishedSignals(payload, postBySlug)
+      if (!signal) return
+
+      const articleUrl = new URL(signal.post.href, window.location.origin)
+      if (articleUrl.origin !== window.location.origin) return
+
+      const item = document.createElement('li')
+      const link = document.createElement('a')
+      link.href = articleUrl.href
+      link.textContent = signal.post.title
+
+      const count = document.createElement('span')
+      count.setAttribute('data-signal-count', '')
+      count.setAttribute('role', 'img')
+      count.setAttribute(
+        'aria-label',
+        `${signal.values.get('reaction')}件の反応`
+      )
+      count.textContent = `♡ ${signal.values.get('reaction')}`
+
+      item.append(link, count)
+      container.querySelector('[data-signal-list]')?.append(item)
+      container.hidden = false
+    } catch {
+      // Signals are optional; keep the static article listing available.
+    }
+  }
+
+  document.addEventListener('astro:page-load', initializeBlogSignals)
+  initializeBlogSignals()
+</script>

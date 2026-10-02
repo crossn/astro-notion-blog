@@ -1,6 +1,7 @@
 ---
 import type { Post, SelectProperty } from '../lib/interfaces.ts'
 import { getDateStr, getPageLink, getPostLink } from '../lib/blog-helpers.ts'
+import BlogSignals, { type SignalPost } from './BlogSignals.astro'
 import BlogTagRail from './BlogTagRail.astro'
 import PostFeaturedImage from './PostFeaturedImage.astro'
 import PostTags from './PostTags.astro'
@@ -13,6 +14,8 @@ export interface Props {
   currentPage: number
   numberOfPages: number
   tag?: string
+  signalPosts?: SignalPost[]
+  signalsEndpoint?: string
 }
 
 const {
@@ -21,6 +24,8 @@ const {
   currentPage,
   numberOfPages,
   tag = '',
+  signalPosts,
+  signalsEndpoint,
 } = Astro.props
 
 const showLatest = currentPage === 1 && posts.length > 0
@@ -99,6 +104,10 @@ const titleFor = (post: Post) =>
               </div>
             </article>
           </section>
+        )}
+
+        {signalPosts?.length && signalsEndpoint && (
+          <BlogSignals posts={signalPosts} endpoint={signalsEndpoint} />
         )}
 
         {recentPosts.length > 0 && (

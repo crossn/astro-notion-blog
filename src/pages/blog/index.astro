@@ -1,18 +1,29 @@
 ---
-import { NUMBER_OF_POSTS_PER_PAGE } from '../../server-constants.ts'
+import {
+  BASE_PATH,
+  NUMBER_OF_POSTS_PER_PAGE,
+} from '../../server-constants.ts'
 import {
   getAllTags,
-  getPosts,
+  getAllPosts,
   getNumberOfPages,
 } from '../../lib/notion/client.ts'
+import { getPostLink } from '../../lib/blog-helpers.ts'
+import { pathJoin } from '../../lib/utils.ts'
 import Layout from '../../layouts/Layout.astro'
 import BlogEditorialListing from '../../components/BlogEditorialListing.astro'
 
-const [posts, tags, numberOfPages] = await Promise.all([
-  getPosts(NUMBER_OF_POSTS_PER_PAGE),
+const allPosts = await getAllPosts()
+const posts = allPosts.slice(0, NUMBER_OF_POSTS_PER_PAGE)
+const [tags, numberOfPages] = await Promise.all([
   getAllTags(),
   getNumberOfPages(),
 ])
+const signalPosts = allPosts.map((post) => ({
+  slug: post.Slug,
+  title: `${post.Icon?.Emoji ? `${post.Icon.Emoji} ` : ''}${post.Title}`,
+  href: getPostLink(post.Slug),
+}))
 ---
 
 <Layout title="Blog" path="/blog">
@@ -21,5 +32,7 @@ const [posts, tags, numberOfPages] = await Promise.all([
     tags={tags}
     currentPage={1}
     numberOfPages={numberOfPages}
+    signalPosts={signalPosts}
+    signalsEndpoint={pathJoin(BASE_PATH, '/api/blog-signals')}
   />
 </Layout>
