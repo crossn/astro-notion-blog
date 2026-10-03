@@ -9,6 +9,7 @@ import {
   downloadFile,
 } from '../../lib/notion/client.ts'
 import {
+  getNavLink,
   getPostLink,
   filePath,
   extractTargetBlocks,
@@ -166,20 +167,22 @@ if (post.FeaturedImage && post.FeaturedImage.Url) {
     }`}
   >
     <main class={styles.article}>
-      <div class={styles.post}>
+      <article class={styles.post}>
         <PostDate post={post} />
         <PostTags post={post} />
         <PostTitle post={post} enableLink={false} />
         <PostFeaturedImage post={post} alt="" />
         <PostBody blocks={blocks} />
-        <PostTags post={post} />
-        <LikeButton slug={post.Slug} />
-        <ArticleRelatedPosts posts={relatedPosts} />
-
-        <footer>
+        <footer class={styles.readingEnd}>
+          <PostTags post={post} />
+          <LikeButton slug={post.Slug} />
           <PostRelativeLink prevPost={prevPost} nextPost={nextPost} />
+          <ArticleRelatedPosts posts={relatedPosts} />
+          <a class={styles.backToBlog} href={getNavLink('/blog')}>
+            <span aria-hidden="true">←</span>Blog一覧へ戻る
+          </a>
         </footer>
-      </div>
+      </article>
     </main>
 
     {
