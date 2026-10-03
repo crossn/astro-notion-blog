@@ -38,12 +38,17 @@ const { items } = Astro.props
 
 <script is:inline data-astro-rerun>
   (() => {
+    const cleanupKey = '__tsukurunBlogTocCleanup'
+    if (typeof window[cleanupKey] === 'function') window[cleanupKey]()
+
     const links = Array.from(document.querySelectorAll('.blog-toc__link'))
     if (!links.length) return
 
     const toc = links[0].closest('.blog-toc')
     const scrollContainer = toc?.querySelector('.blog-toc__scroll')
     let currentActiveLink = null
+    let activeFrame = null
+    let updateFrame = null
 
     const scrollActiveIntoToc = (activeLink) => {
       if (!scrollContainer || !(activeLink instanceof HTMLElement)) return
@@ -85,7 +90,11 @@ const { items } = Astro.props
       })
 
       if (activeChanged) {
-        window.requestAnimationFrame(() => scrollActiveIntoToc(activeLink))
+        if (activeFrame !== null) window.cancelAnimationFrame(activeFrame)
+        activeFrame = window.requestAnimationFrame(() => {
+          activeFrame = null
+          scrollActiveIntoToc(activeLink)
+        })
       }
     }
 
@@ -93,6 +102,7 @@ const { items } = Astro.props
     const topOffset = 16
 
     const updateActive = () => {
+      updateFrame = null
       ticking = false
       const currentY = window.scrollY + topOffset
       let active = sections[0]
@@ -113,9 +123,24 @@ const { items } = Astro.props
     const requestUpdate = () => {
       if (ticking) return
       ticking = true
-      window.requestAnimationFrame(updateActive)
+      updateFrame = window.requestAnimationFrame(updateActive)
     }
 
+    const cleanup = () => {
+      window.removeEventListener('scroll', requestUpdate)
+      window.removeEventListener('resize', requestUpdate)
+      window.removeEventListener('hashchange', requestUpdate)
+      document.removeEventListener('astro:before-swap', cleanup)
+      if (activeFrame !== null) window.cancelAnimationFrame(activeFrame)
+      if (updateFrame !== null) window.cancelAnimationFrame(updateFrame)
+      activeFrame = null
+      updateFrame = null
+      ticking = false
+      if (window[cleanupKey] === cleanup) delete window[cleanupKey]
+    }
+
+    window[cleanupKey] = cleanup
+    document.addEventListener('astro:before-swap', cleanup, { once: true })
     window.addEventListener('scroll', requestUpdate, { passive: true })
     window.addEventListener('resize', requestUpdate)
     window.addEventListener('hashchange', requestUpdate)
