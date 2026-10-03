@@ -1,0 +1,206 @@
+---
+import styles from '../styles/blog-listing.module.css'
+
+export interface SignalPost {
+  slug: string
+  title: string
+  href: string
+}
+
+export interface Props {
+  posts: SignalPost[]
+  endpoint: string
+}
+
+const { posts, endpoint } = Astro.props
+---
+
+<section
+  class={styles.signals}
+  aria-labelledby="blog-signals-heading"
+  data-blog-signals
+  data-posts={JSON.stringify(posts)}
+  data-endpoint={endpoint}
+  hidden
+>
+  <h2 id="blog-signals-heading" class={styles.signalsHeading}>
+    <span>Signals</span>
+    <span class={styles.signalRule} aria-hidden="true"></span>
+  </h2>
+  <div class={styles.signalContent}>
+    <div class={styles.signalDescription} data-signal-description>
+      <h3>最近の気配</h3>
+      <p>読まれ方と反応の記録</p>
+    </div>
+    <ul class={styles.signalList} data-signal-list></ul>
+  </div>
+</section>
+
+<script>
+  let cachedPayload = null
+  let cacheExpiresAt = 0
+  let pendingRequest = null
+
+  async function loadSignals(endpoint) {
+    if (cachedPayload && Date.now() < cacheExpiresAt) {
+      return cachedPayload
+    }
+
+    if (pendingRequest) {
+      return pendingRequest
+    }
+
+    pendingRequest = fetch(endpoint, {
+      headers: { Accept: 'application/json' },
+    })
+      .then((response) => {
+        if (!response.ok) return null
+        return response.json()
+      })
+      .then((payload) => {
+        if (
+          !payload ||
+          payload.version !== 1 ||
+          typeof payload.generatedAt !== 'string' ||
+          !Number.isFinite(Date.parse(payload.generatedAt)) ||
+          !Array.isArray(payload.signals)
+        ) {
+          return null
+        }
+
+        cachedPayload = payload
+        cacheExpiresAt = Date.now() + 60_000
+        return payload
+      })
+      .catch(() => null)
+      .finally(() => {
+        pendingRequest = null
+      })
+
+    return pendingRequest
+  }
+
+  function getPublishedSignals(payload, postBySlug) {
+    let topRead = null
+    let topReaction = null
+
+    for (const signal of payload.signals) {
+      if (
+        !signal ||
+        !['reaction', 'read'].includes(signal.kind) ||
+        typeof signal.slug !== 'string'
+      ) {
+        continue
+      }
+
+      const post = postBySlug.get(signal.slug)
+      if (!post) continue
+
+      if (signal.kind === 'reaction') {
+        const value = Number(signal.value)
+        if (!Number.isSafeInteger(value) || value < 1) continue
+        if (!topReaction) topReaction = { post, value }
+      } else if (!topRead) {
+        topRead = { post }
+      }
+
+      if (topRead && topReaction) break
+    }
+
+    if (topRead && topReaction?.post.slug === topRead.post.slug) {
+      return [{ post: topRead.post, read: true, reaction: topReaction.value }]
+    }
+
+    return [
+      ...(topRead ? [{ post: topRead.post, read: true }] : []),
+      ...(topReaction ? [{ post: topReaction.post, reaction: topReaction.value }] : []),
+    ]
+  }
+
+  async function initializeBlogSignals() {
+    const container = document.querySelector('[data-blog-signals]')
+    if (!container || container.dataset.loaded === 'true') return
+
+    container.dataset.loaded = 'true'
+
+    try {
+      const posts = JSON.parse(container.dataset.posts || '[]')
+      const endpoint = container.dataset.endpoint
+      if (!Array.isArray(posts) || !endpoint) return
+
+      const postBySlug = new Map(
+        posts
+          .filter(
+            (post) =>
+              post &&
+              typeof post.slug === 'string' &&
+              typeof post.title === 'string' &&
+              typeof post.href === 'string' &&
+              post.href.startsWith('/') &&
+              !post.href.startsWith('//')
+          )
+          .map((post) => [post.slug, post])
+      )
+      const payload = await loadSignals(endpoint)
+      if (!payload || !container.isConnected) return
+
+      const signals = getPublishedSignals(payload, postBySlug)
+      const list = container.querySelector('[data-signal-list]')
+      if (!list) return
+
+      const hasRead = signals.some((signal) => signal.read)
+      const hasReaction = signals.some((signal) => signal.reaction)
+      const description = container.querySelector('[data-signal-description]')
+      const heading = description?.querySelector('h3')
+      const copy = description?.querySelector('p')
+      if (hasRead && hasReaction) {
+        if (heading) heading.textContent = '最近の気配'
+        if (copy) copy.textContent = '読まれ方と反応の記録'
+      } else if (hasRead) {
+        if (heading) heading.textContent = '読まれた記録'
+        if (copy) copy.textContent = '最近よく手に取られているノート'
+      } else if (hasReaction) {
+        if (heading) heading.textContent = '反応が多い'
+        if (copy) copy.textContent = '♡が集まった記録'
+      }
+
+      for (const signal of signals) {
+        const articleUrl = new URL(signal.post.href, window.location.origin)
+        if (articleUrl.origin !== window.location.origin) continue
+
+        const item = document.createElement('li')
+        const link = document.createElement('a')
+        link.href = articleUrl.href
+        link.textContent = signal.post.title
+
+        const details = document.createElement('div')
+        details.setAttribute('data-signal-details', '')
+        if (signal.read) {
+          const read = document.createElement('span')
+          read.setAttribute('data-signal-read', '')
+          read.textContent = 'よく読まれている'
+          details.append(read)
+        }
+        if (signal.reaction) {
+          const count = document.createElement('span')
+          count.setAttribute('data-signal-count', '')
+          count.setAttribute('role', 'img')
+          count.setAttribute('aria-label', `${signal.reaction}件の反応`)
+          count.textContent = `♡ ${signal.reaction}`
+          details.append(count)
+        }
+
+        item.append(link, details)
+        list.append(item)
+      }
+
+      if (!list.childElementCount) return
+      container.hidden = false
+    } catch {
+      // Signals are optional; keep the static article listing available.
+    }
+  }
+
+  document.addEventListener('astro:page-load', initializeBlogSignals)
+  initializeBlogSignals()
+</script>

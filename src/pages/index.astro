@@ -1,54 +1,47 @@
 ---
 import Layout from '../layouts/Layout.astro'
+import { existsSync } from 'node:fs'
+import { getPosts } from '../lib/notion/client.ts'
+import { filePath, getDateStr, getNavLink, getPostLink } from '../lib/blog-helpers.ts'
 
 const shopUrl = 'https://suzuri.jp/crossn/digital_products'
+const [featuredPost, ...otherPosts] = await getPosts(3)
 
-const products = [
-  {
-    title: 'Spark Brain OS Pro',
-    eyebrow: 'Brain OS',
-    description:
-      'アイデア、メモ、タスク、振り返りをひとつの流れで扱うためのNotion OS。深く使い込みたい人向けです。',
-    image: '/templates/spark-brain-os-pro.png',
-    href: shopUrl,
-  },
+let featuredPostImage = ''
+if (featuredPost?.FeaturedImage?.Url) {
+  if (import.meta.env.DEV) {
+    featuredPostImage = featuredPost.FeaturedImage.Url
+  } else {
+    try {
+      const imageUrl = new URL(featuredPost.FeaturedImage.Url)
+      const [directory, encodedFilename] = imageUrl.pathname.split('/').slice(-2)
+      const filename = decodeURIComponent(encodedFilename)
+
+      if (existsSync(`public/notion/${directory}/${filename}`)) {
+        featuredPostImage = filePath(imageUrl)
+      }
+    } catch {
+      // A missing or malformed Notion image should leave a text-first post preview.
+    }
+  }
+}
+
+const shelfWorks = [
   {
     title: 'Spark Brain OS Lite',
     eyebrow: 'Brain OS Lite',
-    description:
-      'Spark Brain OSの入口として、思考やメモを散らかしすぎず集めていくための軽量版です。',
     image: '/templates/spark-brain-os-lite.png',
     href: shopUrl,
   },
   {
-    title: 'Color Palette',
-    eyebrow: 'Notion Tools',
-    description:
-      'Notionページづくりの色選びを助けるパレット。整える時間そのものが少し楽しくなる道具です。',
-    image: '/page/palette.png',
-    href: 'https://suzuri.jp/crossn/digital_products/7685',
-  },
-  {
     title: 'Font Chooser',
     eyebrow: 'Notion Tools',
-    description:
-      'Notionページの雰囲気づくりに使えるフォント選びの補助ツール。見た目を整える小さな相棒です。',
     image: '/templates/font-chooser.png',
     href: shopUrl,
   },
   {
-    title: 'Themes / Goal Management',
-    eyebrow: '目標管理',
-    description:
-      'やりたいことを、日々の行動へほどいていくNotionテンプレート。迷子になりがちな目標を、見返せる形に整えます。',
-    image: '/page/tmg-fb.png',
-    href: 'https://suzuri.jp/crossn/digital_products/4871',
-  },
-  {
     title: 'Themes / Goal Management Lite',
     eyebrow: '目標管理 Lite',
-    description:
-      'Goal Managementの考え方を、より軽く始められる形にしたLite版。まず小さく整えたい人向けです。',
     image: '/templates/themes-goal-management-lite.png',
     href: shopUrl,
   },
@@ -61,375 +54,911 @@ const products = [
   path="/"
 >
   <main class="home">
-    <section class="hero">
+    <section class="hero" aria-labelledby="hero-title">
       <div class="heroCopy">
-        <p class="label">tsukurun-Lab / Notion templates</p>
-        <h1>毎日に、<br class="mobileBreak" />自分らしさを少しずつ。</h1>
-        <p class="lead">
-          Notionを完璧に使いこなすことより、毎日ちょっとでも自分らしく、楽しくいられる形を見つけたい。
-          tsukurun-Labは、そんな小さな試行錯誤から生まれたテンプレートと道具を置いていく場所です。
+        <p class="heroLabel">Notion templates and small experiments</p>
+        <h1 id="hero-title">毎日に、自分らしさを少しずつ。</h1>
+        <p class="heroLead">
+          つくったものと、試行錯誤の途中にある記録を置いています。
         </p>
-        <div class="actions">
-          <a class="primaryAction" href="#templates">テンプレートを見る</a>
-          <a class="secondaryAction" href="/blog">Blogを読む</a>
+        <nav class="heroActions" aria-label="ページ内の案内">
+          <a href="#works">つくったものを見る <span aria-hidden="true">→</span></a>
+          <a href={getNavLink('/blog')}>Blogを読む <span aria-hidden="true">→</span></a>
+        </nav>
+      </div>
+
+      <figure class="heroArtwork">
+        <img
+          src="/home/banner.png"
+          alt="tsukurun-Labのロゴと『作って遊んで もっと楽しく もっと自由に』の文字"
+          width="2560"
+          height="1440"
+          fetchpriority="high"
+        />
+      </figure>
+      <p class="heroNext" aria-hidden="true">つくること、試すこと、残すこと</p>
+    </section>
+
+    <section class="labNote" aria-labelledby="lab-note-title">
+      <p class="sectionLabel">Lab note</p>
+      <div>
+        <h2 id="lab-note-title">迷いながら、試しながら。</h2>
+        <p>
+          自由度の高いNotionに、私自身も最初は戸惑いました。調べて、試して、少し離れて。そんな繰り返しの中で自分に合う形を探してきました。
+        </p>
+        <p>
+          ここでは決まった正解を押しつけず、試したものや気づきを形にして残していきます。
+        </p>
+      </div>
+    </section>
+
+    <section class="works" id="works" aria-labelledby="works-title">
+      <header class="sectionHeading">
+        <p class="sectionLabel">Works</p>
+        <h2 id="works-title">つくってきたもの。</h2>
+        <p>
+          思考を集める道具から、色や目標を整えるテンプレートまで。今の自分に合うものを探すきっかけになればうれしいです。
+        </p>
+      </header>
+
+      <div class="worksUpper">
+        <article class="featuredWork">
+          <a href={shopUrl} target="_blank" rel="noopener noreferrer">
+            <div class="featuredImage">
+              <img
+                src="/templates/spark-brain-os-pro.png"
+                alt=""
+                width="1500"
+                height="1500"
+                loading="lazy"
+              />
+            </div>
+            <div class="featuredCopy">
+              <p class="workEyebrow">Brain OS</p>
+              <h3>Spark Brain OS Pro</h3>
+              <p>
+                アイデア、メモ、タスク、振り返りをひとつの流れで扱うNotion OS。深く使い込みたい人に向けたテンプレートです。
+              </p>
+              <span class="workLink">SUZURIで見る <span aria-hidden="true">↗</span></span>
+            </div>
+          </a>
+        </article>
+
+        <div class="mediumWorks">
+          <article class="mediumWork">
+            <a href="https://suzuri.jp/crossn/digital_products/7685" target="_blank" rel="noopener noreferrer">
+              <img
+                src="/page/palette.png"
+                alt=""
+                width="1500"
+                height="1500"
+                loading="lazy"
+              />
+              <div>
+                <p class="workEyebrow">Notion Tools</p>
+                <h3>Color Palette</h3>
+                <p>Notionページの色選びを助ける、小さなパレットです。</p>
+                <span class="workLink">SUZURIで見る <span aria-hidden="true">↗</span></span>
+              </div>
+            </a>
+          </article>
+
+          <article class="mediumWork">
+            <a href="https://suzuri.jp/crossn/digital_products/4871" target="_blank" rel="noopener noreferrer">
+              <img
+                src="/page/tmg-fb.png"
+                alt=""
+                width="1500"
+                height="1500"
+                loading="lazy"
+              />
+              <div>
+                <p class="workEyebrow">目標管理</p>
+                <h3>Themes / Goal Management</h3>
+                <p>やりたいことを日々の行動へほどき、見返せる形に整えます。</p>
+                <span class="workLink">SUZURIで見る <span aria-hidden="true">↗</span></span>
+              </div>
+            </a>
+          </article>
         </div>
       </div>
 
-      <div class="heroVisual" aria-label="tsukurun-Lab visual mood">
-        <img src="/home/banner.png" alt="tsukurun-Lab banner" />
+      <div class="workShelf" aria-label="ほかのテンプレート">
+        {shelfWorks.map((work) => (
+          <article class="shelfWork">
+            <a href={work.href} target="_blank" rel="noopener noreferrer">
+              <img src={work.image} alt="" width="1500" height="1500" loading="lazy" />
+              <span class="shelfCopy">
+                <span class="workEyebrow">{work.eyebrow}</span>
+                <span class="shelfTitle">{work.title}</span>
+              </span>
+              <span class="shelfArrow" aria-hidden="true">↗</span>
+            </a>
+          </article>
+        ))}
       </div>
     </section>
 
-    <section class="intro" aria-labelledby="intro-title">
-      <p class="sectionLabel">About</p>
-      <h2 id="intro-title">少しずつ触れて、<br class="mobileBreak" />自分に合う形を見つけていく。</h2>
-      <div class="introGrid">
-        <p>
-          Notionは自由度が高いぶん、最初はどこから触ればいいのか迷いやすいツールです。
-          私自身も、わからないことを調べたり、試したり、しばらく離れたりしながら、
-          メモやToDoのような身近なところから少しずつ触れ直してきました。
-        </p>
-        <p>
-          ここで大切にしたいのは、決まった正解を押しつけることではなく、自分に合うやり方を見つけること。
-          やりたいこと、できること、調べながら試したことを形にして、
-          「自分でもつくれそう」と思える入口を少しずつ増やしていきます。
-        </p>
-      </div>
-    </section>
+    {featuredPost && (
+      <section class="fromLab" aria-labelledby="from-lab-title">
+        <header class="fromLabHeading">
+          <div>
+            <p class="sectionLabel">From the Lab</p>
+            <h2 id="from-lab-title">つくる途中の記録。</h2>
+          </div>
+          <a class="allPostsLink" href={getNavLink('/blog')}>Blogを読む <span aria-hidden="true">→</span></a>
+        </header>
 
-    <section class="products" id="templates" aria-labelledby="templates-title">
-      <div class="sectionHeading">
-        <p class="sectionLabel">Templates</p>
-        <h2 id="templates-title">いま公開しているテンプレート。</h2>
-        <p>
-          思考を集める、ページの雰囲気を整える、目標を見返せる形にする。
-          その時々のつくりたい形に合わせて選べるNotionテンプレートと小さなツールです。
-        </p>
-      </div>
-
-      <div class="productGrid">
-        {
-          products.map((product) => (
-            <article class="productCard">
-              <a href={product.href} target="_blank" rel="noopener noreferrer">
-                <div class="productImage">
-                  <img src={product.image} alt="" loading="lazy" />
+        <div class="postNotes">
+          <article class:list={['leadPost', { withoutImage: !featuredPostImage }]}>
+            <a href={getPostLink(featuredPost.Slug)}>
+              {featuredPostImage && (
+                <div class="postImage">
+                  <img
+                    src={featuredPostImage}
+                    alt=""
+                    loading="lazy"
+                  />
                 </div>
-                <div>
-                  <p>{product.eyebrow}</p>
-                  <h3>{product.title}</h3>
-                  <span>{product.description}</span>
-                </div>
-              </a>
-            </article>
-          ))
-        }
-      </div>
-    </section>
+              )}
+              <div class="postCopy">
+                <time datetime={featuredPost.Date}>{getDateStr(featuredPost.Date)}</time>
+                <h3>{featuredPost.Title}</h3>
+                {featuredPost.Excerpt && <p>{featuredPost.Excerpt}</p>}
+              </div>
+            </a>
+          </article>
 
-    <section class="contact" aria-label="links">
-      <p>制作メモや使い方は、Blogにも少しずつ残していきます。</p>
-      <div>
-        <a href="/blog">Blog</a>
-        <a href="https://suzuri.jp/crossn" target="_blank" rel="noopener noreferrer">
-          SUZURI
-        </a>
-        <a
-          href="https://www.linkedin.com/in/cross-tsukurun-lab/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          LinkedIn
-        </a>
-        <a href="https://twitter.com/crossma64" target="_blank" rel="noopener noreferrer">
-          X
-        </a>
-      </div>
-    </section>
+          <div class="otherPostNotes">
+            {otherPosts.map((post) => (
+              <article>
+                <a href={getPostLink(post.Slug)}>
+                  <time datetime={post.Date}>{getDateStr(post.Date)}</time>
+                  <h3>{post.Title}</h3>
+                  <span aria-hidden="true">↗</span>
+                </a>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <nav class="quietLinks" aria-label="tsukurun-Labのリンク">
+      <span>ほかの場所</span>
+      <a href={getNavLink('/blog')}>Blog</a>
+      <a href="https://suzuri.jp/crossn" target="_blank" rel="noopener noreferrer">SUZURI</a>
+      <a href="https://www.linkedin.com/in/cross-tsukurun-lab/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      <a href="https://twitter.com/crossma64" target="_blank" rel="noopener noreferrer">X</a>
+    </nav>
   </main>
 </Layout>
 
 <style>
   .home {
-    color: #232323;
+    width: min(100%, 1180px);
+    margin: 0 auto;
+    color: var(--color-ink);
   }
 
   .hero {
     display: grid;
-    grid-template-columns: minmax(0, 0.95fr) minmax(320px, 1.05fr);
-    gap: clamp(2rem, 6vw, 5rem);
-    align-items: center;
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: clamp(3rem, 8vw, 7rem) 0 clamp(4rem, 8vw, 7rem);
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    padding: clamp(2rem, 4.5vw, 3.5rem) 0 0;
   }
 
   .heroCopy {
-    position: relative;
+    grid-column: 2 / span 9;
+    grid-row: 1;
     z-index: 1;
   }
 
-  .label,
-  .sectionLabel {
-    margin: 0 0 1rem;
-    color: #7c6cf2;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
+  .heroLabel,
+  .sectionLabel,
+  .workEyebrow {
+    margin: 0 0 0.75rem;
+    color: var(--color-editorial);
+    font-size: 0.76rem;
+    font-weight: 650;
+    letter-spacing: 0.09em;
   }
 
   .hero h1 {
-    max-width: 13.5em;
+    max-width: 15em;
     margin: 0;
-    font-size: clamp(2.2rem, 4.8vw, 4.6rem);
-    line-height: 1.08;
+    font-size: clamp(2rem, 4.6vw, 4rem);
+    line-height: 1.2;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+
+  .heroLead {
+    max-width: 40rem;
+    margin: 1rem 0 0;
+    color: var(--color-ink-muted);
+    font-size: clamp(1rem, 1.8vw, 1.12rem);
+    line-height: 1.85;
+  }
+
+  .heroActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem 1.6rem;
+    margin-top: 1rem;
+  }
+
+  .heroActions a,
+  .allPostsLink {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--color-ink);
+    text-decoration-color: var(--color-interaction);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.3em;
+    transition: color var(--motion-fast) ease;
+  }
+
+  .heroActions a span,
+  .allPostsLink span {
+    color: var(--color-interaction);
+  }
+
+  .heroActions a:hover,
+  .allPostsLink:hover {
+    color: var(--color-interaction-hover);
+  }
+
+  .heroArtwork {
+    position: relative;
+    grid-column: 5 / -1;
+    grid-row: 2;
+    width: min(100%, 720px);
+    justify-self: end;
+    margin: 0.95rem 0 0;
+    padding: clamp(0.35rem, 1vw, 0.75rem);
+    border: 1px solid var(--color-border-subtle);
+    background: var(--color-paper);
+    box-shadow: var(--shadow-paper);
+    transform: rotate(0.4deg);
+  }
+
+  .heroArtwork::before {
+    position: absolute;
+    z-index: -1;
+    inset: 0.7rem -0.55rem -0.45rem 0.8rem;
+    background:
+      radial-gradient(ellipse at 18% 22%, rgba(245, 218, 157, 0.2), transparent 42%),
+      radial-gradient(ellipse at 84% 78%, rgba(203, 195, 231, 0.19), transparent 43%);
+    content: '';
+  }
+
+  .heroArtwork img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: contain;
+  }
+
+  .heroNext {
+    grid-column: 2 / -1;
+    margin: 0.55rem 0 0;
+    color: var(--color-ink-muted);
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+  }
+
+  .labNote {
+    width: min(82%, 800px);
+    margin: clamp(1.5rem, 3.5vw, 3rem) 0 0 8%;
+    padding: 1rem 1.25rem 1.15rem;
+    border-bottom: 1px solid rgba(126, 111, 88, 0.1);
+    background:
+      radial-gradient(ellipse at 97% 5%, rgba(222, 215, 239, 0.14), transparent 34%),
+      linear-gradient(108deg, rgba(255, 246, 222, 0.28), transparent 58%),
+      var(--color-paper);
+    box-shadow: 0 8px 14px -18px rgba(69, 58, 42, 0.18);
+  }
+
+  .labNote .sectionLabel {
+    margin: 0 0 0.45rem;
+  }
+
+  .labNote > div {
+    max-width: 690px;
+  }
+
+  .labNote h2,
+  .sectionHeading h2,
+  .fromLab h2 {
+    margin: 0;
+    font-size: clamp(1.5rem, 2.8vw, 2.25rem);
+    line-height: 1.35;
     letter-spacing: -0.025em;
   }
 
-  .mobileBreak {
-    display: none;
+  .labNote div > p:not(.sectionLabel) {
+    max-width: 50rem;
+    margin: 0.75rem 0 0;
+    color: var(--color-ink-muted);
+    line-height: 1.9;
   }
 
-  .lead {
-    max-width: 36rem;
-    margin: 1.6rem 0 0;
-    color: #4d4a57;
-    font-size: clamp(1rem, 2vw, 1.15rem);
-    line-height: 2;
-  }
-
-  .actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.8rem;
-    margin-top: 2rem;
-  }
-
-  .primaryAction,
-  .secondaryAction,
-  .contact a {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 3rem;
-    border-radius: 999px;
-    padding: 0.75rem 1.25rem;
-    font-weight: 700;
-  }
-
-  .primaryAction {
-    background: #232323;
-    color: #fff;
-    box-shadow: 0 16px 40px rgba(35, 35, 35, 0.18);
-  }
-
-  .primaryAction:hover {
-    color: #fff;
-    transform: translateY(-1px);
-  }
-
-  .secondaryAction,
-  .contact a {
-    border: 1px solid rgba(35, 35, 35, 0.12);
-    background: rgba(255, 255, 255, 0.72);
-    color: #232323;
-  }
-
-  .heroVisual {
-    position: relative;
-  }
-
-  .heroVisual::before {
-    position: absolute;
-    inset: -8%;
-    z-index: -1;
-    border-radius: 40% 60% 52% 48%;
-    background:
-      radial-gradient(circle at 22% 28%, rgba(248, 221, 94, 0.65), transparent 34%),
-      radial-gradient(circle at 75% 25%, rgba(124, 108, 242, 0.32), transparent 32%),
-      radial-gradient(circle at 58% 80%, rgba(133, 221, 176, 0.42), transparent 36%);
-    content: '';
-    filter: blur(4px);
-  }
-
-  .heroVisual img {
-    display: block;
-    width: 100%;
-    border: 1px solid rgba(35, 35, 35, 0.08);
-    border-radius: 2rem;
-    box-shadow: 0 30px 80px rgba(64, 53, 112, 0.2);
-  }
-
-  .intro,
-  .products,
-  .contact {
-    max-width: 1180px;
-    margin: 0 auto;
-  }
-
-  .intro {
-    border-radius: 2rem;
-    padding: clamp(2rem, 5vw, 4rem);
-    background: #f7f3ea;
-  }
-
-  .intro h2,
-  .sectionHeading h2 {
-    max-width: 48rem;
-    margin: 0;
-    font-size: clamp(1.55rem, 3vw, 2.7rem);
-    line-height: 1.28;
-    letter-spacing: -0.04em;
-  }
-
-  .introGrid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: clamp(1.5rem, 4vw, 3rem);
-    margin-top: 2rem;
-  }
-
-  .introGrid p,
-  .sectionHeading p,
-  .contact p {
-    color: #55505c;
-    line-height: 2;
-  }
-
-  .products {
-    padding: clamp(4rem, 9vw, 7rem) 0;
+  .works {
+    padding: clamp(3.8rem, 8vw, 6.5rem) 0 0;
+    scroll-margin-top: 1rem;
   }
 
   .sectionHeading {
-    display: grid;
-    grid-template-columns: minmax(0, 0.9fr) minmax(280px, 0.7fr);
-    gap: clamp(1.5rem, 5vw, 4rem);
-    align-items: end;
-    margin-bottom: 2rem;
+    max-width: 700px;
+    margin: 0 0 2rem 8%;
   }
 
-  .sectionHeading p:last-child {
+  .sectionHeading > p:last-child {
+    max-width: 40rem;
+    margin: 0.75rem 0 0;
+    color: var(--color-ink-muted);
+    line-height: 1.85;
+  }
+
+  .worksUpper {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: clamp(1.5rem, 4vw, 3.25rem);
+    align-items: start;
+  }
+
+  .featuredWork > a {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .featuredImage {
+    padding: clamp(0.6rem, 2vw, 1.4rem);
+    background:
+      radial-gradient(ellipse at 17% 18%, rgba(247, 212, 255, 0.28), transparent 34%),
+      radial-gradient(ellipse at 86% 84%, rgba(255, 224, 135, 0.26), transparent 36%),
+      #fffefa;
+    box-shadow: var(--shadow-paper);
+  }
+
+  .featuredImage img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: contain;
+  }
+
+  .featuredCopy {
+    padding: 1.1rem 0.35rem 0;
+  }
+
+  .featuredCopy h3,
+  .mediumWork h3 {
+    margin: 0;
+    font-size: clamp(1.18rem, 1.8vw, 1.5rem);
+    line-height: 1.4;
+  }
+
+  .featuredCopy > p:not(.workEyebrow),
+  .mediumWork div > p:not(.workEyebrow) {
+    margin: 0.45rem 0 0;
+    color: var(--color-ink-muted);
+    font-size: 0.94rem;
+    line-height: 1.75;
+  }
+
+  .workEyebrow {
+    margin: 0 0 0.35rem;
+    font-size: 0.72rem;
+  }
+
+  .workLink {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+    color: var(--color-interaction-hover);
+    font-size: 0.88rem;
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 126, 51, 0.55);
+    text-underline-offset: 0.25em;
+  }
+
+  .featuredWork a:hover .workLink,
+  .mediumWork a:hover .workLink {
+    text-decoration-color: currentColor;
+  }
+
+  .mediumWorks {
+    display: grid;
+    gap: 1.5rem;
+    padding-top: 1.25rem;
+  }
+
+  .mediumWork + .mediumWork {
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  .mediumWork a {
+    display: grid;
+    grid-template-columns: minmax(100px, 0.72fr) minmax(0, 1fr);
+    gap: 1rem;
+    align-items: center;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .mediumWork img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: contain;
+    background: #fffefa;
+    box-shadow: inset 0 0 0 1px rgba(126, 111, 88, 0.08);
+  }
+
+  .mediumWork:first-child img {
+    background: linear-gradient(145deg, rgba(247, 212, 234, 0.28), #fffefa 72%);
+  }
+
+  .mediumWork:last-child img {
+    background: linear-gradient(145deg, rgba(207, 223, 205, 0.26), #fffefa 72%);
+  }
+
+  .mediumWork h3 {
+    font-size: 1.1rem;
+  }
+
+  .mediumWork div > p:not(.workEyebrow) {
+    font-size: 0.88rem;
+  }
+
+  .workShelf {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: clamp(1.25rem, 3vw, 2.5rem);
+    margin-top: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .shelfWork a {
+    display: grid;
+    min-height: 126px;
+    grid-template-columns: 84px minmax(0, 1fr) auto;
+    gap: 0.9rem;
+    align-items: center;
+    padding: 1rem;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .shelfWork img {
+    display: block;
+    width: 84px;
+    height: 84px;
+    object-fit: contain;
+    padding: 0.2rem;
+    background: linear-gradient(145deg, rgba(255, 239, 199, 0.25), #fffefa 72%);
+    box-shadow: inset 0 0 0 1px rgba(126, 111, 88, 0.08);
+  }
+
+  .shelfCopy {
+    display: grid;
+    gap: 0.35rem;
+    min-width: 0;
+  }
+
+  .shelfCopy .workEyebrow {
     margin: 0;
   }
 
-  .productGrid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1rem;
+  .shelfTitle {
+    font-size: 0.94rem;
+    font-weight: 650;
+    line-height: 1.4;
   }
 
-  .productCard a {
+  .shelfArrow {
+    color: var(--color-interaction);
+  }
+
+  .fromLab {
+    margin: clamp(4rem, 9vw, 7rem) 4% 0;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  .fromLabHeading {
     display: flex;
-    min-height: 100%;
-    flex-direction: column;
-    overflow: hidden;
-    border: 1px solid rgba(35, 35, 35, 0.08);
-    border-radius: 1.5rem;
-    background: #fff;
-    color: inherit;
-    box-shadow: 0 20px 60px rgba(64, 53, 112, 0.08);
-    transition:
-      box-shadow 0.25s ease,
-      transform 0.25s ease;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1.5rem;
   }
 
-  .productCard a:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 26px 70px rgba(64, 53, 112, 0.14);
+  .fromLab .sectionLabel {
+    margin-bottom: 0.45rem;
   }
 
-  .productImage {
+  .fromLab h2 {
+    font-size: clamp(1.4rem, 2.6vw, 2rem);
+  }
+
+  .allPostsLink {
+    flex-shrink: 0;
+    color: var(--color-interaction-hover);
+    font-size: 0.9rem;
+  }
+
+  .postNotes {
     display: grid;
-    aspect-ratio: 16 / 11;
-    place-items: center;
-    padding: clamp(0.9rem, 3vw, 1.4rem);
-    background:
-      radial-gradient(circle at 20% 20%, rgba(248, 221, 94, 0.38), transparent 34%),
-      radial-gradient(circle at 80% 12%, rgba(124, 108, 242, 0.18), transparent 32%),
-      linear-gradient(135deg, #fbfaf7, #f1f5ff);
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: clamp(1.5rem, 4vw, 3rem);
+    margin-top: 1.3rem;
   }
 
-  .productImage img {
+  .leadPost > a {
+    display: grid;
+    grid-template-columns: minmax(130px, 0.8fr) minmax(0, 1.2fr);
+    gap: 1.15rem;
+    align-items: start;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .leadPost.withoutImage > a {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .postImage {
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border: 1px solid rgba(126, 111, 88, 0.1);
+    background:
+      radial-gradient(ellipse at 5% 100%, rgba(247, 212, 234, 0.12), transparent 38%),
+      #fffefa;
+    box-shadow: 0 5px 18px rgba(69, 58, 42, 0.04);
+  }
+
+  .postImage img {
     display: block;
     width: 100%;
     height: 100%;
     object-fit: contain;
-    filter: drop-shadow(0 14px 24px rgba(64, 53, 112, 0.12));
   }
 
-  .productCard div:not(.productImage) {
-    padding: 1.25rem;
+  .postCopy time,
+  .otherPostNotes time {
+    color: var(--color-ink-muted);
+    font-size: 0.78rem;
+    font-variant-numeric: tabular-nums;
   }
 
-  .productCard p {
-    margin: 0 0 0.5rem;
-    color: #7c6cf2;
-    font-size: 0.8rem;
-    font-weight: 700;
+  .postCopy h3,
+  .otherPostNotes h3 {
+    margin: 0.35rem 0 0;
+    font-size: 1.08rem;
+    line-height: 1.5;
   }
 
-  .productCard h3 {
-    margin: 0 0 0.75rem;
-    font-size: 1.15rem;
-    line-height: 1.35;
+  .postCopy p {
+    margin: 0.45rem 0 0;
+    color: var(--color-ink-muted);
+    font-size: 0.9rem;
+    line-height: 1.7;
   }
 
-  .productCard span {
-    color: #5d5864;
-    line-height: 1.8;
+  .otherPostNotes article {
+    border-bottom: 1px solid var(--color-border-subtle);
   }
 
-  .contact {
-    border-radius: 2rem;
-    margin-bottom: 4rem;
-    padding: clamp(2rem, 5vw, 3rem);
-    background:
-      linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.42)),
-      #eaf7ef;
-    text-align: center;
+  .otherPostNotes a {
+    display: grid;
+    grid-template-columns: 6rem minmax(0, 1fr) auto;
+    gap: 0.8rem;
+    align-items: baseline;
+    padding: 0.85rem 0.2rem;
+    color: inherit;
+    text-decoration: none;
   }
 
-  .contact p {
-    margin: 0 auto 1.4rem;
+  .otherPostNotes h3 {
+    margin: 0;
+    font-size: 0.96rem;
   }
 
-  .contact div {
+  .otherPostNotes a > span {
+    color: var(--color-interaction);
+  }
+
+  .leadPost a:hover h3,
+  .otherPostNotes a:hover h3 {
+    color: var(--color-interaction-hover);
+  }
+
+  .quietLinks {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.7rem;
-    justify-content: center;
+    gap: 0.3rem 1.3rem;
+    align-items: center;
+    margin: clamp(3rem, 6vw, 4.5rem) 4% 0;
+    padding: 1rem 0 1.5rem;
+    border-top: 1px solid var(--color-border-subtle);
+    color: var(--color-ink-muted);
+    font-size: 0.82rem;
+  }
+
+  .quietLinks a {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    color: inherit;
+    text-underline-offset: 0.25em;
+  }
+
+  .quietLinks a:hover {
+    color: var(--color-interaction-hover);
+  }
+
+  .heroActions a:focus-visible,
+  .allPostsLink:focus-visible,
+  .quietLinks a:focus-visible,
+  .featuredWork a:focus-visible,
+  .mediumWork a:focus-visible,
+  .shelfWork a:focus-visible,
+  .leadPost a:focus-visible,
+  .otherPostNotes a:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 4px;
   }
 
   @media (max-width: 900px) {
-    .hero,
-    .sectionHeading {
-      grid-template-columns: 1fr;
+    .worksUpper {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr);
+      gap: 1.5rem;
     }
 
-    .productGrid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+    .mediumWork a {
+      grid-template-columns: minmax(90px, 0.65fr) minmax(0, 1fr);
+      gap: 0.75rem;
+    }
+
+    .shelfWork a {
+      grid-template-columns: 64px minmax(0, 1fr);
+      padding: 0.8rem;
+    }
+
+    .shelfWork img {
+      width: 64px;
+      height: 64px;
+    }
+
+    .shelfArrow {
+      display: none;
     }
   }
 
-  @media (max-width: 720px) {
-    .mobileBreak {
-      display: initial;
-    }
-
+  @media (max-width: 640px) {
     .hero {
-      padding-top: 2.4rem;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      padding-top: 2rem;
     }
 
-    .introGrid,
-    .productGrid {
+    .heroCopy {
+      grid-column: 1 / -1;
+    }
+
+    .hero h1 {
+      font-size: clamp(2rem, 8vw, 2.65rem);
+    }
+
+    .heroLead {
+      max-width: 34rem;
+      margin-top: 0.75rem;
+      font-size: 0.98rem;
+    }
+
+    .heroActions {
+      gap: 0.25rem 0.65rem;
+      margin-top: 0.6rem;
+    }
+
+    .heroActions a {
+      font-size: 0.9rem;
+    }
+
+    .heroArtwork {
+      grid-column: 2 / -1;
+      width: 100%;
+      margin-top: 0.8rem;
+      padding: 0.3rem;
+      transform: none;
+    }
+
+    .heroArtwork::before {
+      inset: 0.35rem -0.2rem -0.2rem 0.35rem;
+      background: radial-gradient(ellipse at 82% 78%, rgba(203, 195, 231, 0.14), transparent 43%);
+    }
+
+    .heroNext {
+      grid-column: 1 / -1;
+      margin-top: 0.6rem;
+      font-size: 0.74rem;
+    }
+
+    .labNote {
+      width: auto;
+      margin: 2rem 0 0;
+      padding: 0.55rem 0.15rem 0.7rem;
+      border-bottom-color: rgba(126, 111, 88, 0.08);
+      background:
+        radial-gradient(ellipse at 100% 0, rgba(222, 215, 239, 0.1), transparent 34%),
+        var(--color-paper);
+      box-shadow: none;
+    }
+
+    .labNote .sectionLabel {
+      margin: 0 0 0.25rem;
+    }
+
+    .labNote h2,
+    .sectionHeading h2 {
+      font-size: 1.5rem;
+    }
+
+    .labNote div > p:not(.sectionLabel) {
+      margin-top: 0.55rem;
+      font-size: 0.93rem;
+      line-height: 1.8;
+    }
+
+    .works {
+      padding-top: 3.2rem;
+    }
+
+    .sectionHeading {
+      margin: 0 0 1.4rem;
+    }
+
+    .sectionHeading > p:last-child {
+      font-size: 0.93rem;
+      line-height: 1.75;
+    }
+
+    .worksUpper {
       grid-template-columns: 1fr;
+      gap: 1.8rem;
     }
 
-    .heroVisual img,
-    .intro,
-    .contact {
-      border-radius: 1.4rem;
+    .featuredImage {
+      padding: 0.55rem;
+    }
+
+    .featuredCopy {
+      padding: 0.9rem 0.1rem 0;
+    }
+
+    .featuredCopy > p:not(.workEyebrow) {
+      font-size: 0.9rem;
+    }
+
+    .mediumWorks {
+      gap: 1rem;
+      padding-top: 0;
+    }
+
+    .mediumWork + .mediumWork {
+      padding-top: 1rem;
+    }
+
+    .mediumWork a {
+      grid-template-columns: minmax(92px, 0.37fr) minmax(0, 1fr);
+      gap: 0.9rem;
+    }
+
+    .mediumWork h3 {
+      font-size: 1rem;
+    }
+
+    .mediumWork div > p:not(.workEyebrow) {
+      font-size: 0.84rem;
+      line-height: 1.6;
+    }
+
+    .mediumWork .workLink {
+      margin-top: 0.25rem;
+      font-size: 0.82rem;
+    }
+
+    .workShelf {
+      grid-template-columns: 1fr;
+      margin-top: 1.8rem;
+      border-top: 1px solid var(--color-border-subtle);
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+
+    .shelfWork + .shelfWork {
+      border-top: 1px solid var(--color-border-subtle);
+      border-left: 0;
+    }
+
+    .shelfWork a {
+      min-height: 92px;
+      grid-template-columns: 64px minmax(0, 1fr) auto;
+      padding: 0.65rem 0.25rem;
+    }
+
+    .shelfArrow {
+      display: block;
+    }
+
+    .fromLab {
+      margin: 3.5rem 0 0;
+      padding-top: 1rem;
+    }
+
+    .fromLabHeading {
+      align-items: start;
+    }
+
+    .fromLab h2 {
+      font-size: 1.4rem;
+    }
+
+    .allPostsLink {
+      min-height: 44px;
+      margin-top: 0.7rem;
+      font-size: 0.8rem;
+    }
+
+    .postNotes {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .leadPost > a {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+
+    .postImage {
+      max-height: 210px;
+    }
+
+    .postCopy h3 {
+      font-size: 1rem;
+    }
+
+    .postCopy p {
+      font-size: 0.86rem;
+    }
+
+    .otherPostNotes a {
+      grid-template-columns: 5.3rem minmax(0, 1fr) auto;
+      gap: 0.45rem;
+      padding: 0.7rem 0.1rem;
+    }
+
+    .otherPostNotes h3 {
+      font-size: 0.88rem;
+    }
+
+    .quietLinks {
+      gap: 0.1rem 0.8rem;
+      margin: 2.5rem 0 0;
+      padding: 0.8rem 0 1rem;
+      font-size: 0.78rem;
+    }
+
+    .quietLinks > span {
+      flex-basis: 100%;
     }
   }
 </style>

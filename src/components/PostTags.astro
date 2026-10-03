@@ -6,16 +6,18 @@ import '../styles/notion-color.css'
 export interface Props {
   post: Post
   enableLink: boolean
+  limit?: number
 }
 
-const { post, enableLink = true } = Astro.props
+const { post, enableLink = true, limit } = Astro.props
+const visibleTags = limit ? post.Tags.slice(0, limit) : post.Tags
 ---
 
 <div class="post-tags">
   {
-    post.Tags &&
-      post.Tags.length > 0 &&
-      post.Tags.map((tag: SelectProperty) => {
+    visibleTags &&
+      visibleTags.length > 0 &&
+      visibleTags.map((tag: SelectProperty) => {
         if (enableLink) {
           return (
             <a href={getTagLink(tag.name)} class={`tag ${tag.color}`}>

@@ -1,0 +1,70 @@
+---
+import type { Post } from '../lib/interfaces.ts'
+import { getPostLink } from '../lib/blog-helpers.ts'
+
+export interface Props {
+  posts: Post[]
+}
+
+const { posts } = Astro.props
+const relatedPosts = posts.slice(0, 3)
+---
+
+{
+  relatedPosts.length > 0 && (
+    <section class="article-related-posts" aria-labelledby="article-related-posts-title">
+      <h2 id="article-related-posts-title">同じカテゴリの記事</h2>
+      <ul>
+        {relatedPosts.map((post) => (
+          <li>
+            <a href={getPostLink(post.Slug)}>{post.Title}</a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+<style>
+  .article-related-posts {
+    margin-top: 1.8rem;
+  }
+
+  .article-related-posts h2 {
+    margin: 0 0 0.55rem;
+    color: #4a435a;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  .article-related-posts ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .article-related-posts li + li {
+    margin-top: 0.1rem;
+  }
+
+  .article-related-posts a {
+    display: flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0.55rem 0.25rem;
+    border-radius: var(--radius-small);
+    color: #4a435a;
+    line-height: 1.5;
+    text-decoration: none;
+  }
+
+  .article-related-posts a:hover {
+    color: var(--color-interaction-hover);
+  }
+
+  .article-related-posts a:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+</style>
