@@ -10,6 +10,11 @@
     "SITE_BASE_PATH": "",
     "GA_TIME_ZONE": "Asia/Tokyo"
   },
+  "secrets": {
+    "required": [
+      "GA_SERVICE_ACCOUNT_JSON"
+    ]
+  },
   "d1_databases": [
     {
       "binding": "BLOG_SIGNALS_DB",
@@ -19,6 +24,8 @@
     }
   ],
   "triggers": {
-    "crons": []
+    "crons": [
+      "0 0 * * *"
+    ]
   }
 }
