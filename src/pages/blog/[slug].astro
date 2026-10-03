@@ -1,13 +1,10 @@
 ---
 import * as interfaces from '../../lib/interfaces.ts'
 import {
-  getPosts,
   getAllPosts,
-  getRankedPosts,
   getPostBySlug,
   getPostsByTag,
   getBlock,
-  getAllTags,
   getAllBlocksByBlockId,
   downloadFile,
 } from '../../lib/notion/client.ts'
@@ -25,8 +22,7 @@ import PostFeaturedImage from '../../components/PostFeaturedImage.astro'
 import PostBody from '../../components/PostBody.astro'
 import LikeButton from '../../components/LikeButton.astro'
 import PostRelativeLink from '../../components/PostRelativeLink.astro'
-import BlogPostsLink from '../../components/BlogPostsLink.astro'
-import BlogTagsLink from '../../components/BlogTagsLink.astro'
+import ArticleRelatedPosts from '../../components/ArticleRelatedPosts.astro'
 import BlogTableOfContents from '../../components/BlogTableOfContents.astro'
 import styles from '../../styles/blog.module.css'
 
@@ -42,15 +38,15 @@ if (!post) {
   throw new Error('Post not found. slug: ${slug}')
 }
 
-const [blocks, allPosts, rankedPosts, recentPosts, tags, postsHavingSameTag] =
-  await Promise.all([
-    getAllBlocksByBlockId(post.PageId),
-    getAllPosts(),
-    getRankedPosts(),
-    getPosts(5),
-    getAllTags(),
-    getPostsByTag(post.Tags[0]?.name, 6),
-  ])
+const [blocks, allPosts, postsHavingSameTag] = await Promise.all([
+  getAllBlocksByBlockId(post.PageId),
+  getAllPosts(),
+  getPostsByTag(post.Tags[0]?.name, 6),
+])
+
+const relatedPosts = postsHavingSameTag
+  .filter((relatedPost) => relatedPost.Slug !== post.Slug)
+  .slice(0, 3)
 
 const fileAtacchedBlocks = extractTargetBlocks('image', blocks)
   .concat(extractTargetBlocks('file', blocks))
@@ -169,18 +165,6 @@ if (post.FeaturedImage && post.FeaturedImage.Url) {
       tocItems.length > 0 ? styles.withToc : styles.withoutToc
     }`}
   >
-    <aside class={styles.sidebar}>
-      <BlogPostsLink
-        heading="同じカテゴリの記事"
-        posts={postsHavingSameTag.filter(
-          (p: interfaces.Post) => p.Slug !== post.Slug
-        )}
-      />
-      <BlogPostsLink heading="おすすめ" posts={rankedPosts} />
-      <BlogPostsLink heading="新着記事" posts={recentPosts} />
-      <BlogTagsLink heading="カテゴリ" tags={tags} />
-    </aside>
-
     <main class={styles.article}>
       <div class={styles.post}>
         <PostDate post={post} />
@@ -190,6 +174,7 @@ if (post.FeaturedImage && post.FeaturedImage.Url) {
         <PostBody blocks={blocks} />
         <PostTags post={post} />
         <LikeButton slug={post.Slug} />
+        <ArticleRelatedPosts posts={relatedPosts} />
 
         <footer>
           <PostRelativeLink prevPost={prevPost} nextPost={nextPost} />
