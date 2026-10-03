@@ -17,6 +17,11 @@ export async function onRequestGet({ env }) {
     return json({ error: 'Likes database is not configured.' }, 503)
   }
 
+  let reactionSignals = []
+  let readSignals = []
+  let reactionSucceeded = false
+  let readSucceeded = false
+
   try {
     const result = await db
       .prepare(
@@ -29,7 +34,7 @@ export async function onRequestGet({ env }) {
       .bind(MAX_SIGNAL_CANDIDATES)
       .all()
 
-    const signals = (Array.isArray(result?.results) ? result.results : [])
+    reactionSignals = (Array.isArray(result?.results) ? result.results : [])
       .map((row) => ({
         kind: 'reaction',
         slug: typeof row?.slug === 'string' ? row.slug : '',
@@ -41,16 +46,41 @@ export async function onRequestGet({ env }) {
           Number.isSafeInteger(signal.value) &&
           signal.value > 0
       )
-
-    return json(
-      {
-        version: 1,
-        generatedAt: new Date().toISOString(),
-        signals,
-      },
-      200
-    )
+    reactionSucceeded = true
   } catch {
+    // A missing or unavailable likes table must not hide read signals.
+  }
+
+  try {
+    const result = await db
+      .prepare(
+        `SELECT slug
+         FROM blog_read_signals
+         WHERE views > 0
+         ORDER BY views DESC, slug ASC
+         LIMIT ?`
+      )
+      .bind(MAX_SIGNAL_CANDIDATES)
+      .all()
+
+    readSignals = (Array.isArray(result?.results) ? result.results : [])
+      .map((row) => ({
+        kind: 'read',
+        slug: typeof row?.slug === 'string' ? row.slug : '',
+      }))
+      .filter((signal) => SLUG_PATTERN.test(signal.slug))
+    readSucceeded = true
+  } catch {
+    // A missing or unavailable read table must not hide reactions.
+  }
+
+  if (!reactionSucceeded && !readSucceeded) {
     return json({ error: 'Failed to read blog signals.' }, 500)
   }
+
+  return json({
+    version: 1,
+    generatedAt: new Date().toISOString(),
+    signals: [...readSignals, ...reactionSignals],
+  })
 }

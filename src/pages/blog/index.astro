@@ -1,15 +1,11 @@
 ---
-import {
-  BASE_PATH,
-  NUMBER_OF_POSTS_PER_PAGE,
-} from '../../server-constants.ts'
+import { NUMBER_OF_POSTS_PER_PAGE } from '../../server-constants.ts'
 import {
   getAllTags,
   getAllPosts,
   getNumberOfPages,
 } from '../../lib/notion/client.ts'
 import { getPostLink } from '../../lib/blog-helpers.ts'
-import { pathJoin } from '../../lib/utils.ts'
 import Layout from '../../layouts/Layout.astro'
 import BlogEditorialListing from '../../components/BlogEditorialListing.astro'
 
@@ -33,6 +29,6 @@ const signalPosts = allPosts.map((post) => ({
     currentPage={1}
     numberOfPages={numberOfPages}
     signalPosts={signalPosts}
-    signalsEndpoint={pathJoin(BASE_PATH, '/api/blog-signals')}
+    signalsEndpoint="/api/blog-signals"
   />
 </Layout>

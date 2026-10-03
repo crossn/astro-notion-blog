@@ -243,7 +243,7 @@
   gap: 0.75rem 1.25rem;
   margin-top: 0.6rem;
   padding: 0.4rem 0 0.4rem 0.8rem;
-  border-left: 1px solid rgba(226, 168, 181, 0.42);
+  border-left: 1px solid rgba(171, 158, 191, 0.35);
 }
 
 .signalDescription h3 {
@@ -269,9 +269,13 @@
 
 .signalList li {
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 0.9rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+}
+
+.signalList li + li {
+  margin-top: 0.55rem;
 }
 
 .signalList a {
@@ -297,10 +301,26 @@
   outline-offset: 3px;
 }
 
+.signalList [data-signal-details] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.75rem;
+}
+
+.signalList [data-signal-read],
 .signalList [data-signal-count] {
   flex: 0 0 auto;
-  color: #946c73;
   font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.signalList [data-signal-read] {
+  color: #796e91;
+}
+
+.signalList [data-signal-count] {
+  color: #946c73;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }

@@ -28,7 +28,7 @@ const { posts, endpoint } = Astro.props
     <span class={styles.signalRule} aria-hidden="true"></span>
   </h2>
   <div class={styles.signalContent}>
-    <div class={styles.signalDescription}>
+    <div class={styles.signalDescription} data-signal-description>
       <h3>反応が多い</h3>
       <p>♡が集まった記録</p>
     </div>
@@ -81,7 +81,8 @@ const { posts, endpoint } = Astro.props
   }
 
   function getPublishedSignals(payload, postBySlug) {
-    const mergedBySlug = new Map()
+    let topRead = null
+    let topReaction = null
 
     for (const signal of payload.signals) {
       if (
@@ -98,27 +99,22 @@ const { posts, endpoint } = Astro.props
       if (signal.kind === 'reaction') {
         const value = Number(signal.value)
         if (!Number.isSafeInteger(value) || value < 1) continue
+        if (!topReaction) topReaction = { post, value }
+      } else if (!topRead) {
+        topRead = { post }
       }
 
-      let merged = mergedBySlug.get(signal.slug)
-      if (!merged) {
-        merged = { post, kinds: new Set(), values: new Map() }
-        mergedBySlug.set(signal.slug, merged)
-      }
-
-      merged.kinds.add(signal.kind)
-      if (signal.kind === 'reaction') {
-        const value = Number(signal.value)
-        merged.values.set(
-          signal.kind,
-          Math.max(merged.values.get(signal.kind) || 0, value)
-        )
-      }
+      if (topRead && topReaction) break
     }
 
-    return Array.from(mergedBySlug.values()).find((signal) =>
-      signal.kinds.has('reaction')
-    )
+    if (topRead && topReaction?.post.slug === topRead.post.slug) {
+      return [{ post: topRead.post, read: true, reaction: topReaction.value }]
+    }
+
+    return [
+      ...(topRead ? [{ post: topRead.post, read: true }] : []),
+      ...(topReaction ? [{ post: topReaction.post, reaction: topReaction.value }] : []),
+    ]
   }
 
   async function initializeBlogSignals() {
@@ -148,28 +144,49 @@ const { posts, endpoint } = Astro.props
       const payload = await loadSignals(endpoint)
       if (!payload || !container.isConnected) return
 
-      const signal = getPublishedSignals(payload, postBySlug)
-      if (!signal) return
+      const signals = getPublishedSignals(payload, postBySlug)
+      const list = container.querySelector('[data-signal-list]')
+      if (!list) return
 
-      const articleUrl = new URL(signal.post.href, window.location.origin)
-      if (articleUrl.origin !== window.location.origin) return
+      if (!signals.some((signal) => signal.reaction)) {
+        const description = container.querySelector('[data-signal-description]')
+        const heading = description?.querySelector('h3')
+        const copy = description?.querySelector('p')
+        if (heading) heading.textContent = '読まれた記録'
+        if (copy) copy.textContent = '記事に残る小さな気配'
+      }
 
-      const item = document.createElement('li')
-      const link = document.createElement('a')
-      link.href = articleUrl.href
-      link.textContent = signal.post.title
+      for (const signal of signals) {
+        const articleUrl = new URL(signal.post.href, window.location.origin)
+        if (articleUrl.origin !== window.location.origin) continue
 
-      const count = document.createElement('span')
-      count.setAttribute('data-signal-count', '')
-      count.setAttribute('role', 'img')
-      count.setAttribute(
-        'aria-label',
-        `${signal.values.get('reaction')}件の反応`
-      )
-      count.textContent = `♡ ${signal.values.get('reaction')}`
+        const item = document.createElement('li')
+        const link = document.createElement('a')
+        link.href = articleUrl.href
+        link.textContent = signal.post.title
 
-      item.append(link, count)
-      container.querySelector('[data-signal-list]')?.append(item)
+        const details = document.createElement('div')
+        details.setAttribute('data-signal-details', '')
+        if (signal.read) {
+          const read = document.createElement('span')
+          read.setAttribute('data-signal-read', '')
+          read.textContent = 'よく読まれている'
+          details.append(read)
+        }
+        if (signal.reaction) {
+          const count = document.createElement('span')
+          count.setAttribute('data-signal-count', '')
+          count.setAttribute('role', 'img')
+          count.setAttribute('aria-label', `${signal.reaction}件の反応`)
+          count.textContent = `♡ ${signal.reaction}`
+          details.append(count)
+        }
+
+        item.append(link, details)
+        list.append(item)
+      }
+
+      if (!list.childElementCount) return
       container.hidden = false
     } catch {
       // Signals are optional; keep the static article listing available.
