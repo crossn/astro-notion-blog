@@ -61,9 +61,9 @@ const navItems = [
   <body>
     <GoogleAnalytics trackingId={PUBLIC_GA_TRACKING_ID} />
     <header class="header" style={{ position: 'relative', zIndex: 2 }}>
-      <h1>
+      <div class="site-title">
         <a href={getNavLink('/')}>{PUBLIC_SITE_TITLE}</a>
-      </h1>
+      </div>
 
       <ul>
         {
@@ -116,7 +116,7 @@ const navItems = [
     padding: 0.7rem 0 0.3rem;
     text-align: center;
   }
-  .header h1 {
+  .header .site-title {
     margin: 0;
     padding: 0.15rem 0;
     font-weight: 400;
@@ -125,7 +125,7 @@ const navItems = [
     letter-spacing: 0.035em;
     color: var(--color-ink);
   }
-  .header h1 a {
+  .header .site-title a {
     color: inherit;
   }
   .header ul {
@@ -139,7 +139,7 @@ const navItems = [
       padding: 0.6rem 0 0.2rem;
     }
 
-    .header h1 {
+    .header .site-title {
       font-size: 1.3rem;
     }
 

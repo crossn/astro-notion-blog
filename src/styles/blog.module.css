@@ -126,6 +126,23 @@
   font-size: inherit;
 }
 
+.post :global(.post-featured-image) {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 38rem;
+  margin: 0.4rem auto 1rem;
+  padding: 0;
+}
+
+.post :global(.post-featured-image img) {
+  width: 100%;
+  max-width: 100%;
+  max-height: none;
+  height: auto;
+  object-fit: contain;
+  border-radius: 0.65rem;
+}
+
 .post :global(.post-excerpt p) {
   color: #5a5467;
   line-height: 1.9;
