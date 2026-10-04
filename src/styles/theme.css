@@ -6,10 +6,11 @@
   --color-canvas: var(--surface-canvas-warm);
   --color-paper: var(--surface-reading);
   --color-ink: #333;
-  --color-ink-muted: #777;
+  --color-ink-muted: #707070;
   --color-interaction: #ff7e33;
-  --color-interaction-hover: #f26000;
-  --color-editorial: #7c6cf2;
+  --color-link-text: #c44d00;
+  --color-interaction-hover: #b84a00;
+  --color-editorial: #7563df;
   --color-border-subtle: rgba(124, 108, 242, 0.14);
   --color-focus-ring: var(--color-interaction);
   --color-watercolor: rgba(247, 212, 255, 0.8);
@@ -33,7 +34,7 @@
   /* Compatibility aliases used by the upstream renderer and older styles. */
   --bg: var(--color-canvas);
   --fg: var(--color-ink);
-  --accents-1: var(--color-interaction);
+  --accents-1: var(--color-link-text);
   --accents-2: var(--color-interaction-hover);
   --accents-3: #666;
   --radius: var(--radius-small);

@@ -106,7 +106,7 @@ const { slug } = Astro.props
       button.setAttribute('aria-pressed', String(liked))
       button.setAttribute(
         'aria-label',
-        liked ? 'この記事へのいいねを取り消す' : 'この記事にいいねする'
+        `${liked ? 'この記事へのいいねを取り消す' : 'この記事にいいねする'}（${likes}件）`
       )
       icon.textContent = liked ? '♥' : '♡'
       count.textContent = String(likes)

@@ -223,7 +223,7 @@
 .post :global(.post-body p code) {
   border-radius: 4px;
   padding: 0.15rem 0.35rem;
-  color: #c94b62;
+  color: #b84259;
   background: rgba(249, 238, 243, 0.9);
 }
 
