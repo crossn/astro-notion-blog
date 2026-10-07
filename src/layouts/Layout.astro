@@ -115,24 +115,48 @@ const navItems = [
     display: block;
     padding: 0.7rem 0 0.3rem;
     text-align: center;
+    background: linear-gradient(180deg, rgba(249, 245, 234, 0.28), transparent);
+  }
+  .header::after {
+    display: block;
+    width: min(20rem, 70%);
+    height: 1px;
+    margin: 0 auto;
+    background: linear-gradient(90deg, transparent, rgba(126, 111, 88, 0.12), transparent);
+    content: '';
   }
   .header .site-title {
     margin: 0;
     padding: 0.15rem 0;
-    font-weight: 400;
-    font-size: clamp(1.3rem, 1.7vw, 1.5rem);
+    font-weight: 500;
+    font-size: clamp(1.3rem, 1.7vw, 1.4rem);
     line-height: 1.15;
-    letter-spacing: 0.035em;
+    letter-spacing: 0.055em;
     color: var(--color-ink);
   }
   .header .site-title a {
+    position: relative;
+    isolation: isolate;
+    display: inline-block;
+    white-space: nowrap;
     color: inherit;
+  }
+  .header .site-title a::before {
+    position: absolute;
+    z-index: -1;
+    inset: 55% -0.5rem -0.15rem 0.2rem;
+    background: radial-gradient(ellipse at 28% 50%, rgba(245, 218, 157, 0.22), transparent 70%);
+    filter: blur(5px);
+    content: '';
+    pointer-events: none;
   }
   .header ul {
     list-style: none;
     margin: inherit;
     padding: 0.2rem 0 0.4rem;
-    font-size: 1.1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
   }
   @media (max-width: 640px) {
     .header {
@@ -145,16 +169,18 @@ const navItems = [
 
     .header ul {
       padding: 0.15rem 0 0.35rem;
-      font-size: 1rem;
+      font-size: 0.88rem;
     }
   }
   .header ul li {
     display: inline-block;
-    padding: 0 0.9rem;
+    padding: 0 0.8rem;
   }
   .header ul li :global(a) {
     position: relative;
-    display: inline-block;
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
     padding: 0.15rem 0.1rem 0.3rem;
     color: var(--color-ink-muted);
     transition: color var(--motion-fast) ease;

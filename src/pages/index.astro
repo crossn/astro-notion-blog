@@ -312,26 +312,25 @@ const shelfWorks = [
 
   .heroArtwork {
     position: relative;
+    isolation: isolate;
     grid-column: 5 / -1;
     grid-row: 2;
     width: min(100%, 720px);
     justify-self: end;
-    margin: 0.95rem 0 0;
-    padding: clamp(0.35rem, 1vw, 0.75rem);
-    border: 1px solid var(--color-border-subtle);
-    background: var(--color-paper);
-    box-shadow: var(--shadow-paper);
-    transform: rotate(0.4deg);
+    margin: 0.7rem 0.75rem 0 0;
   }
 
   .heroArtwork::before {
     position: absolute;
     z-index: -1;
-    inset: 0.7rem -0.55rem -0.45rem 0.8rem;
+    inset: -1.2rem -1rem -0.9rem -2rem;
     background:
-      radial-gradient(ellipse at 18% 22%, rgba(245, 218, 157, 0.2), transparent 42%),
-      radial-gradient(ellipse at 84% 78%, rgba(203, 195, 231, 0.19), transparent 43%);
+      radial-gradient(ellipse at 16% 32%, rgba(245, 218, 157, 0.22), transparent 55%),
+      radial-gradient(ellipse at 72% 18%, rgba(203, 195, 231, 0.18), transparent 58%),
+      radial-gradient(ellipse at 82% 82%, rgba(198, 218, 204, 0.16), transparent 48%);
+    filter: blur(28px);
     content: '';
+    pointer-events: none;
   }
 
   .heroArtwork img {
@@ -340,6 +339,7 @@ const shelfWorks = [
     height: auto;
     aspect-ratio: 16 / 9;
     object-fit: contain;
+    border-radius: 0.4rem;
   }
 
   .heroNext {
@@ -776,14 +776,16 @@ const shelfWorks = [
     .heroArtwork {
       grid-column: 2 / -1;
       width: 100%;
-      margin-top: 0.8rem;
-      padding: 0.3rem;
-      transform: none;
+      margin: 0.8rem 0 0;
     }
 
     .heroArtwork::before {
-      inset: 0.35rem -0.2rem -0.2rem 0.35rem;
-      background: radial-gradient(ellipse at 82% 78%, rgba(203, 195, 231, 0.14), transparent 43%);
+      inset: -0.5rem -0.35rem -0.4rem -0.6rem;
+      background:
+        radial-gradient(ellipse at 16% 32%, rgba(245, 218, 157, 0.12), transparent 55%),
+        radial-gradient(ellipse at 72% 18%, rgba(203, 195, 231, 0.1), transparent 58%),
+        radial-gradient(ellipse at 82% 82%, rgba(198, 218, 204, 0.09), transparent 48%);
+      filter: blur(18px);
     }
 
     .heroNext {
