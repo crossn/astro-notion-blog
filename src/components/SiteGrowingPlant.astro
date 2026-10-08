@@ -1,10 +1,10 @@
 <div class="sitePlant is-seedling" data-site-plant data-stage="seedling">
   <svg class="plantGraphic" viewBox="0 0 64 120" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">
     <g class="plantStem" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M32 124 C34 112 34 103 32 90" />
+      <path d="M32 124 C34 112 34 103 32 98" />
       <path class="plantLeaf" d="M33 100 C22 100 17 94 17 90 C26 89 31 92 33 100Z M35 106 C43 105 49 99 49 96 C42 95 37 99 35 106Z" />
       <g class="plantGrowth plantStemGrowth">
-        <path d="M32 91 C27 76 31 53 37 34" />
+        <path d="M32 99 C27 76 31 53 37 40" />
       </g>
       <g class="plantGrowth plantExtraLeaves firstLeaves">
         <path class="plantLeaf" d="M30 82 C17 81 11 72 12 66 C23 68 29 74 30 82Z M30 69 C40 69 48 61 49 54 C38 54 32 61 30 69Z" />
@@ -13,10 +13,26 @@
         <path class="plantLeaf" d="M33 56 C23 55 19 47 20 41 C29 43 33 49 33 56Z M36 43 C44 42 49 36 48 31 C41 31 37 36 36 43Z" />
       </g>
       <g class="plantFlowerStem">
-        <path d="M37 35 Q39 29 38 24" />
+        <path d="M37 40 Q39 29 38 24" />
       </g>
       <g class="plantFlower">
-        <path class="plantPetals" d="M38 24 C29 23 27 17 32 15 C28 9 34 6 38 12 C41 5 47 9 44 15 C51 16 48 22 41 23 C43 29 36 31 38 24Z" />
+        <g class="flowerVariant flowerYellow">
+          <path class="plantPetals" d="M38 24 C29 23 27 17 32 15 C28 9 34 6 38 12 C41 5 47 9 44 15 C51 16 48 22 41 23 C43 29 36 31 38 24Z" />
+        </g>
+        <g class="flowerVariant flowerCoral">
+          <path class="plantPetals" d="M38 24 C33 31 27 25 32 20 C24 18 28 10 34 14 C33 6 42 6 42 14 C49 9 53 17 45 20 C50 27 43 31 38 24Z" />
+        </g>
+        <g class="flowerVariant flowerLavender plantPetals">
+          <ellipse cx="38.5" cy="12.5" rx="2.1" ry="4.6" />
+          <ellipse cx="38.5" cy="12.5" rx="2.1" ry="4.6" transform="rotate(60 38.5 18.5)" />
+          <ellipse cx="38.5" cy="12.5" rx="2.1" ry="4.6" transform="rotate(120 38.5 18.5)" />
+          <ellipse cx="38.5" cy="12.5" rx="2.1" ry="4.6" transform="rotate(180 38.5 18.5)" />
+          <ellipse cx="38.5" cy="12.5" rx="2.1" ry="4.6" transform="rotate(240 38.5 18.5)" />
+          <ellipse cx="38.5" cy="12.5" rx="2.1" ry="4.6" transform="rotate(300 38.5 18.5)" />
+        </g>
+        <g class="flowerVariant flowerIvory">
+          <path class="plantPetals" d="M38.5 24 C31 31 26 24 33 18.5 C25 12 32 6 38.5 13 C45 6 52 12 44 18.5 C51 24 46 31 38.5 24Z" />
+        </g>
         <circle cx="38.5" cy="18.5" r="2.2" class="plantCenter" />
       </g>
       <g class="scatterParts" aria-hidden="true">
@@ -42,6 +58,9 @@
 
 <style>
   .sitePlant {
+    --flower-fill: #f0dfab;
+    --flower-stroke: #b7a470;
+    --flower-center: #b5a173;
     position: fixed;
     right: max(1.5rem, env(safe-area-inset-right));
     bottom: max(1rem, env(safe-area-inset-bottom));
@@ -75,8 +94,17 @@
   .plantPot:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 3px; }
   .plantStem { stroke: #78816c; stroke-width: 1.1; }
   .plantLeaf { fill: #dce5d3; fill-opacity: 0.35; }
-  .plantPetals { stroke: #b7a470; fill: #f0dfab; fill-opacity: 0.45; }
-  .plantCenter { stroke: none; fill: #b5a173; }
+  .sitePlant[data-flower-variant="coral"] { --flower-fill: #efd0ce; --flower-stroke: #bd9492; --flower-center: #b8a178; }
+  .sitePlant[data-flower-variant="lavender"] { --flower-fill: #ded5ee; --flower-stroke: #a59ab9; --flower-center: #b9ab83; }
+  .sitePlant[data-flower-variant="ivory"] { --flower-fill: #eeeedd; --flower-stroke: #a6b59b; --flower-center: #a6b08e; }
+  .flowerVariant { display: none; }
+  .sitePlant:not([data-flower-variant]) .flowerYellow,
+  .sitePlant[data-flower-variant="yellow"] .flowerYellow,
+  .sitePlant[data-flower-variant="coral"] .flowerCoral,
+  .sitePlant[data-flower-variant="lavender"] .flowerLavender,
+  .sitePlant[data-flower-variant="ivory"] .flowerIvory { display: inline; }
+  .plantPetals { stroke: var(--flower-stroke); fill: var(--flower-fill); fill-opacity: 0.45; }
+  .plantCenter { stroke: none; fill: var(--flower-center); }
 
   .plantGrowth,
   .plantFlowerStem,
@@ -93,7 +121,7 @@
 
   .scatterPetal,
   .scatterLeaf { opacity: 0; transform-box: fill-box; transform-origin: center; }
-  .scatterPetal { fill: #f0dfab; stroke: #b7a470; stroke-width: 0.65; }
+  .scatterPetal { fill: var(--flower-fill); stroke: var(--flower-stroke); stroke-width: 0.65; }
   .scatterLeaf { fill: #dce5d3; fill-opacity: 0.6; }
   .petalOne { --scatter-x: 18px; --scatter-y: -24px; --scatter-rotate: 35deg; --scatter-delay: 0ms; }
   .petalTwo { --scatter-x: -18px; --scatter-y: -20px; --scatter-rotate: -30deg; --scatter-delay: 45ms; }
@@ -151,6 +179,13 @@
     const fromLab = document.querySelector<HTMLElement>('.fromLab')
     const pot = plant?.querySelector<HTMLButtonElement>('.plantPot')
     if (!plant || !pot) return
+
+    // Initial script and astro:page-load can initialize the same DOM twice.
+    // Keep its flower stable until navigation supplies a new plant element.
+    if (!plant.dataset.flowerVariant) {
+      const variants = ['yellow', 'coral', 'lavender', 'ivory']
+      plant.dataset.flowerVariant = variants[Math.floor(Math.random() * variants.length)]
+    }
 
     let frame: number | undefined
     let returning = false
