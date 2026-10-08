@@ -24,7 +24,7 @@ const { title = '', description = '', path = '/', ogImage = '' } = Astro.props
 const siteTitle = title ? `${title} - ${PUBLIC_SITE_TITLE}` : PUBLIC_SITE_TITLE
 const siteDescription = description ? description : PUBLIC_SITE_DESCRIPTION
 const siteURL = new URL(path, Astro.site).toString()
-const siteOGImage = new URL('/default-og-image.png', Astro.site)
+const siteOGImage = new URL('/tsukurun-lab-og.png', Astro.site)
 
 const navItems = [
   { label: 'Home', path: '/' },
