@@ -10,6 +10,7 @@ import { getNavLink } from '../lib/blog-helpers.ts'
 import '../styles/theme.css'
 import '../styles/syntax-coloring.css'
 import GoogleAnalytics from '../components/GoogleAnalytics.astro'
+import SiteGrowingPlant from '../components/SiteGrowingPlant.astro'
 
 export interface Props {
   title: string
@@ -106,6 +107,7 @@ const navItems = [
       </div>
     </footer>
 
+    <SiteGrowingPlant />
     {ENABLE_LIGHTBOX && <script is:inline src="/scripts/fslightbox.js" />}
   </body>
 </html>

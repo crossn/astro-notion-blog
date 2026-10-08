@@ -1,4 +1,4 @@
-<div class="homePlant is-seedling" data-home-plant data-stage="seedling">
+<div class="sitePlant is-seedling" data-site-plant data-stage="seedling">
   <svg class="plantGraphic" viewBox="0 0 64 120" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">
     <g class="plantStem" stroke-linecap="round" stroke-linejoin="round">
       <path d="M32 124 C34 112 34 103 32 90" />
@@ -19,6 +19,16 @@
         <path class="plantPetals" d="M38 24 C29 23 27 17 32 15 C28 9 34 6 38 12 C41 5 47 9 44 15 C51 16 48 22 41 23 C43 29 36 31 38 24Z" />
         <circle cx="38.5" cy="18.5" r="2.2" class="plantCenter" />
       </g>
+      <g class="scatterParts" aria-hidden="true">
+        <ellipse class="scatterPetal petalOne" cx="38" cy="15" rx="2.2" ry="3.5" />
+        <ellipse class="scatterPetal petalTwo" cx="35" cy="18" rx="2.2" ry="3.5" />
+        <ellipse class="scatterPetal petalThree" cx="42" cy="19" rx="2.2" ry="3.5" />
+        <ellipse class="scatterPetal petalFour" cx="38" cy="22" rx="2.2" ry="3.5" />
+        <path class="scatterLeaf leafOne" d="M33 56 C23 55 19 47 20 41 C29 43 33 49 33 56Z" />
+        <path class="scatterLeaf leafTwo" d="M36 43 C44 42 49 36 48 31 C41 31 37 36 36 43Z" />
+        <path class="scatterLeaf leafThree" d="M30 82 C17 81 11 72 12 66 C23 68 29 74 30 82Z" />
+        <path class="scatterLeaf leafFour" d="M30 69 C40 69 48 61 49 54 C38 54 32 61 30 69Z" />
+      </g>
     </g>
   </svg>
   <button class="plantPot" type="button" aria-label="ページ上部へ戻る">
@@ -27,22 +37,21 @@
       <path class="potRim" d="M8 8 Q22 6 36 8 L35 13 Q22 15 9 13Z" />
       <path class="potHighlight" d="M15 18 L17 30" />
     </svg>
-    <span class="potHint" aria-hidden="true">上へ</span>
   </button>
 </div>
 
 <style>
-  .homePlant {
+  .sitePlant {
     position: fixed;
     right: max(1.5rem, env(safe-area-inset-right));
-    bottom: max(1rem, env(safe-area-inset-bottom), var(--plant-footer-offset, 0px));
+    bottom: max(1rem, env(safe-area-inset-bottom));
     z-index: 1;
     width: 84px;
     height: 154px;
     pointer-events: none;
   }
 
-  .plantGraphic { display: block; width: 100%; height: calc(100% - 36px); opacity: 0.78; }
+  .plantGraphic { display: block; width: 100%; height: calc(100% - 36px); opacity: 0.78; overflow: visible; }
   .plantPot {
     position: absolute;
     bottom: 0;
@@ -64,9 +73,6 @@
   .potHighlight { stroke: #fffdf6; stroke-width: 1.5; stroke-linecap: round; }
   .plantPot:hover svg { transform: translateY(-1px); }
   .plantPot:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 3px; }
-  .potHint { position: absolute; right: calc(100% + 5px); top: 12px; white-space: nowrap; font-size: 0.7rem; color: var(--color-ink); opacity: 0; }
-  .plantPot:hover .potHint,
-  .plantPot:focus-visible .potHint { opacity: 1; }
   .plantStem { stroke: #78816c; stroke-width: 1.1; }
   .plantLeaf { fill: #dce5d3; fill-opacity: 0.35; }
   .plantPetals { stroke: #b7a470; fill: #f0dfab; fill-opacity: 0.45; }
@@ -85,35 +91,51 @@
   .is-flower .plantFlowerStem,
   .is-flower .plantFlower { opacity: 1; transform: none; }
 
-  .shed-flower .plantFlower { animation: releaseFlower 450ms ease-out both; }
-  .shed-leaves .firstLeaves { animation: releaseLeaves 450ms ease-out both; }
-  .shed-leaves .lastLeaves { animation: releaseLeaves 450ms 70ms ease-out both; }
-  @keyframes releaseFlower {
-    from { opacity: 1; transform: none; }
-    to { opacity: 0; transform: translate(4px, 7px) rotate(4deg); }
+  .scatterPetal,
+  .scatterLeaf { opacity: 0; transform-box: fill-box; transform-origin: center; }
+  .scatterPetal { fill: #f0dfab; stroke: #b7a470; stroke-width: 0.65; }
+  .scatterLeaf { fill: #dce5d3; fill-opacity: 0.6; }
+  .petalOne { --scatter-x: 18px; --scatter-y: -24px; --scatter-rotate: 35deg; --scatter-delay: 0ms; }
+  .petalTwo { --scatter-x: -18px; --scatter-y: -20px; --scatter-rotate: -30deg; --scatter-delay: 45ms; }
+  .petalThree { --scatter-x: 20px; --scatter-y: -8px; --scatter-rotate: 45deg; --scatter-delay: 70ms; }
+  .petalFour { --scatter-x: -22px; --scatter-y: -12px; --scatter-rotate: -40deg; --scatter-delay: 100ms; }
+  .leafOne { --scatter-x: -16px; --scatter-y: -24px; --scatter-rotate: -35deg; --scatter-delay: 180ms; }
+  .leafTwo { --scatter-x: 18px; --scatter-y: -20px; --scatter-rotate: 40deg; --scatter-delay: 220ms; }
+  .leafThree { --scatter-x: -12px; --scatter-y: -16px; --scatter-rotate: -25deg; --scatter-delay: 280ms; }
+  .leafFour { --scatter-x: 20px; --scatter-y: -12px; --scatter-rotate: 50deg; --scatter-delay: 320ms; }
+  .is-scattering[data-scatter-stage="flower"] .scatterPetal,
+  .is-scattering:not([data-scatter-stage="seedling"]) .scatterLeaf {
+    animation: scatterPlantPart 450ms var(--scatter-delay) ease-out both;
   }
-  @keyframes releaseLeaves {
-    from { opacity: 1; transform: none; }
-    to { opacity: 0; transform: translate(-3px, 7px) rotate(-3deg); }
+  .is-scattering .plantFlower,
+  .is-scattering .plantExtraLeaves { transition-duration: 180ms; }
+  .is-scattering .plantStemGrowth { transition-duration: 350ms; transition-delay: 350ms; }
+  @keyframes scatterPlantPart {
+    0% { opacity: 0; transform: none; }
+    15% { opacity: 0.9; transform: translateY(-3px); }
+    60% { opacity: 0.65; }
+    100% { opacity: 0; transform: translate(var(--scatter-x), var(--scatter-y)) rotate(var(--scatter-rotate)); }
   }
 
   @media (max-width: 800px) {
-    .homePlant { width: 74px; height: 136px; right: max(1.25rem, env(safe-area-inset-right)); }
+    .sitePlant { width: 74px; height: 136px; right: max(1.25rem, env(safe-area-inset-right)); }
   }
 
   @media (max-width: 640px) {
-    .homePlant { width: 64px; height: 118px; right: max(1rem, env(safe-area-inset-right)); bottom: max(0.75rem, env(safe-area-inset-bottom), var(--plant-footer-offset, 0px)); }
+    .sitePlant { width: 64px; height: 118px; right: max(1rem, env(safe-area-inset-right)); bottom: max(0.75rem, env(safe-area-inset-bottom)); }
     .plantGraphic { opacity: 0.65; }
   }
 
   @media (max-width: 360px) {
-    .homePlant { width: 56px; height: 106px; right: max(0.75rem, env(safe-area-inset-right)); }
+    .sitePlant { width: 56px; height: 106px; right: max(0.75rem, env(safe-area-inset-right)); }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .plantGrowth,
     .plantFlowerStem,
     .plantFlower,
+    .scatterPetal,
+    .scatterLeaf,
     .plantPot svg { transition: none; animation: none !important; transform: none; }
   }
 </style>
@@ -121,41 +143,37 @@
 <script>
   let cleanupPlant: (() => void) | undefined
 
-  function initHomePlant() {
+  function initSitePlant() {
     cleanupPlant?.()
     cleanupPlant = undefined
-    const plant = document.querySelector<HTMLElement>('[data-home-plant]')
+    const plant = document.querySelector<HTMLElement>('[data-site-plant]')
     const works = document.querySelector<HTMLElement>('#works')
     const fromLab = document.querySelector<HTMLElement>('.fromLab')
     const pot = plant?.querySelector<HTMLButtonElement>('.plantPot')
-    const footer = document.querySelector<HTMLElement>('body > footer')
-    if (!plant || !works || !pot) return
+    if (!plant || !pot) return
 
     let frame: number | undefined
     let returning = false
-    let sheddingTimer: ReturnType<typeof setTimeout> | undefined
+    let scatterTimer: ReturnType<typeof setTimeout> | undefined
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
-    function clearShedding() {
-      if (sheddingTimer !== undefined) clearTimeout(sheddingTimer)
-      sheddingTimer = undefined
-      plant!.classList.remove('shed-flower', 'shed-leaves')
+    function clearScatter() {
+      if (scatterTimer !== undefined) clearTimeout(scatterTimer)
+      scatterTimer = undefined
+      plant!.classList.remove('is-scattering')
+      delete plant!.dataset.scatterStage
     }
     function updatePlant() {
       frame = undefined
-      // Keep the pot above the shared footer, without changing its layout.
-      const footerOffset = footer ? Math.max(0, window.innerHeight - footer.getBoundingClientRect().top + 12) : 0
-      plant!.style.setProperty('--plant-footer-offset', `${footerOffset}px`)
       const threshold = window.innerHeight * 0.55
-      const stage = fromLab && fromLab.getBoundingClientRect().top <= threshold
-        ? 'flower'
-        : works!.getBoundingClientRect().top <= threshold ? 'grown' : 'seedling'
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight
+      const progress = maxScroll > 2 ? Math.max(0, Math.min(1, window.scrollY / maxScroll)) : 0
+      const positionStage = works
+        ? fromLab && fromLab.getBoundingClientRect().top <= threshold
+          ? 'flower'
+          : works.getBoundingClientRect().top <= threshold ? 'grown' : 'seedling'
+        : progress >= 0.68 ? 'flower' : progress >= 0.28 ? 'grown' : 'seedling'
+      const stage = returning ? 'seedling' : positionStage
       const previous = plant!.dataset.stage
-      if (returning && !reducedMotion.matches && previous !== stage) {
-        if (previous === 'flower' && stage !== 'flower') plant!.classList.add('shed-flower')
-        if (stage === 'seedling' && previous !== 'seedling') plant!.classList.add('shed-leaves')
-        if (sheddingTimer !== undefined) clearTimeout(sheddingTimer)
-        sheddingTimer = setTimeout(clearShedding, 600)
-      }
       if (window.scrollY <= 2) {
         returning = false
         plant!.classList.remove('is-returning-top')
@@ -173,19 +191,29 @@
     }
 
     function returnToTop() {
-      clearShedding()
+      if (returning || scatterTimer !== undefined) return
       returning = window.scrollY > 2 && !reducedMotion.matches
       plant!.classList.toggle('is-returning-top', returning)
+      if (returning) {
+        plant!.dataset.scatterStage = plant!.dataset.stage
+        plant!.classList.add('is-scattering')
+        scatterTimer = setTimeout(() => {
+          clearScatter()
+          queuePlantUpdate()
+        }, 850)
+      }
       window.scrollTo({ top: 0, behavior: reducedMotion.matches ? 'instant' : 'smooth' })
-      queuePlantUpdate()
+      if (frame !== undefined) window.cancelAnimationFrame(frame)
+      frame = undefined
+      updatePlant()
     }
 
     function interruptReturn(event: Event) {
-      if (!returning) return
+      if (!returning && scatterTimer === undefined) return
       if (event instanceof KeyboardEvent && !['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(event.key)) return
       returning = false
       plant!.classList.remove('is-returning-top')
-      clearShedding()
+      clearScatter()
       window.scrollTo({ top: window.scrollY, behavior: 'instant' })
       queuePlantUpdate()
     }
@@ -209,7 +237,7 @@
       frame = undefined
       returning = false
       plant!.classList.remove('is-returning-top')
-      clearShedding()
+      clearScatter()
     }
     updatePlant()
     queuePlantUpdate()
@@ -219,6 +247,6 @@
     cleanupPlant?.()
     cleanupPlant = undefined
   })
-  document.addEventListener('astro:page-load', initHomePlant)
-  initHomePlant()
+  document.addEventListener('astro:page-load', initSitePlant)
+  initSitePlant()
 </script>
