@@ -1,0 +1,116 @@
+<div class="homePlant is-seedling" data-home-plant data-stage="seedling" aria-hidden="true">
+  <svg viewBox="0 0 64 120" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+    <g class="plantStem" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M42 124 C38 112 34 103 32 90" />
+      <path class="plantLeaf" d="M33 100 C22 100 17 94 17 90 C26 89 31 92 33 100Z M35 106 C43 105 49 99 49 96 C42 95 37 99 35 106Z" />
+      <g class="plantGrowth">
+        <path d="M32 91 C27 76 31 53 37 34" />
+        <path class="plantLeaf" d="M30 82 C17 81 11 72 12 66 C23 68 29 74 30 82Z M30 69 C40 69 48 61 49 54 C38 54 32 61 30 69Z M33 56 C23 55 19 47 20 41 C29 43 33 49 33 56Z M36 43 C44 42 49 36 48 31 C41 31 37 36 36 43Z" />
+      </g>
+      <g class="plantFlower">
+        <path d="M37 35 Q39 29 38 24" />
+        <path class="plantPetals" d="M38 24 C29 23 27 17 32 15 C28 9 34 6 38 12 C41 5 47 9 44 15 C51 16 48 22 41 23 C43 29 36 31 38 24Z" />
+        <circle cx="38.5" cy="18.5" r="2.2" class="plantCenter" />
+      </g>
+    </g>
+  </svg>
+</div>
+
+<style>
+  .homePlant {
+    position: fixed;
+    right: -3px;
+    bottom: -5px;
+    z-index: 1;
+    width: 60px;
+    height: 112px;
+    opacity: 0.72;
+    pointer-events: none;
+  }
+
+  .homePlant svg { display: block; width: 100%; height: 100%; }
+  .plantStem { stroke: #78816c; stroke-width: 1.1; }
+  .plantLeaf { fill: #dce5d3; fill-opacity: 0.35; }
+  .plantPetals { stroke: #b7a470; fill: #f0dfab; fill-opacity: 0.45; }
+  .plantCenter { stroke: none; fill: #b5a173; }
+
+  .plantGrowth,
+  .plantFlower {
+    opacity: 0;
+    transform: translateY(3px);
+    transition: opacity 550ms ease, transform 550ms ease;
+  }
+
+  .is-grown .plantGrowth,
+  .is-flower .plantGrowth,
+  .is-flower .plantFlower { opacity: 1; transform: none; }
+
+  @media (max-width: 800px) {
+    .homePlant { width: 44px; height: 82px; opacity: 0.62; }
+  }
+
+  @media (max-width: 640px) {
+    .homePlant { width: 39px; height: 73px; right: -12px; opacity: 0.58; }
+  }
+
+  @media (max-width: 360px) {
+    .homePlant { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .plantGrowth,
+    .plantFlower { transition: none; transform: none; }
+  }
+</style>
+
+<script>
+  let cleanupPlant: (() => void) | undefined
+
+  function initHomePlant() {
+    cleanupPlant?.()
+    cleanupPlant = undefined
+    const plant = document.querySelector<HTMLElement>('[data-home-plant]')
+    const works = document.querySelector<HTMLElement>('#works')
+    const fromLab = document.querySelector<HTMLElement>('.fromLab')
+    if (!plant || !works) return
+
+    let frame: number | undefined
+    function updatePlant() {
+      frame = undefined
+      const threshold = window.innerHeight * 0.55
+      const stage = fromLab && fromLab.getBoundingClientRect().top <= threshold
+        ? 'flower'
+        : works!.getBoundingClientRect().top <= threshold ? 'grown' : 'seedling'
+      if (plant!.dataset.stage === stage) return
+      plant!.dataset.stage = stage
+      plant!.classList.remove('is-seedling', 'is-grown', 'is-flower')
+      plant!.classList.add(`is-${stage}`)
+    }
+
+    // Event-driven throttle, not a continuous animation loop. Also handles jumps
+    // across entire sections, deep links and restored scroll positions.
+    function queuePlantUpdate() {
+      if (frame === undefined) frame = window.requestAnimationFrame(updatePlant)
+    }
+
+    window.addEventListener('scroll', queuePlantUpdate, { passive: true })
+    window.addEventListener('resize', queuePlantUpdate, { passive: true })
+    window.addEventListener('pageshow', queuePlantUpdate)
+    cleanupPlant = () => {
+      window.removeEventListener('scroll', queuePlantUpdate)
+      window.removeEventListener('resize', queuePlantUpdate)
+      window.removeEventListener('pageshow', queuePlantUpdate)
+      if (frame !== undefined) window.cancelAnimationFrame(frame)
+      frame = undefined
+    }
+    updatePlant()
+    queuePlantUpdate()
+  }
+
+  document.addEventListener('astro:before-swap', () => {
+    cleanupPlant?.()
+    cleanupPlant = undefined
+  })
+  document.addEventListener('astro:page-load', initHomePlant)
+  initHomePlant()
+</script>

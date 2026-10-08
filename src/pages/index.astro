@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro'
+import HomeGrowingPlant from '../components/HomeGrowingPlant.astro'
 import { existsSync } from 'node:fs'
 import { getPosts } from '../lib/notion/client.ts'
 import { filePath, getDateStr, getNavLink, getPostLink } from '../lib/blog-helpers.ts'
@@ -54,6 +55,7 @@ const shelfWorks = [
   path="/"
 >
   <main class="home">
+    <HomeGrowingPlant />
     <section class="hero" aria-labelledby="hero-title">
       <div class="heroCopy">
         <p class="heroLabel">Notion templates and small experiments</p>
