@@ -1,40 +1,79 @@
-<div class="homePlant is-seedling" data-home-plant data-stage="seedling" aria-hidden="true">
-  <svg viewBox="0 0 64 120" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+<div class="homePlant is-seedling" data-home-plant data-stage="seedling">
+  <svg class="plantGraphic" viewBox="0 0 64 120" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">
     <g class="plantStem" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M42 124 C38 112 34 103 32 90" />
+      <path d="M32 124 C34 112 34 103 32 90" />
       <path class="plantLeaf" d="M33 100 C22 100 17 94 17 90 C26 89 31 92 33 100Z M35 106 C43 105 49 99 49 96 C42 95 37 99 35 106Z" />
-      <g class="plantGrowth">
+      <g class="plantGrowth plantStemGrowth">
         <path d="M32 91 C27 76 31 53 37 34" />
-        <path class="plantLeaf" d="M30 82 C17 81 11 72 12 66 C23 68 29 74 30 82Z M30 69 C40 69 48 61 49 54 C38 54 32 61 30 69Z M33 56 C23 55 19 47 20 41 C29 43 33 49 33 56Z M36 43 C44 42 49 36 48 31 C41 31 37 36 36 43Z" />
+      </g>
+      <g class="plantGrowth plantExtraLeaves firstLeaves">
+        <path class="plantLeaf" d="M30 82 C17 81 11 72 12 66 C23 68 29 74 30 82Z M30 69 C40 69 48 61 49 54 C38 54 32 61 30 69Z" />
+      </g>
+      <g class="plantGrowth plantExtraLeaves lastLeaves">
+        <path class="plantLeaf" d="M33 56 C23 55 19 47 20 41 C29 43 33 49 33 56Z M36 43 C44 42 49 36 48 31 C41 31 37 36 36 43Z" />
+      </g>
+      <g class="plantFlowerStem">
+        <path d="M37 35 Q39 29 38 24" />
       </g>
       <g class="plantFlower">
-        <path d="M37 35 Q39 29 38 24" />
         <path class="plantPetals" d="M38 24 C29 23 27 17 32 15 C28 9 34 6 38 12 C41 5 47 9 44 15 C51 16 48 22 41 23 C43 29 36 31 38 24Z" />
         <circle cx="38.5" cy="18.5" r="2.2" class="plantCenter" />
       </g>
     </g>
   </svg>
+  <button class="plantPot" type="button" aria-label="ページ上部へ戻る">
+    <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+      <path class="potBody" d="M10 12 H34 L30 34 Q22 38 14 34Z" />
+      <path class="potRim" d="M8 8 Q22 6 36 8 L35 13 Q22 15 9 13Z" />
+      <path class="potHighlight" d="M15 18 L17 30" />
+    </svg>
+    <span class="potHint" aria-hidden="true">上へ</span>
+  </button>
 </div>
 
 <style>
   .homePlant {
     position: fixed;
-    right: -3px;
-    bottom: -5px;
+    right: max(1.5rem, env(safe-area-inset-right));
+    bottom: max(1rem, env(safe-area-inset-bottom), var(--plant-footer-offset, 0px));
     z-index: 1;
-    width: 60px;
-    height: 112px;
-    opacity: 0.72;
+    width: 84px;
+    height: 154px;
     pointer-events: none;
   }
 
-  .homePlant svg { display: block; width: 100%; height: 100%; }
+  .plantGraphic { display: block; width: 100%; height: calc(100% - 36px); opacity: 0.78; }
+  .plantPot {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #8d816b;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+  .plantPot svg { display: block; width: 44px; height: 44px; transition: transform 180ms ease; }
+  .potBody { fill: #f5eedf; stroke: currentColor; stroke-width: 1; }
+  .potRim { fill: #eee3c9; stroke: currentColor; stroke-width: 1; }
+  .potHighlight { stroke: #fffdf6; stroke-width: 1.5; stroke-linecap: round; }
+  .plantPot:hover svg { transform: translateY(-1px); }
+  .plantPot:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 3px; }
+  .potHint { position: absolute; right: calc(100% + 5px); top: 12px; white-space: nowrap; font-size: 0.7rem; color: var(--color-ink); opacity: 0; }
+  .plantPot:hover .potHint,
+  .plantPot:focus-visible .potHint { opacity: 1; }
   .plantStem { stroke: #78816c; stroke-width: 1.1; }
   .plantLeaf { fill: #dce5d3; fill-opacity: 0.35; }
   .plantPetals { stroke: #b7a470; fill: #f0dfab; fill-opacity: 0.45; }
   .plantCenter { stroke: none; fill: #b5a173; }
 
   .plantGrowth,
+  .plantFlowerStem,
   .plantFlower {
     opacity: 0;
     transform: translateY(3px);
@@ -43,23 +82,39 @@
 
   .is-grown .plantGrowth,
   .is-flower .plantGrowth,
+  .is-flower .plantFlowerStem,
   .is-flower .plantFlower { opacity: 1; transform: none; }
 
+  .shed-flower .plantFlower { animation: releaseFlower 450ms ease-out both; }
+  .shed-leaves .firstLeaves { animation: releaseLeaves 450ms ease-out both; }
+  .shed-leaves .lastLeaves { animation: releaseLeaves 450ms 70ms ease-out both; }
+  @keyframes releaseFlower {
+    from { opacity: 1; transform: none; }
+    to { opacity: 0; transform: translate(4px, 7px) rotate(4deg); }
+  }
+  @keyframes releaseLeaves {
+    from { opacity: 1; transform: none; }
+    to { opacity: 0; transform: translate(-3px, 7px) rotate(-3deg); }
+  }
+
   @media (max-width: 800px) {
-    .homePlant { width: 44px; height: 82px; opacity: 0.62; }
+    .homePlant { width: 74px; height: 136px; right: max(1.25rem, env(safe-area-inset-right)); }
   }
 
   @media (max-width: 640px) {
-    .homePlant { width: 39px; height: 73px; right: -12px; opacity: 0.58; }
+    .homePlant { width: 64px; height: 118px; right: max(1rem, env(safe-area-inset-right)); bottom: max(0.75rem, env(safe-area-inset-bottom), var(--plant-footer-offset, 0px)); }
+    .plantGraphic { opacity: 0.65; }
   }
 
   @media (max-width: 360px) {
-    .homePlant { display: none; }
+    .homePlant { width: 56px; height: 106px; right: max(0.75rem, env(safe-area-inset-right)); }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .plantGrowth,
-    .plantFlower { transition: none; transform: none; }
+    .plantFlowerStem,
+    .plantFlower,
+    .plantPot svg { transition: none; animation: none !important; transform: none; }
   }
 </style>
 
@@ -72,16 +127,40 @@
     const plant = document.querySelector<HTMLElement>('[data-home-plant]')
     const works = document.querySelector<HTMLElement>('#works')
     const fromLab = document.querySelector<HTMLElement>('.fromLab')
-    if (!plant || !works) return
+    const pot = plant?.querySelector<HTMLButtonElement>('.plantPot')
+    const footer = document.querySelector<HTMLElement>('body > footer')
+    if (!plant || !works || !pot) return
 
     let frame: number | undefined
+    let returning = false
+    let sheddingTimer: ReturnType<typeof setTimeout> | undefined
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+    function clearShedding() {
+      if (sheddingTimer !== undefined) clearTimeout(sheddingTimer)
+      sheddingTimer = undefined
+      plant!.classList.remove('shed-flower', 'shed-leaves')
+    }
     function updatePlant() {
       frame = undefined
+      // Keep the pot above the shared footer, without changing its layout.
+      const footerOffset = footer ? Math.max(0, window.innerHeight - footer.getBoundingClientRect().top + 12) : 0
+      plant!.style.setProperty('--plant-footer-offset', `${footerOffset}px`)
       const threshold = window.innerHeight * 0.55
       const stage = fromLab && fromLab.getBoundingClientRect().top <= threshold
         ? 'flower'
         : works!.getBoundingClientRect().top <= threshold ? 'grown' : 'seedling'
-      if (plant!.dataset.stage === stage) return
+      const previous = plant!.dataset.stage
+      if (returning && !reducedMotion.matches && previous !== stage) {
+        if (previous === 'flower' && stage !== 'flower') plant!.classList.add('shed-flower')
+        if (stage === 'seedling' && previous !== 'seedling') plant!.classList.add('shed-leaves')
+        if (sheddingTimer !== undefined) clearTimeout(sheddingTimer)
+        sheddingTimer = setTimeout(clearShedding, 600)
+      }
+      if (window.scrollY <= 2) {
+        returning = false
+        plant!.classList.remove('is-returning-top')
+      }
+      if (previous === stage) return
       plant!.dataset.stage = stage
       plant!.classList.remove('is-seedling', 'is-grown', 'is-flower')
       plant!.classList.add(`is-${stage}`)
@@ -93,15 +172,44 @@
       if (frame === undefined) frame = window.requestAnimationFrame(updatePlant)
     }
 
+    function returnToTop() {
+      clearShedding()
+      returning = window.scrollY > 2 && !reducedMotion.matches
+      plant!.classList.toggle('is-returning-top', returning)
+      window.scrollTo({ top: 0, behavior: reducedMotion.matches ? 'instant' : 'smooth' })
+      queuePlantUpdate()
+    }
+
+    function interruptReturn(event: Event) {
+      if (!returning) return
+      if (event instanceof KeyboardEvent && !['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(event.key)) return
+      returning = false
+      plant!.classList.remove('is-returning-top')
+      clearShedding()
+      window.scrollTo({ top: window.scrollY, behavior: 'instant' })
+      queuePlantUpdate()
+    }
+
+    pot.addEventListener('click', returnToTop)
     window.addEventListener('scroll', queuePlantUpdate, { passive: true })
     window.addEventListener('resize', queuePlantUpdate, { passive: true })
     window.addEventListener('pageshow', queuePlantUpdate)
+    window.addEventListener('wheel', interruptReturn, { passive: true })
+    window.addEventListener('touchstart', interruptReturn, { passive: true })
+    window.addEventListener('keydown', interruptReturn)
     cleanupPlant = () => {
+      pot.removeEventListener('click', returnToTop)
       window.removeEventListener('scroll', queuePlantUpdate)
       window.removeEventListener('resize', queuePlantUpdate)
       window.removeEventListener('pageshow', queuePlantUpdate)
+      window.removeEventListener('wheel', interruptReturn)
+      window.removeEventListener('touchstart', interruptReturn)
+      window.removeEventListener('keydown', interruptReturn)
       if (frame !== undefined) window.cancelAnimationFrame(frame)
       frame = undefined
+      returning = false
+      plant!.classList.remove('is-returning-top')
+      clearShedding()
     }
     updatePlant()
     queuePlantUpdate()
