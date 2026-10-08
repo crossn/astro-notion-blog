@@ -69,10 +69,10 @@ const shelfWorks = [
 
       <figure class="heroArtwork">
         <img
-          src="/home/banner.png"
+          src="/home/banner-transparent.png"
           alt="tsukurun-Labのロゴと『作って遊んで もっと楽しく もっと自由に』の文字"
-          width="2560"
-          height="1440"
+          width="1375"
+          height="630"
           fetchpriority="high"
         />
       </figure>
@@ -315,7 +315,7 @@ const shelfWorks = [
     isolation: isolate;
     grid-column: 5 / -1;
     grid-row: 2;
-    width: min(100%, 720px);
+    width: min(100%, 600px);
     justify-self: end;
     margin: 0.7rem 0.75rem 0 0;
   }
@@ -328,6 +328,7 @@ const shelfWorks = [
       radial-gradient(circle at 22% 28%, rgba(248, 221, 94, 0.65), transparent 34%),
       radial-gradient(circle at 75% 25%, rgba(124, 108, 242, 0.32), transparent 32%),
       radial-gradient(circle at 58% 80%, rgba(133, 221, 176, 0.42), transparent 36%);
+    mask-image: radial-gradient(ellipse 50% 50% at center, #000 35%, transparent 100%);
     content: '';
     pointer-events: none;
   }
@@ -336,9 +337,7 @@ const shelfWorks = [
     display: block;
     width: 100%;
     height: auto;
-    aspect-ratio: 16 / 9;
     object-fit: contain;
-    border-radius: 0.4rem;
   }
 
   .heroNext {
