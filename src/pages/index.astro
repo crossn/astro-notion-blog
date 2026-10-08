@@ -312,25 +312,11 @@ const shelfWorks = [
 
   .heroArtwork {
     position: relative;
-    isolation: isolate;
     grid-column: 5 / -1;
     grid-row: 2;
     width: min(100%, 600px);
     justify-self: end;
     margin: 0.7rem 0.75rem 0 0;
-  }
-
-  .heroArtwork::before {
-    position: absolute;
-    z-index: -1;
-    inset: -2.5rem -1.5rem -2rem -3rem;
-    background:
-      radial-gradient(circle at 22% 28%, rgba(248, 221, 94, 0.65), transparent 34%),
-      radial-gradient(circle at 75% 25%, rgba(124, 108, 242, 0.32), transparent 32%),
-      radial-gradient(circle at 58% 80%, rgba(133, 221, 176, 0.42), transparent 36%);
-    mask-image: radial-gradient(ellipse 50% 50% at center, #000 35%, transparent 100%);
-    content: '';
-    pointer-events: none;
   }
 
   .heroArtwork img {
@@ -775,14 +761,6 @@ const shelfWorks = [
       grid-column: 2 / -1;
       width: 100%;
       margin: 0.8rem 0 0;
-    }
-
-    .heroArtwork::before {
-      inset: -1.2rem -0.5rem -0.9rem -1.2rem;
-      background:
-        radial-gradient(circle at 22% 28%, rgba(248, 221, 94, 0.52), transparent 34%),
-        radial-gradient(circle at 75% 25%, rgba(124, 108, 242, 0.256), transparent 32%),
-        radial-gradient(circle at 58% 80%, rgba(133, 221, 176, 0.336), transparent 36%);
     }
 
     .heroNext {
