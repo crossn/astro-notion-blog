@@ -63,36 +63,44 @@ const navItems = [
     <GoogleAnalytics trackingId={PUBLIC_GA_TRACKING_ID} />
     <header class="header" style={{ position: 'relative', zIndex: 2 }}>
       <div class="site-title">
-        <a href={getNavLink('/')}>{PUBLIC_SITE_TITLE}</a>
+        <a href={getNavLink('/')}>
+          <svg class="brandSprig" viewBox="0 0 24 28" aria-hidden="true" focusable="false">
+            <path d="M5 25C10 19 13 13 17 4" />
+            <path d="M9 19C5 19 3 16 3 13c4 0 6 2 6 6ZM12 14c-1-4 1-7 4-8 1 4 0 6-4 8ZM15 9c4 0 6 2 6 5-4 1-6-1-6-5Z" />
+          </svg>
+          <span>{PUBLIC_SITE_TITLE}</span>
+        </a>
       </div>
 
-      <ul>
-        {
-          navItems.map(({ label, path: p }) => {
-            const isActive =
-              p === '/'
-                ? path === '/'
-                : path === p || path.startsWith(`${p}/`)
-            const ariaCurrent = isActive
-              ? path === p
-                ? 'page'
-                : 'location'
-              : undefined
+      <nav aria-label="主要ナビゲーション">
+        <ul>
+          {
+            navItems.map(({ label, path: p }) => {
+              const isActive =
+                p === '/'
+                  ? path === '/'
+                  : path === p || path.startsWith(`${p}/`)
+              const ariaCurrent = isActive
+                ? path === p
+                  ? 'page'
+                  : 'location'
+                : undefined
 
-            return (
-              <li key={label}>
-                <a
-                  href={getNavLink(p)}
-                  class={isActive ? 'active' : null}
-                  aria-current={ariaCurrent}
-                >
-                  {label}
-                </a>
-              </li>
-            )
-          })
-        }
-      </ul>
+              return (
+                <li key={label}>
+                  <a
+                    href={getNavLink(p)}
+                    class={isActive ? 'active' : null}
+                    aria-current={ariaCurrent}
+                  >
+                    {label}
+                  </a>
+                </li>
+              )
+            })
+          }
+        </ul>
+      </nav>
     </header>
     <div class="container">
       <slot />
@@ -114,84 +122,94 @@ const navItems = [
 
 <style>
   .header {
-    display: block;
-    padding: 0.7rem 0 0.3rem;
-    text-align: center;
-    background: linear-gradient(180deg, rgba(249, 245, 234, 0.28), transparent);
+    position: relative;
+    display: flex;
+    width: min(68rem, calc(100% - 2.5rem));
+    min-height: 64px;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin: 0 auto;
+    padding: 0.45rem 0;
+    background: transparent;
   }
   .header::after {
-    display: block;
-    width: min(20rem, 70%);
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
     height: 1px;
-    margin: 0 auto;
-    background: linear-gradient(90deg, transparent, rgba(126, 111, 88, 0.12), transparent);
+    background: linear-gradient(90deg, transparent, rgba(126, 111, 88, 0.14) 12%, rgba(126, 111, 88, 0.14) 88%, transparent);
     content: '';
   }
   .header .site-title {
     margin: 0;
-    padding: 0.15rem 0;
     font-weight: 500;
-    font-size: clamp(1.3rem, 1.7vw, 1.4rem);
+    font-size: clamp(1.2rem, 1.7vw, 1.35rem);
     line-height: 1.15;
-    letter-spacing: 0.055em;
+    letter-spacing: 0.015em;
     color: var(--color-ink);
   }
   .header .site-title a {
-    position: relative;
-    isolation: isolate;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
     white-space: nowrap;
     color: inherit;
+    text-decoration: none;
   }
-  .header .site-title a::before {
-    position: absolute;
-    z-index: -1;
-    inset: 55% -0.5rem -0.15rem 0.2rem;
-    background: radial-gradient(ellipse at 28% 50%, rgba(245, 218, 157, 0.22), transparent 70%);
-    filter: blur(5px);
-    content: '';
+  .brandSprig {
+    width: 20px;
+    height: 24px;
+    flex: none;
+    fill: none;
+    stroke: #8b927d;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.15;
     pointer-events: none;
   }
-  .header ul {
+  .header nav ul {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
     list-style: none;
-    margin: inherit;
-    padding: 0.2rem 0 0.4rem;
+    margin: 0;
+    padding: 0;
     font-size: 0.9rem;
     font-weight: 500;
     letter-spacing: 0.04em;
   }
   @media (max-width: 640px) {
     .header {
-      padding: 0.6rem 0 0.2rem;
+      min-height: 58px;
+      gap: 0.3rem;
     }
 
     .header .site-title {
-      font-size: 1.3rem;
+      font-size: 1.12rem;
     }
 
-    .header ul {
-      padding: 0.15rem 0 0.35rem;
-      font-size: 0.88rem;
+    .header nav ul {
+      gap: 0.1rem;
+      font-size: 0.84rem;
     }
   }
-  .header ul li {
-    display: inline-block;
-    padding: 0 0.8rem;
-  }
-  .header ul li :global(a) {
+  .header nav li :global(a) {
     position: relative;
     display: inline-flex;
     min-height: 44px;
     align-items: center;
-    padding: 0.15rem 0.1rem 0.3rem;
+    padding: 0 0.55rem;
     color: var(--color-ink-muted);
     transition: color var(--motion-fast) ease;
   }
-  .header ul li :global(a::after) {
+  .header nav li :global(a::after) {
     position: absolute;
-    right: 0.1rem;
-    bottom: 0;
-    left: 0.1rem;
+    right: 0.55rem;
+    bottom: 0.25rem;
+    left: 0.55rem;
     height: 1px;
     background: var(--color-interaction);
     content: '';
@@ -199,16 +217,19 @@ const navItems = [
     transform-origin: center;
     transition: transform var(--motion-soft) ease;
   }
-  .header ul li :global(a:hover),
-  .header ul li :global(a.active) {
+  .header nav li :global(a:hover),
+  .header nav li :global(a.active) {
     color: var(--color-interaction-hover);
   }
-  .header ul li :global(a:hover::after),
-  .header ul li :global(a.active::after) {
+  .header nav li :global(a:hover::after),
+  .header nav li :global(a.active::after) {
     transform: scaleX(1);
   }
-  .header ul li :global(a:focus-visible) {
+  .header nav li :global(a:focus-visible) {
     border-radius: var(--radius-small);
+  }
+  @media (max-width: 360px) {
+    .brandSprig { display: none; }
   }
 
   .container {
