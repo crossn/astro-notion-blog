@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <g class="sprig">
+    <path class="stem" d="M24 43c2-8 1-20 1-35" />
+    <path class="leaf" d="M25 33c-8-1-14-6-17-14 9-1 16 4 17 13Z" />
+    <path class="leaf" d="M25 27c3-8 9-13 16-14 0 9-6 15-16 16Z" />
+    <path class="leaf" d="M25 17c-5-2-8-6-7-11 5 0 9 4 9 10Z" />
+  </g>
+  <style>
+    .stem { stroke: #66735c; stroke-width: 4.5; stroke-linecap: round; }
+    .leaf { fill: #748269; }
+    @media (prefers-color-scheme: dark) {
+      .stem { stroke: #d3dbc9; }
+      .leaf { fill: #c3ceb7; }
+    }
+  </style>
+</svg>

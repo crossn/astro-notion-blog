@@ -39,6 +39,10 @@ const navItems = [
     <meta name="robots" content="max-image-preview:large" />
     <meta charset="UTF-8" />
     <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href={getNavLink('/favicon.svg')} />
+    <link rel="icon" type="image/png" sizes="32x32" href={getNavLink('/favicon-32x32.png')} />
+    <link rel="apple-touch-icon" sizes="180x180" href={getNavLink('/apple-touch-icon.png')} />
+    <meta name="theme-color" content="#fffefa" />
     <title>{siteTitle}</title>
     <meta name="description" content={siteDescription} />
     <link rel="canonical" href={siteURL} />
@@ -64,10 +68,7 @@ const navItems = [
     <header class="header" style={{ position: 'relative', zIndex: 2 }}>
       <div class="site-title">
         <a href={getNavLink('/')}>
-          <svg class="brandSprig" viewBox="0 0 24 28" aria-hidden="true" focusable="false">
-            <path d="M5 25C10 19 13 13 17 4" />
-            <path d="M9 19C5 19 3 16 3 13c4 0 6 2 6 6ZM12 14c-1-4 1-7 4-8 1 4 0 6-4 8ZM15 9c4 0 6 2 6 5-4 1-6-1-6-5Z" />
-          </svg>
+          <img class="brandSprig" src={getNavLink('/favicon.svg')} width="24" height="24" alt="" aria-hidden="true" />
           <span>{PUBLIC_SITE_TITLE}</span>
         </a>
       </div>
@@ -160,14 +161,11 @@ const navItems = [
     text-decoration: none;
   }
   .brandSprig {
-    width: 20px;
+    display: block;
+    width: 24px;
     height: 24px;
     flex: none;
-    fill: none;
-    stroke: #8b927d;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke-width: 1.15;
+    object-fit: contain;
     pointer-events: none;
   }
   .header nav ul {
