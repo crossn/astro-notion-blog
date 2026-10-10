@@ -68,7 +68,14 @@ const navItems = [
     <header class="header" style={{ position: 'relative', zIndex: 2 }}>
       <div class="site-title">
         <a href={getNavLink('/')}>
-          <img class="brandSprig" src={getNavLink('/favicon.svg')} width="24" height="24" alt="" aria-hidden="true" />
+          <svg class="brandSprig" viewBox="0 0 48 48" fill="none" aria-hidden="true" focusable="false">
+            <g class="brandSprigPaths">
+              <path d="M24 43c2.7-8.5-1.6-17.2.2-37" />
+              <path d="M24.3 22.2c3.7-7.4 9-11.7 15-13.1-.1 7.4-5.1 13.3-14.4 15.2" />
+              <path d="M24.5 30.1c-6.7-1.7-11.7-5.7-15.4-11.5 7.2-.9 13.4 2.4 17.2 9.6" />
+              <path d="M26.1 35.1c4.2-5.8 9.7-8.8 16.4-8.7-2 6.9-7.6 11.1-15.6 11.5" />
+            </g>
+          </svg>
           <span>{PUBLIC_SITE_TITLE}</span>
         </a>
       </div>
@@ -165,8 +172,17 @@ const navItems = [
     width: 24px;
     height: 24px;
     flex: none;
-    object-fit: contain;
     pointer-events: none;
+  }
+  .brandSprigPaths {
+    fill: none;
+    stroke: #737d6b;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  @media (prefers-color-scheme: dark) {
+    .brandSprigPaths { stroke: #c3ceb7; }
   }
   .header nav ul {
     display: flex;
