@@ -11,9 +11,39 @@ import type {
 } from './interfaces'
 import { pathJoin } from './utils'
 
+export const getNotionFilePathParts = (url: URL) => {
+  const [encodedDirectory, encodedFilename] = url.pathname
+    .split('/')
+    .filter(Boolean)
+    .slice(-2)
+
+  if (!encodedDirectory || !encodedFilename) {
+    throw new Error('Invalid Notion file URL path')
+  }
+
+  const directory = decodeURIComponent(encodedDirectory)
+  const filename = decodeURIComponent(encodedFilename)
+  if (
+    [directory, filename].some(
+      (segment) =>
+        !segment ||
+        segment === '.' ||
+        segment === '..' ||
+        /[\\/]/.test(segment)
+    )
+  ) {
+    throw new Error('Invalid Notion file URL path')
+  }
+
+  return { directory, filename, encodedDirectory, encodedFilename }
+}
+
 export const filePath = (url: URL): string => {
-  const [dir, filename] = url.pathname.split('/').slice(-2)
-  return pathJoin(BASE_PATH, `/notion/${dir}/${filename}`)
+  const { encodedDirectory, encodedFilename } = getNotionFilePathParts(url)
+  return pathJoin(
+    BASE_PATH,
+    `/notion/${encodedDirectory}/${encodedFilename}`
+  )
 }
 
 export const extractTargetBlocks = (

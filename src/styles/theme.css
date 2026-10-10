@@ -1,0 +1,64 @@
+:root {
+  /* tsukurun-Lab semantic color roles */
+  --surface-canvas-warm: #fffefa;
+  --surface-reading: #fff;
+  --wash-pink: rgba(247, 212, 234, 0.12);
+  --color-canvas: var(--surface-canvas-warm);
+  --color-paper: var(--surface-reading);
+  --color-ink: #333;
+  --color-ink-muted: #707070;
+  --color-interaction: #ff7e33;
+  --color-link-text: #c44d00;
+  --color-interaction-hover: #b84a00;
+  --color-editorial: #7563df;
+  --color-border-subtle: rgba(124, 108, 242, 0.14);
+  --color-focus-ring: var(--color-interaction);
+  --color-watercolor: rgba(247, 212, 255, 0.8);
+
+  /* Small semantic scales, kept intentionally close to existing styles. */
+  --radius-small: 4px;
+  --radius-object: 1.25rem;
+  --radius-sheet: 2rem;
+  --radius-pill: 999px;
+
+  --space-page-gutter: 5%;
+  --space-section: 2rem;
+  --space-content: 1rem;
+
+  --shadow-paper: 0 1px 3px rgba(82, 63, 92, 0.06);
+  --shadow-lift: 0 4px 14px rgba(82, 63, 92, 0.1);
+
+  --motion-fast: 160ms;
+  --motion-soft: 220ms;
+
+  /* Compatibility aliases used by the upstream renderer and older styles. */
+  --bg: var(--color-canvas);
+  --fg: var(--color-ink);
+  --accents-1: var(--color-link-text);
+  --accents-2: var(--color-interaction-hover);
+  --accents-3: #666;
+  --radius: var(--radius-small);
+  --gap-quarter: 0.25rem;
+  --gap-half: 0.5rem;
+  --gap: 1rem;
+  --gap-double: 2rem;
+
+  --geist-foreground: #000;
+  --geist-success: #690;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+    'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
+    'Helvetica Neue', sans-serif;
+  --font-mono: SFMono-Regular, Menlo, Consolas, 'PT Mono', 'Liberation Mono',
+    Courier, monospace;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 1ms;
+    --motion-soft: 1ms;
+  }
+}
+
+:where(:focus-visible) {
+  outline-color: var(--color-focus-ring);
+}

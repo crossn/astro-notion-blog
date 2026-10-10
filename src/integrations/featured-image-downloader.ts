@@ -6,23 +6,36 @@ export default (): AstroIntegration => ({
   hooks: {
     'astro:build:start': async () => {
       const posts = await getAllPosts()
-
-      await Promise.all(
-        posts.map((post) => {
-          if (!post.FeaturedImage || !post.FeaturedImage.Url) {
-            return Promise.resolve()
-          }
-
-          let url!: URL
+      const featuredImages = posts.filter(
+        (post) => post.FeaturedImage?.Url
+      )
+      const available = await Promise.all(
+        featuredImages.map(async (post) => {
+          let url: URL
           try {
-            url = new URL(post.FeaturedImage.Url)
+            url = new URL(post.FeaturedImage!.Url)
           } catch {
-            console.log('Invalid FeaturedImage URL')
-            return Promise.resolve()
+            console.warn(
+              `[featured-image-downloader] Invalid image URL for post ${post.Slug}`
+            )
+            return false
           }
 
-          return downloadFile(url)
+          try {
+            return await downloadFile(url)
+          } catch {
+            // A featured image is optional; keep the rest of the build available.
+            console.warn(
+              `[featured-image-downloader] Could not make image available for ${url.origin}${url.pathname}`
+            )
+            return false
+          }
         })
+      )
+
+      const availableCount = available.filter(Boolean).length
+      console.info(
+        `[featured-image-downloader] ${availableCount} of ${featuredImages.length} featured images available; ${featuredImages.length - availableCount} unavailable.`
       )
     },
   },

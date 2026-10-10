@@ -7,8 +7,10 @@ import {
   ENABLE_LIGHTBOX,
 } from '../server-constants.ts'
 import { getNavLink } from '../lib/blog-helpers.ts'
+import '../styles/theme.css'
 import '../styles/syntax-coloring.css'
 import GoogleAnalytics from '../components/GoogleAnalytics.astro'
+import SiteGrowingPlant from '../components/SiteGrowingPlant.astro'
 
 export interface Props {
   title: string
@@ -22,7 +24,7 @@ const { title = '', description = '', path = '/', ogImage = '' } = Astro.props
 const siteTitle = title ? `${title} - ${PUBLIC_SITE_TITLE}` : PUBLIC_SITE_TITLE
 const siteDescription = description ? description : PUBLIC_SITE_DESCRIPTION
 const siteURL = new URL(path, Astro.site).toString()
-const siteOGImage = new URL('/default-og-image.png', Astro.site)
+const siteOGImage = new URL('/tsukurun-lab-og.png', Astro.site)
 
 const navItems = [
   { label: 'Home', path: '/' },
@@ -37,6 +39,10 @@ const navItems = [
     <meta name="robots" content="max-image-preview:large" />
     <meta charset="UTF-8" />
     <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href={getNavLink('/favicon.svg')} />
+    <link rel="icon" type="image/png" sizes="32x32" href={getNavLink('/favicon-32x32.png')} />
+    <link rel="apple-touch-icon" sizes="180x180" href={getNavLink('/apple-touch-icon.png')} />
+    <meta name="theme-color" content="#fffefa" />
     <title>{siteTitle}</title>
     <meta name="description" content={siteDescription} />
     <link rel="canonical" href={siteURL} />
@@ -60,21 +66,49 @@ const navItems = [
   <body>
     <GoogleAnalytics trackingId={PUBLIC_GA_TRACKING_ID} />
     <header class="header" style={{ position: 'relative', zIndex: 2 }}>
-      <h1>
-        <a href={getNavLink('/')}>{PUBLIC_SITE_TITLE}</a>
-      </h1>
+      <div class="site-title">
+        <a href={getNavLink('/')}>
+          <svg class="brandSprig" viewBox="0 0 48 48" fill="none" aria-hidden="true" focusable="false">
+            <g class="brandSprigPaths">
+              <path d="M24 43c2.7-8.5-1.6-17.2.2-37" />
+              <path d="M24.3 22.2c3.7-7.4 9-11.7 15-13.1-.1 7.4-5.1 13.3-14.4 15.2" />
+              <path d="M24.5 30.1c-6.7-1.7-11.7-5.7-15.4-11.5 7.2-.9 13.4 2.4 17.2 9.6" />
+              <path d="M26.1 35.1c4.2-5.8 9.7-8.8 16.4-8.7-2 6.9-7.6 11.1-15.6 11.5" />
+            </g>
+          </svg>
+          <span>{PUBLIC_SITE_TITLE}</span>
+        </a>
+      </div>
 
-      <ul>
-        {
-          navItems.map(({ label, path: p }) => (
-            <li key={label}>
-              <a href={getNavLink(p)} class={p === path ? 'active' : null}>
-                {label}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
+      <nav aria-label="主要ナビゲーション">
+        <ul>
+          {
+            navItems.map(({ label, path: p }) => {
+              const isActive =
+                p === '/'
+                  ? path === '/'
+                  : path === p || path.startsWith(`${p}/`)
+              const ariaCurrent = isActive
+                ? path === p
+                  ? 'page'
+                  : 'location'
+                : undefined
+
+              return (
+                <li key={label}>
+                  <a
+                    href={getNavLink(p)}
+                    class={isActive ? 'active' : null}
+                    aria-current={ariaCurrent}
+                  >
+                    {label}
+                  </a>
+                </li>
+              )
+            })
+          }
+        </ul>
+      </nav>
     </header>
     <div class="container">
       <slot />
@@ -89,88 +123,165 @@ const navItems = [
       </div>
     </footer>
 
+    <SiteGrowingPlant />
     {ENABLE_LIGHTBOX && <script is:inline src="/scripts/fslightbox.js" />}
   </body>
 </html>
 
 <style>
   .header {
-    display: block;
-    padding: 15px 0;
-    text-align: center;
+    position: relative;
+    display: flex;
+    width: min(68rem, calc(100% - 2.5rem));
+    min-height: 64px;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin: 0 auto;
+    padding: 0.45rem 0;
+    background: transparent;
   }
-  .header h1 {
-    padding: 0.5rem 0;
-    font-weight: 400;
-    color: #000;
+  .header::after {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(126, 111, 88, 0.14) 12%, rgba(126, 111, 88, 0.14) 88%, transparent);
+    content: '';
   }
-  .header h1 a {
+  .header .site-title {
+    margin: 0;
+    font-weight: 500;
+    font-size: clamp(1.2rem, 1.7vw, 1.35rem);
+    line-height: 1.15;
+    letter-spacing: 0.015em;
+    color: var(--color-ink);
+  }
+  .header .site-title a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    white-space: nowrap;
     color: inherit;
+    text-decoration: none;
   }
-  .header ul {
+  .brandSprig {
+    display: block;
+    width: 24px;
+    height: 24px;
+    flex: none;
+    pointer-events: none;
+  }
+  .brandSprigPaths {
+    fill: none;
+    stroke: #737d6b;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  @media (prefers-color-scheme: dark) {
+    .brandSprigPaths { stroke: #c3ceb7; }
+  }
+  .header nav ul {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
     list-style: none;
-    margin: inherit;
-    padding: 0.5rem 0;
-    font-size: 1.1rem;
+    margin: 0;
+    padding: 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
   }
   @media (max-width: 640px) {
-    .header ul {
-      font-size: 1rem;
+    .header {
+      min-height: 58px;
+      gap: 0.3rem;
+    }
+
+    .header .site-title {
+      font-size: 1.12rem;
+    }
+
+    .header nav ul {
+      gap: 0.1rem;
+      font-size: 0.84rem;
     }
   }
-  .header ul li {
-    display: inline-block;
-    padding: 0 15px;
+  .header nav li :global(a) {
+    position: relative;
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    padding: 0 0.55rem;
+    color: var(--color-ink-muted);
+    transition: color var(--motion-fast) ease;
   }
-  .header ul li :global(a.active) {
-    color: var(--accents-3);
+  .header nav li :global(a::after) {
+    position: absolute;
+    right: 0.55rem;
+    bottom: 0.25rem;
+    left: 0.55rem;
+    height: 1px;
+    background: var(--color-interaction);
+    content: '';
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform var(--motion-soft) ease;
+  }
+  .header nav li :global(a:hover),
+  .header nav li :global(a.active) {
+    color: var(--color-interaction-hover);
+  }
+  .header nav li :global(a:hover::after),
+  .header nav li :global(a.active::after) {
+    transform: scaleX(1);
+  }
+  .header nav li :global(a:focus-visible) {
+    border-radius: var(--radius-small);
+  }
+  @media (max-width: 360px) {
+    .brandSprig { display: none; }
   }
 
   .container {
     width: 100%;
-    padding: 0 5%;
+    padding: 0 var(--space-page-gutter);
   }
 
   .footer {
-    margin: 40px 0 10px;
+    margin: var(--space-section) 0 0.5rem;
     text-align: center;
     font-size: 0.75rem;
-    background: #f7d4ea50;
-    /* opacity: 0.1; */
-    padding: 100px;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      var(--wash-pink) 100%
+    );
+    border-top: 1px solid var(--color-border-subtle);
+    padding: 2rem 1rem 1.5rem;
   }
   .footer span {
-    color: #777;
+    color: var(--color-ink-muted);
   }
-  .footer span a {
+  .footer a {
     color: inherit;
+  }
+  .footer a:hover {
+    color: var(--color-interaction-hover);
+  }
+
+  @media (max-width: 640px) {
+    .footer {
+      margin-top: 1.5rem;
+      padding: 1.5rem 1rem 1.25rem;
+    }
   }
 </style>
 
 <style is:global>
-  :root {
-    --gap-quarter: 0.25rem;
-    --gap-half: 0.5rem;
-    --gap: 1rem;
-    --gap-double: 2rem;
-
-    --bg: #fff;
-    --fg: #333;
-    --accents-1: #ff7e33;
-    --accents-2: #f26000;
-    --accents-3: #666;
-    --geist-foreground: #000;
-    --geist-success: #690;
-
-    --radius: 4px;
-
-    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
-      'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
-      'Helvetica Neue', sans-serif;
-    --font-mono: SFMono-Regular, Menlo, Consolas, 'PT Mono', 'Liberation Mono',
-      Courier, monospace;
-  }
-
   * {
     box-sizing: border-box;
     word-break: break-word;
@@ -311,6 +422,10 @@ const navItems = [
     padding: 0.25rem;
     border-radius: var(--radius);
     font-family: var(--font-mono);
+  }
+
+  :not(pre) > code {
+    color: #b84444;
   }
 
   table {
