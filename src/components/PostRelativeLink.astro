@@ -1,78 +1,100 @@
 ---
-import { Post } from '../lib/interfaces.ts'
-import { getNavLink, getPostLink } from '../lib/blog-helpers.ts'
-import PostTags from './PostTags.astro'
+import type { Post } from '../lib/interfaces.ts'
+import { getPostLink } from '../lib/blog-helpers.ts'
 
 export interface Props {
-  prevPost: Post
-  nextPost: Post
+  prevPost?: Post
+  nextPost?: Post
 }
 
 const { prevPost, nextPost } = Astro.props
 ---
 
-<div class="post-relative-link">
-  <div>
-    {
-      nextPost && (
-        <a href={getPostLink(nextPost.Slug)} class="colored">
-          <div>◀︎ Next</div>
-          <div>{nextPost.Title}</div>
-          <PostTags post={nextPost} enableLink={false} />
+{
+  (nextPost || prevPost) && (
+    <nav class="post-relative-link" aria-label="前後の記事">
+      {nextPost && (
+        <a href={getPostLink(nextPost.Slug)} class="next-post">
+          <span class="direction"><span class="arrow" aria-hidden="true">←</span> 次の記事</span>
+          <span class="title">{nextPost.Title}</span>
         </a>
-      )
-    }
-  </div>
-  <div>
-    {
-      prevPost && (
-        <a href={getPostLink(prevPost.Slug)} class="colored">
-          <div>▶︎ Previous</div>
-          <div>{prevPost.Title}</div>
-          <PostTags post={prevPost} enableLink={false} />
+      )}
+      {prevPost && (
+        <a href={getPostLink(prevPost.Slug)} class="previous-post">
+          <span class="direction">前の記事 <span class="arrow" aria-hidden="true">→</span></span>
+          <span class="title">{prevPost.Title}</span>
         </a>
-      )
-    }
-  </div>
-  <div>
-    <a href={getNavLink('/blog')} class="text">▲ Return to list</a>
-  </div>
-</div>
+      )}
+    </nav>
+  )
+}
 
 <style>
-  div.post-relative-link {
-    margin-top: 1rem;
+  .post-relative-link {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(1rem, 3vw, 2rem);
+    margin-top: 1.9rem;
   }
-  div.post-relative-link > div {
-    display: block;
-    margin-top: 0.6rem;
+
+  .post-relative-link a {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    min-width: 0;
+    min-height: 4.5rem;
+    padding: 0.6rem 0.25rem;
+    border-radius: var(--radius-small);
+    color: #3f394d;
+    text-decoration: none;
   }
-  div.post-relative-link > div > a {
-    display: block;
-    text-align: center;
-    line-height: 1.2rem;
-    font-size: 0.95rem;
+
+  .next-post {
+    grid-column: 1;
   }
-  div.post-relative-link > div > a.text {
-    margin-top: 1rem;
-    padding: 0.5rem;
+
+  .previous-post {
+    grid-column: 2;
+    text-align: right;
   }
-  div.post-relative-link > div > a.colored {
-    padding: 1rem;
-    border-radius: var(--radius);
-    color: var(--fg);
-    background: rgba(227, 226, 224, 0.5);
+
+  .direction {
+    color: #6b6478;
+    font-size: 0.82rem;
+    line-height: 1.4;
   }
-  div.post-relative-link > div > a.colored > div:first-child {
-    width: auto;
-    text-align: left;
-    font-size: 0.85rem;
+
+  .arrow {
+    color: var(--color-interaction);
   }
-  div.post-relative-link > div > a.colored > div:nth-child(2) {
-    width: auto;
-    padding: 0 0 0.4rem;
-    text-align: left;
+
+  .title {
     font-size: 1rem;
-    font-weight: bold;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  .post-relative-link a:hover .title {
+    text-decoration: underline;
+    text-decoration-color: var(--color-interaction);
+    text-underline-offset: 0.2em;
+  }
+
+  .post-relative-link a:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 640px) {
+    .post-relative-link {
+      grid-template-columns: 1fr;
+      gap: 0.65rem;
+    }
+
+    .next-post,
+    .previous-post {
+      grid-column: 1;
+      text-align: left;
+    }
   }
 </style>

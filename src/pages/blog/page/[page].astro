@@ -1,79 +1,38 @@
 ---
 import {
-  getPostsByPage,
-  getRankedPosts,
   getAllTags,
-  getNumberOfPages,
   getPostsByPage,
+  getNumberOfPages,
 } from '../../../lib/notion/client.ts'
 import Layout from '../../../layouts/Layout.astro'
-import NoContents from '../../../components/NoContents.astro'
-import PostDate from '../../../components/PostDate.astro'
-import PostTags from '../../../components/PostTags.astro'
-import PostTitle from '../../../components/PostTitle.astro'
-import PostFeaturedImage from '../../../components/PostFeaturedImage.astro'
-import PostExcerpt from '../../../components/PostExcerpt.astro'
-import ReadMoreLink from '../../../components/ReadMoreLink.astro'
-import Pagination from '../../../components/Pagination.astro'
-import BlogPostsLink from '../../../components/BlogPostsLink.astro'
-import BlogTagsLink from '../../../components/BlogTagsLink.astro'
-import styles from '../../../styles/blog.module.css'
+import BlogEditorialListing from '../../../components/BlogEditorialListing.astro'
 
 export async function getStaticPaths() {
   const numberOfPages = await getNumberOfPages()
 
-  let params = []
-  for (let i = 2; i <= numberOfPages; i++) {
-    params.push({ params: { page: i.toString() } })
-  }
-  return params
+  return Array.from({ length: Math.max(0, numberOfPages - 1) }, (_, index) => ({
+    params: { page: (index + 2).toString() },
+  }))
 }
 
-const { page } = Astro.params
+const { page = '2' } = Astro.params
+const currentPage = Number.parseInt(page, 10)
 
-const [posts, rankedPosts, tags, numberOfPages] = await Promise.all([
-  getPostsByPage(parseInt(page, 10)),
-  getRankedPosts(),
+const [posts, tags, numberOfPages] = await Promise.all([
+  getPostsByPage(currentPage),
   getAllTags(),
   getNumberOfPages(),
 ])
 ---
 
-<Layout title={`Posts ${page}/${numberOfPages}`} path={`/blog/page/${page}`}>
-  <div class={styles.container}>
-    <main>
-      <header>
-        <h2>{page}/{numberOfPages}</h2>
-      </header>
-
-      {
-        posts.length === 0 ? (
-          <NoContents contents={posts} />
-        ) : (
-          posts.map((post) => (
-            <div class={styles.post} key={post.Slug}>
-              <PostDate post={post} />
-              <PostTags post={post} />
-              <PostTitle post={post} />
-              <PostFeaturedImage post={post} />
-              <PostExcerpt post={post} />
-              <ReadMoreLink post={post} />
-            </div>
-          ))
-        )
-      }
-
-      <footer>
-        <Pagination
-          currentPage={parseInt(page, 10)}
-          numberOfPages={numberOfPages}
-        />
-      </footer>
-    </main>
-
-    <aside>
-      <BlogPostsLink heading="おすすめ" posts={rankedPosts} />
-      <BlogTagsLink heading="カテゴリ" tags={tags} />
-    </aside>
-  </div>
+<Layout
+  title={`Blog ${currentPage}/${numberOfPages}`}
+  path={`/blog/page/${currentPage}`}
+>
+  <BlogEditorialListing
+    posts={posts}
+    tags={tags}
+    currentPage={currentPage}
+    numberOfPages={numberOfPages}
+  />
 </Layout>

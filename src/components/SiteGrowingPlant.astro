@@ -1,0 +1,287 @@
+<div class="sitePlant is-seedling" data-site-plant data-stage="seedling">
+  <svg class="plantGraphic" viewBox="0 0 64 120" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">
+    <g class="plantStem" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M32 124 C34 112 34 103 32 98" />
+      <path class="plantLeaf" d="M33 100 C22 100 17 94 17 90 C26 89 31 92 33 100Z M35 106 C43 105 49 99 49 96 C42 95 37 99 35 106Z" />
+      <g class="plantGrowth plantStemGrowth">
+        <path d="M32 99 C27 76 31 53 37 40" />
+      </g>
+      <g class="plantGrowth plantExtraLeaves firstLeaves">
+        <path class="plantLeaf" d="M30 82 C17 81 11 72 12 66 C23 68 29 74 30 82Z M30 69 C40 69 48 61 49 54 C38 54 32 61 30 69Z" />
+      </g>
+      <g class="plantGrowth plantExtraLeaves lastLeaves">
+        <path class="plantLeaf" d="M33 56 C23 55 19 47 20 41 C29 43 33 49 33 56Z M36 43 C44 42 49 36 48 31 C41 31 37 36 36 43Z" />
+      </g>
+      <g class="plantFlowerStem">
+        <path d="M37 40 Q39 29 38 24" />
+      </g>
+      <g class="plantFlower">
+        <g class="flowerVariant flowerYellow">
+          <path class="plantPetals" d="M38 24 C29 23 27 17 32 15 C28 9 34 6 38 12 C41 5 47 9 44 15 C51 16 48 22 41 23 C43 29 36 31 38 24Z" />
+        </g>
+        <g class="flowerVariant flowerCoral">
+          <path class="plantPetals" d="M38 24 C33 31 27 25 32 20 C24 18 28 10 34 14 C33 6 42 6 42 14 C49 9 53 17 45 20 C50 27 43 31 38 24Z" />
+        </g>
+        <g class="flowerVariant flowerLavender plantPetals">
+          <ellipse cx="38.5" cy="12.5" rx="2.1" ry="4.6" />
+          <ellipse cx="38.5" cy="12.5" rx="2.1" ry="4.6" transform="rotate(60 38.5 18.5)" />
+          <ellipse cx="38.5" cy="12.5" rx="2.1" ry="4.6" transform="rotate(120 38.5 18.5)" />
+          <ellipse cx="38.5" cy="12.5" rx="2.1" ry="4.6" transform="rotate(180 38.5 18.5)" />
+          <ellipse cx="38.5" cy="12.5" rx="2.1" ry="4.6" transform="rotate(240 38.5 18.5)" />
+          <ellipse cx="38.5" cy="12.5" rx="2.1" ry="4.6" transform="rotate(300 38.5 18.5)" />
+        </g>
+        <g class="flowerVariant flowerIvory">
+          <path class="plantPetals" d="M38.5 24 C31 31 26 24 33 18.5 C25 12 32 6 38.5 13 C45 6 52 12 44 18.5 C51 24 46 31 38.5 24Z" />
+        </g>
+        <circle cx="38.5" cy="18.5" r="2.2" class="plantCenter" />
+      </g>
+      <g class="scatterParts" aria-hidden="true">
+        <ellipse class="scatterPetal petalOne" cx="38" cy="15" rx="2.2" ry="3.5" />
+        <ellipse class="scatterPetal petalTwo" cx="35" cy="18" rx="2.2" ry="3.5" />
+        <ellipse class="scatterPetal petalThree" cx="42" cy="19" rx="2.2" ry="3.5" />
+        <ellipse class="scatterPetal petalFour" cx="38" cy="22" rx="2.2" ry="3.5" />
+        <path class="scatterLeaf leafOne" d="M33 56 C23 55 19 47 20 41 C29 43 33 49 33 56Z" />
+        <path class="scatterLeaf leafTwo" d="M36 43 C44 42 49 36 48 31 C41 31 37 36 36 43Z" />
+        <path class="scatterLeaf leafThree" d="M30 82 C17 81 11 72 12 66 C23 68 29 74 30 82Z" />
+        <path class="scatterLeaf leafFour" d="M30 69 C40 69 48 61 49 54 C38 54 32 61 30 69Z" />
+      </g>
+    </g>
+  </svg>
+  <button class="plantPot" type="button" aria-label="ページ上部へ戻る">
+    <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+      <path class="potBody" d="M10 12 H34 L30 34 Q22 38 14 34Z" />
+      <path class="potRim" d="M8 8 Q22 6 36 8 L35 13 Q22 15 9 13Z" />
+      <path class="potHighlight" d="M15 18 L17 30" />
+    </svg>
+  </button>
+</div>
+
+<style>
+  .sitePlant {
+    --flower-fill: #f0dfab;
+    --flower-stroke: #b7a470;
+    --flower-center: #b5a173;
+    position: fixed;
+    right: max(1.5rem, env(safe-area-inset-right));
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    z-index: 1;
+    width: 84px;
+    height: 154px;
+    pointer-events: none;
+  }
+
+  .plantGraphic { display: block; width: 100%; height: calc(100% - 36px); opacity: 0.78; overflow: visible; }
+  .plantPot {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #8d816b;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+  .plantPot svg { display: block; width: 44px; height: 44px; transition: transform 180ms ease; }
+  .potBody { fill: #f5eedf; stroke: currentColor; stroke-width: 1; }
+  .potRim { fill: #eee3c9; stroke: currentColor; stroke-width: 1; }
+  .potHighlight { stroke: #fffdf6; stroke-width: 1.5; stroke-linecap: round; }
+  .plantPot:hover svg { transform: translateY(-1px); }
+  .plantPot:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 3px; }
+  .plantStem { stroke: #78816c; stroke-width: 1.1; }
+  .plantLeaf { fill: #dce5d3; fill-opacity: 0.35; }
+  .sitePlant[data-flower-variant="coral"] { --flower-fill: #efd0ce; --flower-stroke: #bd9492; --flower-center: #b8a178; }
+  .sitePlant[data-flower-variant="lavender"] { --flower-fill: #ded5ee; --flower-stroke: #a59ab9; --flower-center: #b9ab83; }
+  .sitePlant[data-flower-variant="ivory"] { --flower-fill: #eeeedd; --flower-stroke: #a6b59b; --flower-center: #a6b08e; }
+  .flowerVariant { display: none; }
+  .sitePlant:not([data-flower-variant]) .flowerYellow,
+  .sitePlant[data-flower-variant="yellow"] .flowerYellow,
+  .sitePlant[data-flower-variant="coral"] .flowerCoral,
+  .sitePlant[data-flower-variant="lavender"] .flowerLavender,
+  .sitePlant[data-flower-variant="ivory"] .flowerIvory { display: inline; }
+  .plantPetals { stroke: var(--flower-stroke); fill: var(--flower-fill); fill-opacity: 0.45; }
+  .plantCenter { stroke: none; fill: var(--flower-center); }
+
+  .plantGrowth,
+  .plantFlowerStem,
+  .plantFlower {
+    opacity: 0;
+    transform: translateY(3px);
+    transition: opacity 550ms ease, transform 550ms ease;
+  }
+
+  .is-grown .plantGrowth,
+  .is-flower .plantGrowth,
+  .is-flower .plantFlowerStem,
+  .is-flower .plantFlower { opacity: 1; transform: none; }
+
+  .scatterPetal,
+  .scatterLeaf { opacity: 0; transform-box: fill-box; transform-origin: center; }
+  .scatterPetal { fill: var(--flower-fill); stroke: var(--flower-stroke); stroke-width: 0.65; }
+  .scatterLeaf { fill: #dce5d3; fill-opacity: 0.6; }
+  .petalOne { --scatter-x: 18px; --scatter-y: -24px; --scatter-rotate: 35deg; --scatter-delay: 0ms; }
+  .petalTwo { --scatter-x: -18px; --scatter-y: -20px; --scatter-rotate: -30deg; --scatter-delay: 45ms; }
+  .petalThree { --scatter-x: 20px; --scatter-y: -8px; --scatter-rotate: 45deg; --scatter-delay: 70ms; }
+  .petalFour { --scatter-x: -22px; --scatter-y: -12px; --scatter-rotate: -40deg; --scatter-delay: 100ms; }
+  .leafOne { --scatter-x: -16px; --scatter-y: -24px; --scatter-rotate: -35deg; --scatter-delay: 180ms; }
+  .leafTwo { --scatter-x: 18px; --scatter-y: -20px; --scatter-rotate: 40deg; --scatter-delay: 220ms; }
+  .leafThree { --scatter-x: -12px; --scatter-y: -16px; --scatter-rotate: -25deg; --scatter-delay: 280ms; }
+  .leafFour { --scatter-x: 20px; --scatter-y: -12px; --scatter-rotate: 50deg; --scatter-delay: 320ms; }
+  .is-scattering[data-scatter-stage="flower"] .scatterPetal,
+  .is-scattering:not([data-scatter-stage="seedling"]) .scatterLeaf {
+    animation: scatterPlantPart 450ms var(--scatter-delay) ease-out both;
+  }
+  .is-scattering .plantFlower,
+  .is-scattering .plantExtraLeaves { transition-duration: 180ms; }
+  .is-scattering .plantStemGrowth { transition-duration: 350ms; transition-delay: 350ms; }
+  @keyframes scatterPlantPart {
+    0% { opacity: 0; transform: none; }
+    15% { opacity: 0.9; transform: translateY(-3px); }
+    60% { opacity: 0.65; }
+    100% { opacity: 0; transform: translate(var(--scatter-x), var(--scatter-y)) rotate(var(--scatter-rotate)); }
+  }
+
+  @media (max-width: 800px) {
+    .sitePlant { width: 74px; height: 136px; right: max(1.25rem, env(safe-area-inset-right)); }
+  }
+
+  @media (max-width: 640px) {
+    .sitePlant { width: 64px; height: 118px; right: max(1rem, env(safe-area-inset-right)); bottom: max(0.75rem, env(safe-area-inset-bottom)); }
+    .plantGraphic { opacity: 0.65; }
+  }
+
+  @media (max-width: 360px) {
+    .sitePlant { width: 56px; height: 106px; right: max(0.75rem, env(safe-area-inset-right)); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .plantGrowth,
+    .plantFlowerStem,
+    .plantFlower,
+    .scatterPetal,
+    .scatterLeaf,
+    .plantPot svg { transition: none; animation: none !important; transform: none; }
+  }
+</style>
+
+<script>
+  let cleanupPlant: (() => void) | undefined
+
+  function initSitePlant() {
+    cleanupPlant?.()
+    cleanupPlant = undefined
+    const plant = document.querySelector<HTMLElement>('[data-site-plant]')
+    const works = document.querySelector<HTMLElement>('#works')
+    const fromLab = document.querySelector<HTMLElement>('.fromLab')
+    const pot = plant?.querySelector<HTMLButtonElement>('.plantPot')
+    if (!plant || !pot) return
+
+    // Initial script and astro:page-load can initialize the same DOM twice.
+    // Keep its flower stable until navigation supplies a new plant element.
+    if (!plant.dataset.flowerVariant) {
+      const variants = ['yellow', 'coral', 'lavender', 'ivory']
+      plant.dataset.flowerVariant = variants[Math.floor(Math.random() * variants.length)]
+    }
+
+    let frame: number | undefined
+    let returning = false
+    let scatterTimer: ReturnType<typeof setTimeout> | undefined
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+    function clearScatter() {
+      if (scatterTimer !== undefined) clearTimeout(scatterTimer)
+      scatterTimer = undefined
+      plant!.classList.remove('is-scattering')
+      delete plant!.dataset.scatterStage
+    }
+    function updatePlant() {
+      frame = undefined
+      const threshold = window.innerHeight * 0.55
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight
+      const progress = maxScroll > 2 ? Math.max(0, Math.min(1, window.scrollY / maxScroll)) : 0
+      const positionStage = works
+        ? fromLab && fromLab.getBoundingClientRect().top <= threshold
+          ? 'flower'
+          : works.getBoundingClientRect().top <= threshold ? 'grown' : 'seedling'
+        : progress >= 0.68 ? 'flower' : progress >= 0.28 ? 'grown' : 'seedling'
+      const stage = returning ? 'seedling' : positionStage
+      const previous = plant!.dataset.stage
+      if (window.scrollY <= 2) {
+        returning = false
+        plant!.classList.remove('is-returning-top')
+      }
+      if (previous === stage) return
+      plant!.dataset.stage = stage
+      plant!.classList.remove('is-seedling', 'is-grown', 'is-flower')
+      plant!.classList.add(`is-${stage}`)
+    }
+
+    // Event-driven throttle, not a continuous animation loop. Also handles jumps
+    // across entire sections, deep links and restored scroll positions.
+    function queuePlantUpdate() {
+      if (frame === undefined) frame = window.requestAnimationFrame(updatePlant)
+    }
+
+    function returnToTop() {
+      if (returning || scatterTimer !== undefined) return
+      returning = window.scrollY > 2 && !reducedMotion.matches
+      plant!.classList.toggle('is-returning-top', returning)
+      if (returning) {
+        plant!.dataset.scatterStage = plant!.dataset.stage
+        plant!.classList.add('is-scattering')
+        scatterTimer = setTimeout(() => {
+          clearScatter()
+          queuePlantUpdate()
+        }, 850)
+      }
+      window.scrollTo({ top: 0, behavior: reducedMotion.matches ? 'instant' : 'smooth' })
+      if (frame !== undefined) window.cancelAnimationFrame(frame)
+      frame = undefined
+      updatePlant()
+    }
+
+    function interruptReturn(event: Event) {
+      if (!returning && scatterTimer === undefined) return
+      if (event instanceof KeyboardEvent && !['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(event.key)) return
+      returning = false
+      plant!.classList.remove('is-returning-top')
+      clearScatter()
+      window.scrollTo({ top: window.scrollY, behavior: 'instant' })
+      queuePlantUpdate()
+    }
+
+    pot.addEventListener('click', returnToTop)
+    window.addEventListener('scroll', queuePlantUpdate, { passive: true })
+    window.addEventListener('resize', queuePlantUpdate, { passive: true })
+    window.addEventListener('pageshow', queuePlantUpdate)
+    window.addEventListener('wheel', interruptReturn, { passive: true })
+    window.addEventListener('touchstart', interruptReturn, { passive: true })
+    window.addEventListener('keydown', interruptReturn)
+    cleanupPlant = () => {
+      pot.removeEventListener('click', returnToTop)
+      window.removeEventListener('scroll', queuePlantUpdate)
+      window.removeEventListener('resize', queuePlantUpdate)
+      window.removeEventListener('pageshow', queuePlantUpdate)
+      window.removeEventListener('wheel', interruptReturn)
+      window.removeEventListener('touchstart', interruptReturn)
+      window.removeEventListener('keydown', interruptReturn)
+      if (frame !== undefined) window.cancelAnimationFrame(frame)
+      frame = undefined
+      returning = false
+      plant!.classList.remove('is-returning-top')
+      clearScatter()
+    }
+    updatePlant()
+    queuePlantUpdate()
+  }
+
+  document.addEventListener('astro:before-swap', () => {
+    cleanupPlant?.()
+    cleanupPlant = undefined
+  })
+  document.addEventListener('astro:page-load', initSitePlant)
+  initSitePlant()
+</script>

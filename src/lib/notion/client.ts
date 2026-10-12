@@ -1,7 +1,9 @@
 import fs, { createWriteStream } from 'node:fs'
+import { randomUUID } from 'node:crypto'
 import { pipeline } from 'node:stream'
 import { promisify } from 'node:util'
 import fetch, { AbortError } from 'node-fetch'
+import { getNotionFilePathParts } from '../blog-helpers'
 import {
   NOTION_API_SECRET,
   DATABASE_ID,
@@ -349,40 +351,78 @@ export async function getAllTags(): Promise<SelectProperty[]> {
     )
 }
 
-export async function downloadFile(url: URL) {
+export async function downloadFile(url: URL): Promise<boolean> {
+  let directory: string
+  let filename: string
+  try {
+    const pathParts = getNotionFilePathParts(url)
+    directory = pathParts.directory
+    filename = pathParts.filename
+  } catch {
+    console.warn(
+      `[featured-image-downloader] Invalid image path: ${url.origin}${url.pathname}`
+    )
+    return false
+  }
+
+  const dir = `./public/notion/${directory}`
+  const filepath = `${dir}/${filename}`
+  const temporaryFilepath = `${filepath}.${randomUUID()}.tmp`
+  const safeTarget = `${url.origin}${url.pathname}`
+  const hasUsableFile = () => {
+    try {
+      const stat = fs.statSync(filepath)
+      return stat.isFile() && stat.size > 0
+    } catch {
+      return false
+    }
+  }
+
   const controller = new AbortController()
   const timeout = setTimeout(() => {
     controller.abort()
   }, REQUEST_TIMEOUT_MS)
 
-  let res!: Response
   try {
-    res = (await fetch(url.toString(), {
+    const res = (await fetch(url.toString(), {
       signal: controller.signal,
     })) as Response
-  } catch (err) {
-    if (err instanceof AbortError) {
-      console.log('File fetch request was aborted')
-      return Promise.resolve()
+
+    if (!res.ok) {
+      res.body?.destroy()
+      console.warn(
+        `[featured-image-downloader] HTTP ${res.status} for ${safeTarget}`
+      )
+      return hasUsableFile()
     }
+
+    if (!res.body) {
+      console.warn(
+        `[featured-image-downloader] Empty response for ${safeTarget}`
+      )
+      return hasUsableFile()
+    }
+
+    await fs.promises.mkdir(dir, { recursive: true })
+    await promisify(pipeline)(
+      res.body,
+      createWriteStream(temporaryFilepath, { flags: 'wx' })
+    )
+    await fs.promises.rename(temporaryFilepath, filepath)
+    return true
+  } catch (error) {
+    const reason =
+      error instanceof AbortError || controller.signal.aborted
+        ? 'request timed out'
+        : 'request or save failed'
+    console.warn(
+      `[featured-image-downloader] ${reason} for ${safeTarget}`
+    )
+    return hasUsableFile()
   } finally {
     clearTimeout(timeout)
+    await fs.promises.rm(temporaryFilepath, { force: true }).catch(() => {})
   }
-
-  if (!res || !res.body) {
-    return Promise.resolve()
-  }
-
-  const dir = './public/notion/' + url.pathname.split('/').slice(-2)[0]
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir)
-  }
-
-  const filename = decodeURIComponent(url.pathname.split('/').slice(-1)[0])
-  const filepath = `${dir}/${filename}`
-
-  const streamPipeline = promisify(pipeline)
-  return streamPipeline(res.body, createWriteStream(filepath))
 }
 
 function _buildBlock(blockObject: responses.BlockObject): Block {

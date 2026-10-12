@@ -1,0 +1,34 @@
+---
+import type { SelectProperty } from '../lib/interfaces.ts'
+import { getTagLink } from '../lib/blog-helpers.ts'
+import styles from '../styles/blog-listing.module.css'
+import '../styles/notion-color.css'
+
+export interface Props {
+  tags: SelectProperty[]
+  activeTag?: string
+}
+
+const { tags, activeTag = '' } = Astro.props
+---
+
+{
+  tags.length > 0 && (
+    <nav class={styles.tagRail} aria-label="タグから記事を探す">
+      <h2>タグから探す</h2>
+      <ul>
+        {tags.map((tag) => (
+          <li>
+            <a
+              href={getTagLink(tag.name)}
+              class={`tag ${tag.color}`}
+              aria-current={tag.name === activeTag ? 'page' : undefined}
+            >
+              {tag.name}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}

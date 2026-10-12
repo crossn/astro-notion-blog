@@ -1,19 +1,29 @@
 ---
 import { Post } from '../lib/interfaces.ts'
-import { filePath } from '../lib/blog-helpers'
+import { existsSync } from 'node:fs'
+import { filePath, getNotionFilePathParts } from '../lib/blog-helpers'
 
 export interface Props {
   post: Post
+  alt?: string
 }
 
-const { post } = Astro.props
+const { post, alt = 'post-featured-image' } = Astro.props
 
 let image = ''
 if (post.FeaturedImage && post.FeaturedImage.Url) {
   if (import.meta.env.DEV) {
     image = post.FeaturedImage.Url
   } else {
-    image = filePath(new URL(post.FeaturedImage.Url))
+    try {
+      const url = new URL(post.FeaturedImage.Url)
+      const { directory, filename } = getNotionFilePathParts(url)
+      if (existsSync(`public/notion/${directory}/${filename}`)) {
+        image = filePath(url)
+      }
+    } catch {
+      // Keep the post visible when its optional featured image is unavailable.
+    }
   }
 }
 ---
@@ -21,7 +31,7 @@ if (post.FeaturedImage && post.FeaturedImage.Url) {
 {
   image && (
     <div class="post-featured-image">
-      <img src={image} alt="post-featured-image" />
+      <img src={image} alt={alt} />
     </div>
   )
 }

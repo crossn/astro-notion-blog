@@ -38,12 +38,17 @@ const { items } = Astro.props
 
 <script is:inline data-astro-rerun>
   (() => {
+    const cleanupKey = '__tsukurunBlogTocCleanup'
+    if (typeof window[cleanupKey] === 'function') window[cleanupKey]()
+
     const links = Array.from(document.querySelectorAll('.blog-toc__link'))
     if (!links.length) return
 
     const toc = links[0].closest('.blog-toc')
     const scrollContainer = toc?.querySelector('.blog-toc__scroll')
     let currentActiveLink = null
+    let activeFrame = null
+    let updateFrame = null
 
     const scrollActiveIntoToc = (activeLink) => {
       if (!scrollContainer || !(activeLink instanceof HTMLElement)) return
@@ -85,7 +90,11 @@ const { items } = Astro.props
       })
 
       if (activeChanged) {
-        window.requestAnimationFrame(() => scrollActiveIntoToc(activeLink))
+        if (activeFrame !== null) window.cancelAnimationFrame(activeFrame)
+        activeFrame = window.requestAnimationFrame(() => {
+          activeFrame = null
+          scrollActiveIntoToc(activeLink)
+        })
       }
     }
 
@@ -93,6 +102,7 @@ const { items } = Astro.props
     const topOffset = 16
 
     const updateActive = () => {
+      updateFrame = null
       ticking = false
       const currentY = window.scrollY + topOffset
       let active = sections[0]
@@ -113,9 +123,24 @@ const { items } = Astro.props
     const requestUpdate = () => {
       if (ticking) return
       ticking = true
-      window.requestAnimationFrame(updateActive)
+      updateFrame = window.requestAnimationFrame(updateActive)
     }
 
+    const cleanup = () => {
+      window.removeEventListener('scroll', requestUpdate)
+      window.removeEventListener('resize', requestUpdate)
+      window.removeEventListener('hashchange', requestUpdate)
+      document.removeEventListener('astro:before-swap', cleanup)
+      if (activeFrame !== null) window.cancelAnimationFrame(activeFrame)
+      if (updateFrame !== null) window.cancelAnimationFrame(updateFrame)
+      activeFrame = null
+      updateFrame = null
+      ticking = false
+      if (window[cleanupKey] === cleanup) delete window[cleanupKey]
+    }
+
+    window[cleanupKey] = cleanup
+    document.addEventListener('astro:before-swap', cleanup, { once: true })
     window.addEventListener('scroll', requestUpdate, { passive: true })
     window.addEventListener('resize', requestUpdate)
     window.addEventListener('hashchange', requestUpdate)
@@ -131,20 +156,20 @@ const { items } = Astro.props
     box-sizing: border-box;
     width: 100%;
     max-height: min(720px, calc(100vh - 3rem));
-    padding: 1.1rem;
+    padding: 0.35rem 0.15rem 0.35rem 0.5rem;
     overflow: hidden;
-    border: 1px solid rgba(124, 108, 242, 0.14);
-    border-radius: 18px;
+    border: 0;
+    border-radius: 0;
     color: #6b6478;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(250, 247, 255, 0.72));
-    box-shadow: 0 18px 44px rgba(76, 60, 120, 0.08);
+    background: transparent;
+    box-shadow: none;
   }
 
   .blog-toc__title {
-    margin: 0 0 0.85rem;
-    color: #3f394d;
-    font-size: 1rem;
-    font-weight: 700;
+    margin: 0 0 0.65rem;
+    color: #655f70;
+    font-size: 0.88rem;
+    font-weight: 600;
     letter-spacing: 0.04em;
   }
 
@@ -281,7 +306,7 @@ const { items } = Astro.props
     text-overflow: ellipsis;
   }
 
-  @media (max-width: 1320px) {
+  @media (max-width: 1140px) {
     .blog-toc {
       position: relative;
       right: 0;
@@ -291,10 +316,10 @@ const { items } = Astro.props
       max-height: min(720px, calc(100vh - 3rem));
       margin-left: 0;
       padding: 0.6rem 0;
-      border: 1px solid rgba(124, 108, 242, 0.14);
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.78);
-      box-shadow: 0 16px 36px rgba(76, 60, 120, 0.08);
+      border: 1px solid rgba(124, 108, 242, 0.12);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.68);
+      box-shadow: none;
       transition:
         width 180ms ease,
         padding 180ms ease,
@@ -305,9 +330,9 @@ const { items } = Astro.props
     .blog-toc:focus-within {
       width: min(300px, calc(100vw - 2rem));
       padding: 1.1rem;
-      border-color: rgba(124, 108, 242, 0.14);
-      border-radius: 18px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(250, 247, 255, 0.9));
+      border-color: rgba(124, 108, 242, 0.12);
+      border-radius: 12px;
+      background: var(--color-paper);
     }
 
     .blog-toc__title,
@@ -392,6 +417,22 @@ const { items } = Astro.props
     .blog-toc:focus-within .blog-toc__text {
       width: auto;
       padding: 0.18rem 0.35rem 0.18rem 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .blog-toc,
+    .blog-toc__link,
+    .blog-toc__marker,
+    .blog-toc__title,
+    .blog-toc__text {
+      transition: none;
+    }
+
+    .blog-toc__link:hover .blog-toc__marker,
+    .blog-toc__link:focus-visible .blog-toc__marker,
+    .blog-toc__link.is-active .blog-toc__marker {
+      transform: none;
     }
   }
 </style>
