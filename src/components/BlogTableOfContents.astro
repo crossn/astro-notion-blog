@@ -99,7 +99,8 @@ const { items } = Astro.props
     }
 
     let ticking = false
-    const topOffset = 16
+    const headerBottom = document.querySelector('header')?.getBoundingClientRect().bottom ?? 64
+    const topOffset = headerBottom + 17
 
     const updateActive = () => {
       updateFrame = null

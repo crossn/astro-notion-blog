@@ -43,7 +43,7 @@
 .container > .tocSidebar {
   grid-area: toc;
   position: sticky;
-  top: 1.5rem;
+  top: 5rem;
   align-self: start;
   justify-self: stretch;
   min-width: 0;
@@ -153,6 +153,10 @@
   padding: 1rem 0 0;
   color: #373241;
   line-height: 1.85;
+}
+
+.post :global(.post-body a[id]) {
+  scroll-margin-top: 5rem;
 }
 
 .post :global(.post-body > *) {

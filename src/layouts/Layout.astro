@@ -65,7 +65,7 @@ const navItems = [
   </head>
   <body>
     <GoogleAnalytics trackingId={PUBLIC_GA_TRACKING_ID} />
-    <header class="header" style={{ position: 'relative', zIndex: 2 }}>
+    <header class="header">
       <div class="site-title">
         <a href={getNavLink('/')}>
           <svg class="brandSprig" viewBox="0 0 48 48" fill="none" aria-hidden="true" focusable="false">
@@ -130,7 +130,9 @@ const navItems = [
 
 <style>
   .header {
-    position: relative;
+    position: sticky;
+    top: 0;
+    z-index: 10;
     display: flex;
     width: min(68rem, calc(100% - 2.5rem));
     min-height: 64px;
@@ -140,7 +142,7 @@ const navItems = [
     gap: 0.75rem;
     margin: 0 auto;
     padding: 0.45rem 0;
-    background: transparent;
+    background: var(--surface-canvas-warm);
   }
   .header::after {
     position: absolute;
@@ -242,10 +244,6 @@ const navItems = [
   .header nav li :global(a:focus-visible) {
     border-radius: var(--radius-small);
   }
-  @media (max-width: 360px) {
-    .brandSprig { display: none; }
-  }
-
   .container {
     width: 100%;
     padding: 0 var(--space-page-gutter);
