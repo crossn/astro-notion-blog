@@ -1,5 +1,6 @@
 import { defineConfig } from 'astro/config';
 import { loadEnv } from 'vite';
+import sitemap from '@astrojs/sitemap';
 
 // Integrations run in Node during config/build startup, before Vite exposes
 // import.meta.env to site modules. Load the same mode-specific .env values into
@@ -30,6 +31,9 @@ const getSite = function () {
   return new URL(BASE_PATH, `https://${productionDomain}`).toString();
 };
 
+const isProduction =
+  Boolean(process.env.CF_PAGES) && process.env.CF_PAGES_BRANCH === 'main';
+
 // https://astro.build/config
 export default defineConfig({
   site: getSite(),
@@ -38,5 +42,19 @@ export default defineConfig({
   build: {
     inlineStylesheets: 'never',
   },
-  integrations: [FeaturedImageDownloader(), PublicNotionCopier()],
+  integrations: [
+    FeaturedImageDownloader(),
+    PublicNotionCopier(),
+    ...(isProduction
+      ? [sitemap({
+          // Match the existing canonical URLs without changing page routes.
+          serialize(item) {
+            if (new URL(item.url).pathname !== '/') {
+              item.url = item.url.replace(/\/$/, '');
+            }
+            return item;
+          },
+        })]
+      : []),
+  ],
 });
