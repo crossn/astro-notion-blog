@@ -1,6 +1,20 @@
 // Offline build fixture. Preload only in tests; never reads or writes real Notion.
 import assert from 'node:assert/strict'
+import http from 'node:http'
+import https from 'node:https'
+import { syncBuiltinESMExports } from 'node:module'
 import { Client } from '@notionhq/client'
+
+// Fail closed if any build code bypasses the SDK stub below.
+const rejectNetwork = () => {
+  throw new Error('Network access is disabled in the offline SEO fixture')
+}
+for (const transport of [http, https]) {
+  transport.request = rejectNetwork
+  transport.get = rejectNetwork
+}
+syncBuiltinESMExports()
+globalThis.fetch = rejectNetwork
 
 const slugs = [
   'notion-codex-skill-sync', 'chatgpt-codex-development-workflow',

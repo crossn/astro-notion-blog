@@ -127,3 +127,47 @@ git diff --check
 - 自動検証で未確認: 実Notion最新データ、今回のCloudflare配信、検索登録・検索順位・流入増加、実利用時のLike/Signals。本PRはSEO効果の測定結果を含まない。
 - PR完成までの技術的blocker: なし。実データ・配信確認はレビュー項目として残す。
 - 作業開始: 2026-10-24 13:34:15 JST。最終検証完了: 13:42:16 JST（clockツールの差分8分1秒、commit / push / PR作成の時間は含まない）。利用token・料金・人間の作業時間は未計測。
+
+## PR #19 第三者レビュー対応（2026-10-24）
+
+### 追加変更と検証
+
+既存ESLint / Buildを維持し、同じCI workflowへ`SEO (production)` / `SEO (preview)`のmatrixを追加した。実NotionのSecretは参照しない。各ジョブでnpm ci後、NODE_OPTIONSで既存fixtureを読み込み、CF_PAGES=1・branch=mainまたはseo-reviewでbuildし、既存のPython検証を実行する。
+
+fixtureにはHTTP / HTTPSのrequest / getとglobal fetchを拒否するガードを追加した。SDKのrequest置換で想定外の呼び出しも拒否する。テストデータに画像・外部埋込はなく、build中の実Notionアクセスは不要。Node標準モジュールのnamed exportにもガードを反映する。インストール用ネットワークはnpm ciの段階に限り必要であり、実Notionへの認証・接続とは分ける。
+
+ローカルのNode 22.16.0 / npm 10.8.2でnpm ci・lint・通常buildが成功。本番相当 / Preview相当は各7成功・baseline比較1 skip（既存の変更前後比較は今回再実施しない）。HTTP / HTTPS / fetchの拒否も個別に確認。新しいGitHub CIの結果はPR本文とチャットの完了報告へ記録する。サイト実装、canonical、RSS、記事URL、package-lockは今回変更しない。
+
+### URL正規化の調査（read-only）
+
+再確認した本番の`/blog`、`/blog/notion-codex-skill-sync`、`/blog/tag/AI`、`/blog/page/2`は、末尾`/`付きへ308。Blogと記事の転送先は200。
+
+Astroではbuild.formatの上書きがなく、既定のdirectory形式で`blog/<slug>/index.html`等を生成する。一方、`pathJoin`は空のpath要素を除去するため、getPostLink / getTagLink / getPageLink等は末尾slashなしを返す。Layoutも受け取ったpathからcanonical / og:urlを生成し、Blog / tag / paginationのpathは直接slashなしで指定される。本PRのsitemap serializeもその既存canonicalに合わせている。独自_redirectsはrepoにない。
+
+[Cloudflare Pagesの配信仕様](https://developers.cloudflare.com/pages/configuration/serving-pages/)ではdirectory indexの正規配信URLを`/about/`として説明しており、生成形式・実HTTPと一致する。Cloudflare管理画面の追加ルールは閲覧できていないため、その不存在までは断定しない。
+
+Googleの説明では[redirectとrel=canonicalは強いシグナル、sitemapは弱いシグナル](https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls)。[308は永続転送として転送先の正規化を示す](https://developers.google.com/search/docs/crawling-indexing/301-redirects)。現在はredirectがslashあり、canonical / sitemapがslashなしを示しており、シグナルが競合する。Googleが指定canonicalを採用しない可能性や余分な転送はあるが、実際の採用URLや順位・流入への影響はSearch Console未接続のため未確認。ペナルティや順位低下は断定しない。
+
+別PRでは**現在200を返す末尾slashありをHTMLページの正規URLとする**ことを推奨する。slashなしを選ぶ場合は、Astroの出力形式やCloudflareの配信・redirectの再設計が必要になるため範囲が広い。
+
+別PRの変更候補:
+
+- HTMLページ専用のURL正規化を導入し、Layoutのcanonical / og:url、Home / Blog / article / tag / paginationの内部リンクを揃える。pathJoinを一律変更するとassetやAPIにも波及するため避ける。navのactive判定も回帰確認する。
+- sitemap serializeのslash除去を見直し、canonical集合・200最終URLとの一致を検証する。
+- RSS linkをslashありへ揃える場合、`@astrojs/rss`がlinkからguidも生成することに注意する。既存guidを明示的に維持する方法を検証し、購読者への重複配信を防ぐ。`/feed`・`/rss.xml`というfeed自体のURLは維持する。
+- 旧slashなしURLの308継続と、転送ループがないことを確認する。slug、Notionデータ、Like/Signalsのslug key、API・assetのURLは変えない。
+- タグの日本語エンコード、query/hash、Preview/local、BASE_PATH、RSS guid、全HTML内部リンクを対象に回帰確認する。404は引き続き別課題とする。
+
+### PreviewとProduction branchの確認範囲
+
+調査時のPR head `ab0751a432c437536a156d1d16425adeb1d89cfa`にはESLint / Buildの成功checkだけがあり、Cloudflare check・Preview案内コメントはない。GitHub deployment APIもbranch指定・SHA指定とも0件だった。
+
+`fix-seo-discovery-foundation.tsukurun-lab.pages.dev`という候補aliasへread-onlyで問い合わせたが、Home / sitemap-index.xmlは404。robots.txtだけは200 / text/plainでCloudflareのContent Signalsの説明を返し、アプリのDisallowを確認する応答ではなかった。候補aliasをPR #19のPreviewと認定しない。**PRに紐づくPreviewは発見できず、要求された3つのHTTP確認は未確認**。手動deployは実施しない。
+
+mainには過去のCloudflare Pages成功checkがあるが、これはProduction branchの現在の設定値を証明しない。利用可能なCloudflare connector / runtime credentialがなく、Production branch設定は未確認。人間レビューでCloudflare PagesのProduction branch=mainを確認する必要がある。
+
+### @types/nodeの影響評価
+
+追加したsitemap@9.0.1が`@types/node ^24.9.2`を要求し、lockでは24.19.2へdedupeされている。npm lsではsitemapだけでなくvite / @types/node-fetchもこの型を参照する。
+
+これはTypeScriptの型定義の変更であり、Node実行環境を24へ変更するものではない。アプリのNode 22.16.0 / npm 10.8.2でinstall / lint / buildは成功している。現在のCIに独立したtypecheckはなく、Astro buildは完全な型検証を代替しない。将来Node 24専用APIを誤って型上利用可能と扱うリスクは残る。必要なら別の依存整理でプロジェクト用@types/nodeを22系へ明示し、sitemap用24系をnestedにする案を検討する。今回の軽微なCI追加ではlockや依存を再変更しない。
